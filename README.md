@@ -5,7 +5,7 @@
   - API validation using Express Validator [https://github.com/express-validator/express-validator]
   - Doc generation through Swagger ([https://swagger.io/])
 
-# Quickstart
+## Quickstart
 Here is a basic example:
 
 ```
@@ -35,7 +35,7 @@ Running this node script will start an Express app on port 8080. A GET request o
 }
 ```
 
-# Routing by convention
+## Routing by convention
 It is easy to create routes and nested routes using Expressive. Here are some points:
   - The ExpressApp class takes a 'router' parameter in its constructor
   - This 'router' object looks like this:
