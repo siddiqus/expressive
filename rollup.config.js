@@ -1,6 +1,7 @@
 const resolve = require("rollup-plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
 const commonjs = require("rollup-plugin-commonjs");
+const builtins = require("rollup-plugin-node-builtins");
 
 const dependencies = Object.keys(require("./package.json").dependencies);
 module.exports = {
@@ -16,7 +17,8 @@ module.exports = {
             }
         }),
         commonjs(),
-        terser()
+        terser(),
+        builtins()
     ],
     external: dependencies
 }
