@@ -96,8 +96,52 @@ We need to define a router object as follows:
 }
 ```
 
-# Express App Configuration with middleware and error handling
-tbd
+### Express App Configuration with middleware and error handling
+The ExpressApp class constructor's second parameter is a configuration object that looks like this: 
+```
+{
+    swaggerHeader = null, // this is an optional JSON with the basic swagger info e.g. name, basepath, etc.
+    swaggerDefinitions, // this is an optional JSON for the swagger model definitions
+    allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
+    middlewares = null, // Array of express middlewares can be provided (optional)
+    errorMiddleware = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
+    basePath = "/", // Root path of the api, default "/"
+}
+```
 
-# Documentation with Swagger syntax
-tbd
+### Documentation with Swagger syntax
+Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
+Example:
+```
+{
+    path: "/hello",
+    method: "get",
+    controller: async (req, res) => res.json({ hello:"world" }),
+    doc: helloDoc // json in swagger syntax
+}
+```
+
+The 'doc' property could be an object like this:
+```
+{
+    "tags": [
+        "Hello"
+    ],
+    "description": "Say hello.",
+    "responses": {
+        "200": {
+            "description": "Say hello.",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "hello": {
+                        "type": "string",
+                        "example": "world"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
