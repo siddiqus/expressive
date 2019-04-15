@@ -13,11 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "4.16.3",
     "cors": "2.8.4",
+    "express": "4.16.3",
     "express-validator": "5.3.0",
     "swagger-ui-express": "4.0.1",
-    "unirest": "0.5.1"
+    "unirest": "0.6.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
