@@ -3,9 +3,10 @@
   - Templated Routing
   - Pluggable middleware
   - API validation using Express Validator [https://github.com/express-validator/express-validator]
+  - Centralized error handling
   - Doc generation through Swagger ([https://swagger.io/])
 
-# Quickstart
+## Quickstart
 Here is a basic example:
 
 ```
@@ -34,8 +35,10 @@ Running this node script will start an Express app on port 8080. A GET request o
     "hello": "world"
 }
 ```
+**Notice that the express app is the *express* property of the *app* object.**
 
-# Routing by convention
+
+## Routing by convention
 It is easy to create routes and nested routes using Expressive. Here are some points:
   - The ExpressApp class takes a 'router' parameter in its constructor
   - This 'router' object looks like this:
@@ -48,9 +51,11 @@ It is easy to create routes and nested routes using Expressive. Here are some po
   - Each object in the *routes* array looks like this:
     ```
     {
-        path: '/some/path',
-        method: "get", // or put, post, delete,
-        controller: someFunction // express request handler e.g. function (req, res, next) => { }
+        path: '/some/path', // required - relative end path of endpoint
+        method: "get", // required - request HTTP method
+        controller: someFunction, // required - express request handler e.g. function (req, res, next) => { }
+        validator: someValidatorArray, // optional - validator array in express-validator format
+        errorHandler: someHandler // optional - express middleware function for error handling, e.g. function(err, req, res, next){}
     }
     ```
   - Each object in the *subroutes* array looks like this:
@@ -110,6 +115,39 @@ The ExpressApp class constructor's second parameter is a configuration object th
 }
 ```
 
+### Centralized error handling
+The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
+```
+const app = new expressive.ExpressApp(router, {
+  errorMiddleware: (error, req, res, next) => {
+      res.status(500);
+      res.send({
+        message: "There was an internal error."
+      });
+  }
+}
+```
+
+Error handling can be overridden for individual endpoints using the 'errorHandler' property in the route object. Example:
+```
+{
+    method: RestMethods.GET,
+    path: "/users/:userId",
+    controller: GetSpecificUser,
+    validator: UserIdParamValidator,
+    errorHandler: function customErrorHandler(err, req, res, next) {
+        if (err.message == "Could not find user") {
+            res.status(404);
+            res.send("Not found");
+        } else {
+            res.status(500);
+            res.send("Internal server error");
+        }
+        next();
+    }
+}
+```
+
 ### Express validation using express-validator
 Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
 ```
@@ -158,3 +196,5 @@ The 'doc' property could be an object like this:
 }
 ```
 
+### Example
+See the 'example' folder in this repo.
