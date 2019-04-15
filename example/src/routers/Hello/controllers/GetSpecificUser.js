@@ -19,7 +19,7 @@ const users = [
 module.exports = async function (req, res) {
     const userId = req.params.userId;
     if (userId > users.length) {
-        res.json(null);
+        throw new Error("Could not find user");
     } else {
         res.json(users[userId]);
     }

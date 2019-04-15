@@ -10,20 +10,24 @@ export default class RouterFactory {
         } else return false;
     }
 
-    _getWrappedController(controller) {
+    _getWrappedController(controller, errorHandler = null) {
         return async (req, res, next) => {
             try {
                 if (!this._hasValidationErrors(req, res)) {
                     await controller(req, res, next);
                 }
             } catch (e) {
-                next(e);
+                if(errorHandler){
+                    errorHandler(e, req, res, next);
+                } else {
+                    next(e);
+                }
             }
         }
     }
 
-    _registerRoute(router, { method, path, controller, validator = [] }) {
-        router[method](path, validator, this._getWrappedController(controller));
+    _registerRoute(router, { method, path, controller, validator = [], errorHandler = null }) {
+        router[method](path, validator, this._getWrappedController(controller, errorHandler));
     }
 
     _registerSubroute(router, { path, router: subrouter, validator = [] }) {
