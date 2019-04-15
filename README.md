@@ -1,7 +1,8 @@
 # Expressive
-**Expressive** is a NodeJS API framework built on ExpressJs, bootstrapped with conventions to minimize code. This includes:
+**Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
   - Templated Routing
   - Pluggable middleware
+  - API validation using Express Validator [https://github.com/express-validator/express-validator]
   - Doc generation through Swagger ([https://swagger.io/])
 
 # Quickstart
@@ -108,6 +109,18 @@ The ExpressApp class constructor's second parameter is a configuration object th
     basePath = "/", // Root path of the api, default "/"
 }
 ```
+
+### Express validation using express-validator
+Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
+```
+{
+  path: "/hello",
+  method: "get",
+  controller: someFunction, // express request handler
+  validator: someValidator // optional validator -> an array as defined by Express Validator conventions
+}
+```
+
 
 ### Documentation with Swagger syntax
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
