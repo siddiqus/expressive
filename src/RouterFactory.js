@@ -34,8 +34,12 @@ export default class RouterFactory {
         router.use(path, validator, this.getExpressRouter(subrouter));
     }
 
+    _getRouter(){
+        return Router({ mergeParams: true });
+    }
+
     getExpressRouter(routeConfigs) {
-        const router = Router({ mergeParams: true });
+        const router = this._getRouter();
 
         if (routeConfigs.routes) {
             routeConfigs.routes.forEach((routeConf) => {
