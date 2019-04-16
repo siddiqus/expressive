@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && babel src/framework --out-dir dist --copy-files --ignore **/*.test.js",
     "test": "jest --watch",
     "coverage": "jest --coverage",
     "rollup": "rollup -c"
