@@ -2,7 +2,7 @@ const { RestMethods } = require("../../../lib/expressive.bundle");
 const GetUsers = require("./controllers/GetUsers");
 const Hello = require("./controllers/Hello");
 const HelloDocs = require("./docs/HelloDocs");
-const GetSpecificUser = require("./controllers/GetSpecificUser");
+const GetUserById = require("./controllers/GetUserById");
 const UserIdParamValidator = require("./validators/UserIdParamValidator");
 
 function customErrorHandler(err, req, res, next) {
@@ -32,7 +32,7 @@ module.exports = {
         {
             method: RestMethods.GET,
             path: "/users/:userId",
-            controller: GetSpecificUser,
+            controller: GetUserById,
             validator: UserIdParamValidator,
             errorHandler: customErrorHandler
         }
