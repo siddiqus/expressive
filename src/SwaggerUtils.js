@@ -41,7 +41,37 @@ function writeSwaggerJson(router, swaggerHeader, output) {
     fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));
 }
 
+function getSwaggerHeader(
+    basePath = "/",
+    swaggerInfo = {
+        version: "1.0.0",
+        title: "Expressive API",
+        contact: {
+            name: "Author",
+            email: "Your email address",
+            url: ""
+        }
+    }
+) {
+    return {
+        "swagger": "2.0",
+        "info": swaggerInfo,
+        "basePath": basePath,
+        "schemes": [
+            "http",
+            "https"
+        ],
+        "consumes": [
+            "application/json"
+        ],
+        "produces": [
+            "application/json"
+        ]
+    }
+}
+
 export default {
+    getSwaggerHeader,
     registerExpress,
     convertDocsToSwaggerDoc,
     writeSwaggerJson

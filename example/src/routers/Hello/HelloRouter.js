@@ -1,4 +1,4 @@
-const { RestMethods } = require("../../../lib/expressive.bundle");
+const { RestMethods } = require("../../../lib/expressive");
 const GetUsers = require("./controllers/GetUsers");
 const Hello = require("./controllers/Hello");
 const HelloDocs = require("./docs/HelloDocs");

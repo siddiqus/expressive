@@ -5,30 +5,41 @@ import SwaggerUtils from "./SwaggerUtils";
 
 export default class ExpressApp {
     constructor(router, {
-        swaggerHeader = null,
+        basePath = "/",
+        showSwaggerOnlyInDev = true,
+        swaggerInfo = undefined,
         swaggerDefinitions,
         allowCors = false,
         middlewares = null,
-        errorMiddleware = null,
-        basePath = "/"
+        errorMiddleware = null
     }) {
         this.config = {
+            swaggerInfo,
+            showSwaggerOnlyInDev,
+            swaggerDefinitions,
             basePath,
-            swaggerHeader, swaggerDefinitions,
             allowCors,
-            middlewares, errorMiddleware
+            middlewares,
+            errorMiddleware
         };
         this.router = router;
         this.express = Express();
         this.register_routes();
     }
 
+    _registerSwagger() {
+        const swaggerHeader = SwaggerUtils.getSwaggerHeader(
+            this.config.basePath, this.config.swaggerInfo
+        );
+        const swaggerJson = SwaggerUtils.convertDocsToSwaggerDoc(
+            this.router, swaggerHeader, this.config.swaggerDefinitions
+        );
+        SwaggerUtils.registerExpress(this.express, swaggerJson);
+    }
+
     register_routes() {
-        if (this.config.swaggerHeader && process.env.NODE_ENV === "development") {
-            const swaggerJson = SwaggerUtils.convertDocsToSwaggerDoc(
-                this.router, this.config.swaggerHeader, this.config.swaggerDefinitions
-            );
-            SwaggerUtils.registerExpress(this.express, swaggerJson);
+        if (this.config.showSwaggerOnlyInDev) {
+            this._registerSwagger()
         }
 
         if (this.config.allowCors) {

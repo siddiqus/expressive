@@ -1,13 +1,20 @@
 
-const expressive = require("./lib/expressive.bundle");
+const expressive = require("./lib/expressive");
 const router = require("./src/router");
-const swaggerHeader = require("./src/docs/SwaggerHeader.json");
-
 const port = process.env.PORT || 8080;
+
+const swaggerInfo = {
+    version: "1.0.0",
+    title: "Example Expressive App",
+    contact: {
+        name: "Sabbir Siddiqui",
+        email: "sabbir.m.siddiqui@gmail.com"
+    }
+};
 
 const app = new expressive.ExpressApp(router, {
     allowCors: true,
-    swaggerHeader
+    swaggerInfo
 });
 
 app.express.listen(port, () => console.log("Listening on port " + port));

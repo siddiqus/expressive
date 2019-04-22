@@ -7,7 +7,7 @@ const dependencies = Object.keys(require("./package.json").dependencies);
 module.exports = {
     input: "src/index.js",
     output: {
-        file: "dist/expressive.bundle.js",
+        file: "dist/expressive.js",
         format: "cjs"
     },
     plugins: [
