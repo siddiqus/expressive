@@ -1,10 +1,16 @@
 # Expressive
 **Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
   - Templated Routing
+    - Write APIs with declarative endpoints (including nested endpoints) easily
   - Pluggable middleware
+    - Just like Express, inject own middleware functions
   - API validation using Express Validator [https://github.com/express-validator/express-validator]
+    - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
+    - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
   - Doc generation through Swagger ([https://swagger.io/])
+    - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
+    - Swagger doc can be viewed in development at http://localhost:8080/docs
 
 ## Quickstart
 Here is a basic example:
@@ -194,6 +200,19 @@ The 'doc' property could be an object like this:
         }
     }
 }
+```
+In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in *Dev*).
+
+--- 
+To create a swagger.json file, the function *writeSwaggerJson* can be used from the *SwaggerUtils* export. Example:
+
+```
+const { SwaggerUtils } = require("expressive");
+SwaggerUtils.writeSwaggerJson(
+  router, // express router configuration
+  swaggerHeader, // json for basic Swagger info
+  outputPath // absolute path of output file
+)
 ```
 
 ### Example
