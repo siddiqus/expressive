@@ -1,15 +1,21 @@
 # Expressive
 **Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
   - Templated Routing
+    - Write APIs with declarative endpoints (including nested endpoints) easily
   - Pluggable middleware
+    - Just like Express, inject own middleware functions
   - API validation using Express Validator [https://github.com/express-validator/express-validator]
+    - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
+    - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
   - Doc generation through Swagger ([https://swagger.io/])
+    - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
+    - Swagger doc can be viewed in development at http://localhost:8080/docs
 
 ## Quickstart
 Here is a basic example:
 
-```
+```javascript
 const expressive = require("./lib/expressive");
 const router = {
     routes: [
@@ -30,7 +36,7 @@ const port = process.env.PORT || 8080;
 app.express.listen(port, () => console.log("Listening on port " + port));
 ```
 Running this node script will start an Express app on port 8080. A GET request on [http://localhost:8080/hello] will return the following JSON response
-```
+```json
 {
     "hello": "world"
 }
@@ -42,14 +48,14 @@ Running this node script will start an Express app on port 8080. A GET request o
 It is easy to create routes and nested routes using Expressive. Here are some points:
   - The ExpressApp class takes a 'router' parameter in its constructor
   - This 'router' object looks like this:
-    ```
+    ```javascript
     {
         routes: [],
         subroutes: []
     }
     ```
   - Each object in the *routes* array looks like this:
-    ```
+    ```javascript
     {
         path: '/some/path', // required - relative end path of endpoint
         method: "get", // required - request HTTP method
@@ -59,7 +65,7 @@ It is easy to create routes and nested routes using Expressive. Here are some po
     }
     ```
   - Each object in the *subroutes* array looks like this:
-    ```
+    ```javascript
     {
        path: "/some/sub/path",
        router: someRouter // this is also a router object
@@ -71,7 +77,7 @@ Let's say we want to create the following routes:
   - POST /hello/users
 
 We need to define a router object as follows:
-```
+```javascript
 {
     subroutes: [
         {
@@ -104,7 +110,7 @@ We need to define a router object as follows:
 
 ### Express App Configuration with middleware and error handling
 The ExpressApp class constructor's second parameter is a configuration object that looks like this: 
-```
+```javascript
 {
     swaggerHeader = null, // this is an optional JSON with the basic swagger info e.g. name, basepath, etc.
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
@@ -117,7 +123,7 @@ The ExpressApp class constructor's second parameter is a configuration object th
 
 ### Centralized error handling
 The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
-```
+```javascript
 const app = new expressive.ExpressApp(router, {
   errorMiddleware: (error, req, res, next) => {
       res.status(500);
@@ -129,7 +135,7 @@ const app = new expressive.ExpressApp(router, {
 ```
 
 Error handling can be overridden for individual endpoints using the 'errorHandler' property in the route object. Example:
-```
+```javascript
 {
     method: RestMethods.GET,
     path: "/users/:userId",
@@ -150,7 +156,7 @@ Error handling can be overridden for individual endpoints using the 'errorHandle
 
 ### Express validation using express-validator
 Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
-```
+```javascript
 {
   path: "/hello",
   method: "get",
@@ -163,7 +169,7 @@ Expressive uses express-validator [https://github.com/express-validator/express-
 ### Documentation with Swagger syntax
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
-```
+```javascript
 {
     path: "/hello",
     method: "get",
@@ -173,7 +179,7 @@ Example:
 ```
 
 The 'doc' property could be an object like this:
-```
+```javascript
 {
     "tags": [
         "Hello"
@@ -194,6 +200,19 @@ The 'doc' property could be an object like this:
         }
     }
 }
+```
+In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in *Dev*).
+
+--- 
+To create a swagger.json file, the function *writeSwaggerJson* can be used from the *SwaggerUtils* export. Example:
+
+```javascript
+const { SwaggerUtils } = require("expressive");
+SwaggerUtils.writeSwaggerJson(
+  router, // express router configuration
+  swaggerHeader, // json for basic Swagger info
+  outputPath // absolute path of output file
+)
 ```
 
 ### Example
