@@ -112,7 +112,7 @@ We need to define a router object as follows:
 The ExpressApp class constructor's second parameter is a configuration object that looks like this: 
 ```javascript
 {
-    swaggerHeader = null, // this is an optional JSON with the basic swagger info e.g. name, basepath, etc.
+    swaggerInfo = null, // this is an optional JSON with the basic swagger info detailed later
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
     allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
     middlewares = null, // Array of express middlewares can be provided (optional)
@@ -203,14 +203,39 @@ The 'doc' property could be an object like this:
 ```
 In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in *Dev*).
 
---- 
+---
+
+You can initialize your app with the basic swagger 'info' property as shown below:
+```javascript
+const swaggerInfo = {
+    version: "1.0.0",
+    title: "Example Expressive App",
+    contact: {
+        name: "Sabbir Siddiqui",
+        email: "sabbir.m.siddiqui@gmail.com"
+    }
+};
+
+const app = new expressive.ExpressApp(router, {
+    allowCors: true,
+    swaggerInfo: swaggerInfo
+});
+
+```
+
+---
+
 To create a swagger.json file, the function *writeSwaggerJson* can be used from the *SwaggerUtils* export. Example:
 
 ```javascript
 const { SwaggerUtils } = require("expressive");
+const appConfig = {
+    basePath: "/",
+    swaggerInfo: {} // swagger info property as shown above
+};
 SwaggerUtils.writeSwaggerJson(
   router, // express router configuration
-  swaggerHeader, // json for basic Swagger info
+  appConfig, // json for basic Swagger info
   outputPath // absolute path of output file
 )
 ```

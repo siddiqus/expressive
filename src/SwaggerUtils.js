@@ -36,22 +36,25 @@ function convertDocsToSwaggerDoc(router, swaggerHeader, swaggerDefinitions = und
     };
 }
 
-function writeSwaggerJson(router, swaggerHeader, output) {
+const sampleSwaggerInfo = {
+    version: "1.0.0",
+    title: "Expressive API",
+    contact: {
+        name: "Author",
+        email: "Your email address",
+        url: ""
+    }
+};
+
+function writeSwaggerJson(router, output, basePath = "/", swaggerInfo = sampleSwaggerInfo) {
+    const swaggerHeader = getSwaggerHeader(basePath, swaggerInfo);
     const swaggerJson = convertDocsToSwaggerDoc(router, swaggerHeader);
     fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));
 }
 
 function getSwaggerHeader(
     basePath = "/",
-    swaggerInfo = {
-        version: "1.0.0",
-        title: "Expressive API",
-        contact: {
-            name: "Author",
-            email: "Your email address",
-            url: ""
-        }
-    }
+    swaggerInfo = sampleSwaggerInfo
 ) {
     return {
         "swagger": "2.0",

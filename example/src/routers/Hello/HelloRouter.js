@@ -1,7 +1,8 @@
 const { RestMethods } = require("../../../lib/expressive");
 const GetUsers = require("./controllers/GetUsers");
 const Hello = require("./controllers/Hello");
-const HelloDocs = require("./docs/HelloDocs");
+const HelloDoc = require("./docs/HelloDoc");
+const GetUsersDoc = require("./docs/GetUsersDoc");
 const GetUserById = require("./controllers/GetUserById");
 const UserIdParamValidator = require("./validators/UserIdParamValidator");
 
@@ -22,12 +23,13 @@ module.exports = {
             method: RestMethods.GET,
             path: "/",
             controller: Hello,
-            doc: HelloDocs
+            doc: HelloDoc
         },
         {
             method: RestMethods.GET,
             path: "/users",
-            controller: GetUsers
+            controller: GetUsers,
+            doc: GetUsersDoc
         },
         {
             method: RestMethods.GET,
