@@ -12,7 +12,7 @@ export default class ExpressApp {
         allowCors = false,
         middlewares = null,
         errorMiddleware = null
-    }) {
+    } = {}) {
         this.config = {
             swaggerInfo,
             showSwaggerOnlyInDev,
@@ -24,22 +24,24 @@ export default class ExpressApp {
         };
         this.router = router;
         this.express = Express();
+        this.SwaggerUtils = SwaggerUtils;
+        this.routerFactory = new RouterFactory();
         this.register_routes();
     }
 
     _registerSwagger() {
-        const swaggerHeader = SwaggerUtils.getSwaggerHeader(
+        const swaggerHeader = this.SwaggerUtils.getSwaggerHeader(
             this.config.basePath, this.config.swaggerInfo
         );
-        const swaggerJson = SwaggerUtils.convertDocsToSwaggerDoc(
+        const swaggerJson = this.SwaggerUtils.convertDocsToSwaggerDoc(
             this.router, swaggerHeader, this.config.swaggerDefinitions
         );
-        SwaggerUtils.registerExpress(this.express, swaggerJson);
+        this.SwaggerUtils.registerExpress(this.express, swaggerJson);
     }
 
     register_routes() {
         if (this.config.showSwaggerOnlyInDev) {
-            this._registerSwagger()
+            this._registerSwagger();
         }
 
         if (this.config.allowCors) {
@@ -50,7 +52,7 @@ export default class ExpressApp {
             this.express.use(this.config.middlewares);
         }
 
-        const router = new RouterFactory().getExpressRouter(this.router);
+        const router = this.routerFactory.getExpressRouter(this.router);
         this.express.use(this.config.basePath, router);
 
         if (this.config.errorMiddleware) {
