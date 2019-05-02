@@ -2,10 +2,15 @@ import { Router } from "express";
 import { validationResult } from "express-validator/check";
 
 export default class RouterFactory {
+    constructor() {
+        this.validationResult = validationResult;
+    }
+
     _hasValidationErrors(req, res) {
-        const errors = validationResult(req);
+        const errors = this.validationResult(req);
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array({ onlyFirstError: true }) });
+            res.status(422);
+            res.json({ errors: errors.array({ onlyFirstError: true }) });
             return true;
         } else return false;
     }
@@ -17,7 +22,7 @@ export default class RouterFactory {
                     await controller(req, res, next);
                 }
             } catch (e) {
-                if(errorHandler){
+                if (errorHandler) {
                     errorHandler(e, req, res, next);
                 } else {
                     next(e);
@@ -27,14 +32,18 @@ export default class RouterFactory {
     }
 
     _registerRoute(router, { method, path, controller, validator = [], errorHandler = null }) {
-        router[method](path, validator, this._getWrappedController(controller, errorHandler));
+        router[method](
+            path,
+            validator,
+            this._getWrappedController(controller, errorHandler)
+        );
     }
 
     _registerSubroute(router, { path, router: subrouter, validator = [] }) {
         router.use(path, validator, this.getExpressRouter(subrouter));
     }
 
-    _getRouter(){
+    _getRouter() {
         return Router({ mergeParams: true });
     }
 
