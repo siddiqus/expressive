@@ -7,7 +7,8 @@
     "clean": "rimraf dist",
     "test": "jest --watch",
     "coverage": "jest --coverage",
-    "rollup": "rollup -c"
+    "rollup": "rollup -c",
+    "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js"
   },
   "author": "",
   "license": "ISC",
