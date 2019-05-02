@@ -3,9 +3,11 @@ export default function GetRoutesInfo(router, paths = [], parentPath = "") {
         router.routes.forEach(route => {
             const routeData = {
                 method: route.method,
-                path: `${parentPath}${route.path}`,
-                doc: route.doc
+                path: `${parentPath}${route.path}`
             };
+            if (route.doc) {
+                routeData.doc = route.doc
+            }
             paths.push(routeData);
         })
     }
