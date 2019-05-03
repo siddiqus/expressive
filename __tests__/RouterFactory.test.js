@@ -1,5 +1,4 @@
-import { Router } from "express";
-import RouterFactory from "./RouterFactory";
+import RouterFactory from "../src/RouterFactory";
 
 describe("RouterFactory", () => {
     describe("getExpressRouter", () => {

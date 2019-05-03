@@ -1,7 +1,6 @@
-import childProcess from "child_process";
 import path from "path";
 import fs from "fs";
-import SwaggerUtils from "./SwaggerUtils";
+import SwaggerUtils from "../src/SwaggerUtils";
 
 describe("SwaggerUtils", () => {
     describe("writeSwaggerJson", () => {

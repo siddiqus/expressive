@@ -1,4 +1,4 @@
-import GetRoutesInfo from "./GetRoutesInfo";
+import GetRoutesInfo from "../src/GetRoutesInfo";
 
 
 describe("GetRoutesInfo", () => {

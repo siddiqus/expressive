@@ -1,4 +1,4 @@
-import ExpressApp from './ExpressApp';
+import ExpressApp from '../src/ExpressApp';
 
 describe("ExpressApp", () => {
     it('should be defined', () => {
