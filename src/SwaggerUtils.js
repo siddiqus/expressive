@@ -9,7 +9,11 @@ function registerExpress(express, swaggerJson) {
     }));
 }
 
-function convertDocsToSwaggerDoc(router, swaggerHeader, swaggerDefinitions = undefined) {
+function convertDocsToSwaggerDoc(
+    router,
+    swaggerHeader,
+    swaggerDefinitions = undefined
+) {
     const infoList = getRoutesInfo(router);
     const paths = {};
     let tags = [];
@@ -27,7 +31,7 @@ function convertDocsToSwaggerDoc(router, swaggerHeader, swaggerDefinitions = und
         }
     });
 
-    tags = Array.from(new Set(tags)).map((t) => ({name: t}));
+    tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
     return {
         ...swaggerHeader,
         definitions: swaggerDefinitions,
@@ -46,7 +50,12 @@ const sampleSwaggerInfo = {
     },
 };
 
-function writeSwaggerJson(router, output, basePath = "/", swaggerInfo = sampleSwaggerInfo) {
+function writeSwaggerJson(
+    router,
+    output,
+    basePath = "/",
+    swaggerInfo = sampleSwaggerInfo
+) {
     const swaggerHeader = getSwaggerHeader(basePath, swaggerInfo);
     const swaggerJson = convertDocsToSwaggerDoc(router, swaggerHeader);
     fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));

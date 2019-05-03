@@ -35,6 +35,7 @@ module.exports = {
     "prefer-rest-params": 0,
     "quotes": ["error", "double"],
     "class-methods-use-this": 0,
-    "require-jsdoc": 0
-  },
+    "require-jsdoc": 0,
+    "object-curly-spacing": 0
+  }
 };
