@@ -1,7 +1,7 @@
-import GetRoutesInfo from "../src/GetRoutesInfo";
+import getRoutesInfo from "../src/getRoutesInfo";
 
 
-describe("GetRoutesInfo", () => {
+describe("getRoutesInfo", () => {
     it("Should register all routes and subroutes", () => {
         const expectedRoutes = [
             { path: "/", method: "get", doc: "hello" },
@@ -61,7 +61,7 @@ describe("GetRoutesInfo", () => {
             ]
         }
 
-        const result = GetRoutesInfo(mockRouter);
+        const result = getRoutesInfo(mockRouter);
         expect(result).toEqual(expectedRoutes);
     });
 
@@ -113,9 +113,9 @@ describe("GetRoutesInfo", () => {
 
                 }
             ]
-        }
+        };
 
-        const result = GetRoutesInfo(mockRouter);
+        const result = getRoutesInfo(mockRouter);
         expect(result).toEqual(expectedRoutes);
     });
 });

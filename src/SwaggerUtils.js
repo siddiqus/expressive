@@ -1,16 +1,16 @@
 import fs from "fs";
 import SwaggerUi from "swagger-ui-express";
-import GetRoutesInfo from "./GetRoutesInfo";
+import getRoutesInfo from "./getRoutesInfo";
 
 
 function registerExpress(express, swaggerJson) {
     express.use("/docs", SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
-        explorer: true
+        explorer: true,
     }));
 }
 
 function convertDocsToSwaggerDoc(router, swaggerHeader, swaggerDefinitions = undefined) {
-    const infoList = GetRoutesInfo(router);
+    const infoList = getRoutesInfo(router);
     const paths = {};
     let tags = [];
 
@@ -20,19 +20,19 @@ function convertDocsToSwaggerDoc(router, swaggerHeader, swaggerDefinitions = und
                 paths[route.path][route.method] = route.doc;
             } else {
                 paths[route.path] = {
-                    [route.method]: route.doc
-                }
+                    [route.method]: route.doc,
+                };
             }
             tags.concat(route.doc.tags);
         }
-    })
+    });
 
-    tags = Array.from(new Set(tags)).map(t => ({ name: t }));
+    tags = Array.from(new Set(tags)).map((t) => ({name: t}));
     return {
         ...swaggerHeader,
         definitions: swaggerDefinitions,
         tags,
-        paths
+        paths,
     };
 }
 
@@ -42,8 +42,8 @@ const sampleSwaggerInfo = {
     contact: {
         name: "Author",
         email: "Your email address",
-        url: ""
-    }
+        url: "",
+    },
 };
 
 function writeSwaggerJson(router, output, basePath = "/", swaggerInfo = sampleSwaggerInfo) {
@@ -62,20 +62,20 @@ function getSwaggerHeader(
         "basePath": basePath,
         "schemes": [
             "http",
-            "https"
+            "https",
         ],
         "consumes": [
-            "application/json"
+            "application/json",
         ],
         "produces": [
-            "application/json"
-        ]
-    }
+            "application/json",
+        ],
+    };
 }
 
 export default {
     getSwaggerHeader,
     registerExpress,
     convertDocsToSwaggerDoc,
-    writeSwaggerJson
-}
+    writeSwaggerJson,
+};

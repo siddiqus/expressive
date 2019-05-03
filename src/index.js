@@ -1,11 +1,11 @@
 import ExpressApp from "./ExpressApp";
 import RestMethods from "./RestMethods";
-import GetRoutesInfo from "./GetRoutesInfo";
+import getRoutesInfo from "./getRoutesInfo";
 import SwaggerUtils from "./SwaggerUtils";
 
 export default {
     ExpressApp,
     RestMethods,
-    GetRoutesInfo,
-    SwaggerUtils
-}
+    getRoutesInfo,
+    SwaggerUtils,
+};

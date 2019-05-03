@@ -11,7 +11,7 @@ export default class ExpressApp {
         swaggerDefinitions,
         allowCors = false,
         middlewares = null,
-        errorMiddleware = null
+        errorMiddleware = null,
     } = {}) {
         this.config = {
             swaggerInfo,
@@ -20,13 +20,13 @@ export default class ExpressApp {
             basePath,
             allowCors,
             middlewares,
-            errorMiddleware
+            errorMiddleware,
         };
         this.router = router;
-        this.express = Express();
+        this.express = new Express();
         this.SwaggerUtils = SwaggerUtils;
         this.routerFactory = new RouterFactory();
-        this.register_routes();
+        this.registerRoutes();
     }
 
     _registerSwagger() {
@@ -39,7 +39,7 @@ export default class ExpressApp {
         this.SwaggerUtils.registerExpress(this.express, swaggerJson);
     }
 
-    register_routes() {
+    registerRoutes() {
         if (this.config.showSwaggerOnlyInDev) {
             this._registerSwagger();
         }
