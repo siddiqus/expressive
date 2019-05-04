@@ -1,5 +1,5 @@
 # Expressive
-Fast, opinionated, minimalist, and conventional web framework for [node](http://nodejs.org).
+Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
 
 **Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
   - Templated Routing
