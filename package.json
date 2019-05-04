@@ -46,5 +46,22 @@
     "rollup-plugin-node-resolve": "4.2.3",
     "rollup-plugin-terser": "4.0.4",
     "rollup-plugin-uglify": "6.0.2"
-  }
+  },
+  "homepage": "https://github.com/siddiqus/expressive#readme",
+  "bugs": {
+    "url": "https://github.com/siddiqus/expressive/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddiqus/expressive.git"
+  },
+  "keywords": [
+    "express",
+    "framework",
+    "nodejs",
+    "server",
+    "javascript",
+    "rest api",
+    "convention based routing"
+  ]
 }
