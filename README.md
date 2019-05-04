@@ -1,3 +1,5 @@
+[![Expressive Logo](https://raw.githubusercontent.com/siddiqus/expressive/master/logo.png)](https://github.com/siddiqus/expressive/)
+
 # Expressive
 Fast, opinionated, minimalist, and conventional web framework for [node](http://nodejs.org).
 
