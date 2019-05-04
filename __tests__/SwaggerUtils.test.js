@@ -21,8 +21,9 @@ describe("SwaggerUtils", () => {
                         path: "/",
                         method: "get",
                         controller: () => { },
-                        doc: {},
-                        tags: ["Engagement"]
+                        doc: {
+                            tags: ["Engagement"]
+                        },
                     }
                 ],
                 subroutes: [
@@ -34,8 +35,9 @@ describe("SwaggerUtils", () => {
                                     path: "/",
                                     method: "get",
                                     controller: () => { },
-                                    doc: {},
-                                    tags: ["Engagement"]
+                                    doc: {
+                                        tags: ["Engagement"]
+                                    },
                                 },
                                 {
                                     path: "/",
@@ -85,8 +87,9 @@ describe("SwaggerUtils", () => {
                         path: "/",
                         method: "get",
                         controller: () => { },
-                        doc: {},
-                        tags: ["Engagement"]
+                        doc: {
+                            tags: ["Engagement"]
+                        },
                     }
                 ],
                 subroutes: [
@@ -98,8 +101,9 @@ describe("SwaggerUtils", () => {
                                     path: "/",
                                     method: "get",
                                     controller: () => { },
-                                    doc: {},
-                                    tags: ["Engagement"]
+                                    doc: {
+                                        tags: ["Engagement"]
+                                    },
                                 },
                                 {
                                     path: "/",
@@ -141,6 +145,17 @@ describe("SwaggerUtils", () => {
             expect(file).toBeDefined();
             fs.unlinkSync(outputPath);
         });
+    });
 
+    describe("getSwaggerHeader", () => {
+        it("works with defaults", () => {
+            const header = SwaggerUtils.getSwaggerHeader();
+            expect(header).toBeDefined();
+        });
+
+        it("works with non defaults", () => {
+            const header = SwaggerUtils.getSwaggerHeader("/api");
+            expect(header).toBeDefined();
+        });
     });
 });

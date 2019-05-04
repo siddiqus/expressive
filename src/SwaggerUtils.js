@@ -27,7 +27,7 @@ function convertDocsToSwaggerDoc(
                     [route.method]: route.doc,
                 };
             }
-            tags.concat(route.doc.tags);
+            tags = tags.concat(route.doc.tags);
         }
     });
 
