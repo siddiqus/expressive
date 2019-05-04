@@ -1,19 +1,19 @@
-import ExpressApp from '../src/ExpressApp';
+import ExpressApp from "../src/ExpressApp";
 
 describe("ExpressApp", () => {
-    it('should be defined', () => {
+    it("should be defined", () => {
         expect(ExpressApp).toBeDefined();
-    })
+    });
 
     describe("_registerSwagger", () => {
         it("Should register properly", () => {
             const swaggerInfo = { name: "John Smith" };
             const mockRouter = {
                 some: "routes"
-            }
+            };
             const mockSwaggerDefinitions = {
                 some: " Definition"
-            }
+            };
             const app = new ExpressApp(mockRouter, {
                 swaggerInfo,
                 swaggerDefinitions: mockSwaggerDefinitions
@@ -57,4 +57,4 @@ describe("ExpressApp", () => {
             expect(app.express).toBeDefined();
         });
     });
-})
+});

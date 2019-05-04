@@ -1,6 +1,6 @@
 import fs from "fs";
 import SwaggerUi from "swagger-ui-express";
-import getRoutesInfo from "./getRoutesInfo";
+import RouteUtil from "./RouteUtil.js";
 
 
 function registerExpress(express, swaggerJson) {
@@ -14,7 +14,7 @@ function convertDocsToSwaggerDoc(
     swaggerHeader,
     swaggerDefinitions = undefined
 ) {
-    const infoList = getRoutesInfo(router);
+    const infoList = RouteUtil.getRoutesInfo(router);
     const paths = {};
     let tags = [];
 
