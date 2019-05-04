@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "jest --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "coverage": "jest --coverage",
     "rollup": "rollup -c",
     "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js",
