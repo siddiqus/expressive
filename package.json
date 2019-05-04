@@ -1,5 +1,5 @@
 {
-  "name": "expressive",
+  "name": "@siddiqus/expressive",
   "version": "1.0.0",
   "description": "A NodeJS API framework built on ExpressJs",
   "main": "src/index.js",
