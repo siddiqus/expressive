@@ -1,8 +1,8 @@
-import bodyParser from "body-parser";
-import addRequestId from "express-request-id";
-import responseMiddleware from "./response";
+const bodyParser = require("body-parser");
+const addRequestId = require("express-request-id");
+const responseMiddleware = require("./response");
 
-export default class MiddlewareManager {
+module.exports = class MiddlewareManager {
     constructor(options = {
         bodyLimit: "100kb"
     }) {

@@ -1,10 +1,10 @@
-import Express from "express";
-import cors from "cors";
-import RouterFactory from "./RouterFactory";
-import SwaggerUtils from "./SwaggerUtils";
-import MiddlewareManager from "./middleware/MiddlewareManager";
+const Express = require("express");
+const cors = require("cors");
+const RouterFactory = require("./RouterFactory");
+const SwaggerUtils = require("./SwaggerUtils");
+const MiddlewareManager = require("./middleware/MiddlewareManager");
 
-export default class ExpressApp {
+module.exports = class ExpressApp {
     constructor(router, {
         basePath = "/",
         showSwaggerOnlyInDev = true,

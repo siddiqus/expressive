@@ -2,7 +2,10 @@
   "name": "@siddiqus/expressive",
   "version": "1.1.4",
   "description": "Fast, opinionated, minimalist, and conventional REST API framework for NodeJS, built on ExpressJs.",
-  "main": "dist/expressive.js",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "test": "jest",
@@ -10,10 +13,11 @@
     "coverage": "jest --coverage",
     "coveralls": "jest --coverage && cat coverage/lcov.info | coveralls",
     "rollup": "rollup -c",
+    "build": "babel src --out-dir build",
     "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js",
     "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html || echo Lint report: reports/lint.html",
     "lintFix": "eslint --fix src || echo Linting done!",
-    "dev": "nodemon -w example/index.dev.js --exec babel-node example/index.dev.js"
+    "dev": "nodemon -w example/index.js --exec node example/index.js"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
   "license": "ISC",

@@ -1,9 +1,9 @@
-import ExpressApp from "./ExpressApp";
-import RestMethods from "./RestMethods";
-import RouteUtil from "./RouteUtil";
-import SwaggerUtils from "./SwaggerUtils";
+const ExpressApp = require("./ExpressApp");
+const RestMethods = require("./RestMethods");
+const RouteUtil = require("./RouteUtil");
+const SwaggerUtils = require("./SwaggerUtils");
 
-export default {
+module.exports = exports = {
     ExpressApp,
     RestMethods,
     RouteUtil,

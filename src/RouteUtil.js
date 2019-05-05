@@ -1,4 +1,4 @@
-export default class RouteUtil {
+module.exports = class RouteUtil {
     static getRoutesInfo(router, paths = [], parentPath = "") {
         if (router.routes) {
             router.routes.forEach((route) => {
@@ -23,4 +23,3 @@ export default class RouteUtil {
         return paths;
     }
 }
-

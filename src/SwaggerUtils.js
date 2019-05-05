@@ -1,6 +1,6 @@
-import fs from "fs";
-import SwaggerUi from "swagger-ui-express";
-import RouteUtil from "./RouteUtil.js";
+const fs = require("fs");
+const SwaggerUi = require("swagger-ui-express");
+const RouteUtil = require("./RouteUtil.js");
 
 
 function registerExpress(express, swaggerJson) {
@@ -82,7 +82,7 @@ function getSwaggerHeader(
     };
 }
 
-export default {
+module.exports = {
     getSwaggerHeader,
     registerExpress,
     convertDocsToSwaggerDoc,

@@ -1,7 +1,7 @@
-import { Router } from "express";
-import { validationResult } from "express-validator/check";
+const { Router } = require("express");
+const { validationResult } = require("express-validator/check");
 
-export default class RouterFactory {
+module.exports = class RouterFactory {
     constructor() {
         this.validationResult = validationResult;
     }
