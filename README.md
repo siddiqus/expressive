@@ -127,6 +127,13 @@ The ExpressApp class constructor's second parameter is a configuration object th
 }
 ```
 
+The Expressive app comes with the following built-in middleware:
+- [body-parser](https://www.npmjs.com/package/body-parser) - manage request body in middleware
+- [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
+- [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for eqch request
+
+The 'middlewares' property in the app config object is placed after the built in middleware for API request handling.
+
 ### Centralized error handling
 The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
 ```javascript

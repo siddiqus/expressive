@@ -1,5 +1,6 @@
 import expressive from "../src/index";
 import router from "./src/router";
+import swaggerDefinitions from "./docs/swaggerDefinitions";
 
 const port = process.env.PORT || 8080;
 
@@ -12,12 +13,11 @@ const swaggerInfo = {
     }
 };
 
-const appConfig = {
+const app = new expressive.ExpressApp(router, {
     allowCors: true,
-    swaggerInfo
-}
-
-const app = new expressive.ExpressApp(router, appConfig);
+    swaggerInfo,
+    swaggerDefinitions
+});
 
 app.express.listen(port, () => console.log("Listening on port " + port));
 module.exports = app.express;

@@ -2,9 +2,15 @@ const { RestMethods } = require("../../../lib/expressive");
 const GetUsers = require("./controllers/GetUsers");
 const Hello = require("./controllers/Hello");
 const HelloDoc = require("./docs/HelloDoc");
-const GetUsersDoc = require("./docs/GetUsersDoc");
+
+const HelloName = require("./controllers/HelloName");
+const HelloNameDoc = require("./docs/HelloNameDoc");
+
 const GetUserById = require("./controllers/GetUserById");
+const GetUsersDoc = require("./docs/GetUsersDoc");
+
 const UserIdParamValidator = require("./validators/UserIdParamValidator");
+const HelloNameValidator = require("./validators/HelloNameValidator");
 
 function customErrorHandler(err, req, res, next) {
     if (err.message == "Could not find user") {
@@ -19,6 +25,13 @@ function customErrorHandler(err, req, res, next) {
 
 module.exports = {
     routes: [
+        {
+            method: RestMethods.POST,
+            path: "/",
+            controller: HelloName,
+            validator: HelloNameValidator,
+            doc: HelloNameDoc
+        },
         {
             method: RestMethods.GET,
             path: "/",

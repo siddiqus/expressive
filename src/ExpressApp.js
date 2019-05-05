@@ -2,6 +2,7 @@ import Express from "express";
 import cors from "cors";
 import RouterFactory from "./RouterFactory";
 import SwaggerUtils from "./SwaggerUtils";
+import MiddlewareManager from "./middleware/MiddlewareManager";
 
 export default class ExpressApp {
     constructor(router, {
@@ -12,6 +13,7 @@ export default class ExpressApp {
         allowCors = false,
         middlewares = null,
         errorMiddleware = null,
+        bodyLimit = "100kb"
     } = {}) {
         this.config = {
             swaggerInfo,
@@ -21,11 +23,17 @@ export default class ExpressApp {
             allowCors,
             middlewares,
             errorMiddleware,
+            bodyLimit
         };
         this.router = router;
         this.express = new Express();
         this.SwaggerUtils = SwaggerUtils;
         this.routerFactory = new RouterFactory();
+
+        this.middlewareManager = new MiddlewareManager({
+            bodyLimit
+        });
+
         this.registerRoutes();
     }
 
@@ -48,12 +56,12 @@ export default class ExpressApp {
             this.express.use(cors());
         }
 
-        if (this.config.middlewares) {
-            this.express.use(this.config.middlewares);
-        }
+        this.middlewareManager.registerMiddleware(
+            this.express, this.config.middlewares
+        );
 
-        const router = this.routerFactory.getExpressRouter(this.router);
-        this.express.use(this.config.basePath, router);
+        const expressRouter = this.routerFactory.getExpressRouter(this.router);
+        this.express.use(this.config.basePath, expressRouter);
 
         if (this.config.errorMiddleware) {
             this.express.use(this.config.errorMiddleware);
