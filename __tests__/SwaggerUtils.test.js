@@ -22,7 +22,7 @@ describe("SwaggerUtils", () => {
                         method: "get",
                         controller: () => { },
                         doc: {
-                            tags: ["Engagement"]
+                            tags: ["SomeTag"]
                         },
                     }
                 ],
@@ -36,7 +36,7 @@ describe("SwaggerUtils", () => {
                                     method: "get",
                                     controller: () => { },
                                     doc: {
-                                        tags: ["Engagement"]
+                                        tags: ["SomeTag"]
                                     },
                                 },
                                 {
@@ -88,7 +88,7 @@ describe("SwaggerUtils", () => {
                         method: "get",
                         controller: () => { },
                         doc: {
-                            tags: ["Engagement"]
+                            tags: ["SomeTag"]
                         },
                     }
                 ],
@@ -102,7 +102,7 @@ describe("SwaggerUtils", () => {
                                     method: "get",
                                     controller: () => { },
                                     doc: {
-                                        tags: ["Engagement"]
+                                        tags: ["SomeTag"]
                                     },
                                 },
                                 {
