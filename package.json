@@ -1,6 +1,6 @@
 {
   "name": "@siddiqus/expressive",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Fast, opinionated, minimalist, and conventional REST API framework for NodeJS, built on ExpressJs.",
   "main": "src/index.js",
   "scripts": {
