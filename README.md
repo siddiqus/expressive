@@ -8,8 +8,9 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 **Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
   - Templated Routing
     - Write APIs with declarative endpoints (including nested endpoints) easily
-  - Pluggable middleware
-    - Just like Express, inject own middleware functions
+  - Pluggable middleware with built-ins
+    - Inject own middleware just like Express
+    - Built in middleware e.g. body-parser, cors, etc.
   - API validation using Express Validator [https://github.com/express-validator/express-validator]
     - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
@@ -132,7 +133,7 @@ The Expressive app comes with the following built-in middleware:
 - [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
 - [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for eqch request
 
-The 'middlewares' property in the app config object is placed after the built in middleware for API request handling.
+The 'middlewares' property in the app config object is an array of middleware functions that are injected after the built-in middleware for API request handling.
 
 ### Centralized error handling
 The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
