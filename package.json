@@ -12,7 +12,8 @@
     "rollup": "rollup -c",
     "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js",
     "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html || echo Lint report: reports/lint.html",
-    "lintFix": "eslint --fix src || echo Linting done!"
+    "lintFix": "eslint --fix src || echo Linting done!",
+    "dev": "nodemon -w example/index.dev.js --exec babel-node example/index.dev.js"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
   "license": "ISC",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@babel/cli": "7.4.3",
     "@babel/core": "7.4.3",
+    "@babel/node": "7.2.2",
     "@babel/plugin-transform-runtime": "7.4.3",
     "@babel/preset-env": "7.4.3",
     "@babel/runtime-corejs2": "7.4.3",
@@ -42,6 +44,7 @@
     "eslint-detailed-reporter": "0.8.0",
     "eslint-plugin-react": "7.12.4",
     "jest": "24.7.1",
+    "nodemon": "1.19.0",
     "rimraf": "2.6.2",
     "rollup": "1.10.0",
     "rollup-plugin-commonjs": "9.3.4",
