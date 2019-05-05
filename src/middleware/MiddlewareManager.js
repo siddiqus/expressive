@@ -8,6 +8,7 @@ export default class MiddlewareManager {
     }) {
         this.options = options;
         this.bodyParser = bodyParser;
+        this.addRequestId = addRequestId;
     }
 
     _getBodyParser() {
@@ -22,10 +23,10 @@ export default class MiddlewareManager {
     registerMiddleware(express, userMiddleware) {
         express.use(this._getBodyParser());
         express.use(responseMiddleware);
-        express.use(addRequestId());
+        express.use(this.addRequestId());
 
         if (userMiddleware) {
-            express.use(this.config.middlewares);
+            express.use(userMiddleware);
         }
     }
 }
