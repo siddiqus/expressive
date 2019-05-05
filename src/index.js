@@ -3,7 +3,7 @@ import RestMethods from "./RestMethods";
 import RouteUtil from "./RouteUtil";
 import SwaggerUtils from "./SwaggerUtils";
 
-export default {
+module.exports = {
     ExpressApp,
     RestMethods,
     RouteUtil,
