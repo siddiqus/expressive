@@ -3,7 +3,7 @@ const RestMethods = require("./RestMethods");
 const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
 const Route = require("./models/Route");
-const Subroute = require("./models/Subroute");
+const subRoute = require("./models/subRoute");
 
 module.exports = exports = {
     ExpressApp,
@@ -11,5 +11,5 @@ module.exports = exports = {
     RouteUtil,
     SwaggerUtils,
     Route,
-    Subroute
+    subRoute
 };

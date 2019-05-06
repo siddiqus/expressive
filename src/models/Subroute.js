@@ -1,6 +1,6 @@
-module.exports = class SubRoute {
-    constructor(path, router) {
-        this.path = path;
-        this.router = router;
-    }
+module.exports = (path, router) => {
+    return {
+        path,
+        router
+    };
 };
