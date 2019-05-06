@@ -22,4 +22,4 @@ module.exports = class RouteUtil {
         }
         return paths;
     }
-}
+};

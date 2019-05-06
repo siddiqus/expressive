@@ -1,16 +1,47 @@
 import RouterFactory from "../src/RouterFactory";
 
+const mockSubroutes = [
+    {
+        path: "/users",
+        router: {
+            routes: [
+                {
+                    path: "/",
+                    method: "get",
+                    controller: () => { }
+                },
+                {
+                    path: "/",
+                    method: "post",
+                    controller: () => { }
+                }
+            ],
+            subroutes: [
+                {
+                    path: "/:userId/posts",
+                    router: {
+                        routes: [
+                            {
+                                path: "/",
+                                method: "get",
+                                controller: () => { }
+                            },
+                            {
+                                path: "/",
+                                method: "post",
+                                controller: () => { }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+];
+
 describe("RouterFactory", () => {
     describe("getExpressRouter", () => {
         it("Should register all routes and subroutes", () => {
-            const expectedRoutes = [
-                { path: "/", method: "get" },
-                { path: "/users", method: "get" },
-                { path: "/users", method: "post" },
-                { path: "/users/:userId/posts", method: "get" },
-                { path: "/users/:userId/posts", method: "post" }
-            ];
-
             const mockRouter = {
                 routes: [
                     {
@@ -19,45 +50,7 @@ describe("RouterFactory", () => {
                         controller: () => { }
                     }
                 ],
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { }
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { }
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-
-                    }
-                ]
+                subroutes: mockSubroutes
             }
 
             const routerFactory = new RouterFactory();
@@ -84,55 +77,9 @@ describe("RouterFactory", () => {
         });
 
         it("Should register all subroutes from top", () => {
-            const expectedRoutes = [
-                { path: "/", method: "get" },
-                { path: "/users", method: "get" },
-                { path: "/users", method: "post" },
-                { path: "/users/:userId/posts", method: "get" },
-                { path: "/users/:userId/posts", method: "post" }
-            ];
-
             const mockRouter = {
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { }
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { }
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-
-                    }
-                ]
-            }
+                subroutes: mockSubroutes
+            };
 
             const routerFactory = new RouterFactory();
             const mockExpressRouter = {

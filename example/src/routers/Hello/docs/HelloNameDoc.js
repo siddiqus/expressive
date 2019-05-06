@@ -16,7 +16,7 @@ module.exports = {
     "description": "Say hello to user.",
     "responses": {
         "200": {
-            "description": "Say hello.",
+            "description": "Say hello with a user name.",
             "schema": {
                 "type": "object",
                 "properties": {

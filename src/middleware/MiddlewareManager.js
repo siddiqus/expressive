@@ -29,4 +29,4 @@ module.exports = class MiddlewareManager {
             express.use(userMiddleware);
         }
     }
-}
+};

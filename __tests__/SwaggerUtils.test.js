@@ -2,10 +2,65 @@ import path from "path";
 import fs from "fs";
 import SwaggerUtils from "../src/SwaggerUtils";
 
+const mockRouterWithTopRoutes = {
+    routes: [
+        {
+            path: "/",
+            method: "get",
+            controller: () => { },
+            doc: {
+                tags: ["SomeTag"]
+            },
+        }
+    ],
+    subroutes: [
+        {
+            path: "/users",
+            router: {
+                routes: [
+                    {
+                        path: "/",
+                        method: "get",
+                        controller: () => { },
+                        doc: {
+                            tags: ["SomeTag"]
+                        },
+                    },
+                    {
+                        path: "/",
+                        method: "post",
+                        controller: () => { },
+                        doc: {}
+                    }
+                ],
+                subroutes: [
+                    {
+                        path: "/:userId/posts",
+                        router: {
+                            routes: [
+                                {
+                                    path: "/",
+                                    method: "get",
+                                    controller: () => { }
+                                },
+                                {
+                                    path: "/",
+                                    method: "post",
+                                    controller: () => { }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+
+        }
+    ]
+};
+
 describe("SwaggerUtils", () => {
     describe("writeSwaggerJson", () => {
         it("should write json for swagger", () => {
-
             const sampleSwaggerInfo = {
                 version: "1.0.0",
                 title: "Expressive API",
@@ -15,64 +70,10 @@ describe("SwaggerUtils", () => {
                     url: ""
                 }
             };
-            const mockRouter = {
-                routes: [
-                    {
-                        path: "/",
-                        method: "get",
-                        controller: () => { },
-                        doc: {
-                            tags: ["SomeTag"]
-                        },
-                    }
-                ],
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { },
-                                    doc: {
-                                        tags: ["SomeTag"]
-                                    },
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { },
-                                    doc: {}
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
 
-                    }
-                ]
-            }
             const outputPath = path.resolve(__dirname, "output.json");
             SwaggerUtils.writeSwaggerJson(
-                mockRouter, outputPath, "/api", sampleSwaggerInfo
+                mockRouterWithTopRoutes, outputPath, "/api", sampleSwaggerInfo
             );
 
             const file = fs.readFileSync(outputPath);
@@ -81,64 +82,10 @@ describe("SwaggerUtils", () => {
         });
 
         it("should write json for swagger using defaults", () => {
-            const mockRouter = {
-                routes: [
-                    {
-                        path: "/",
-                        method: "get",
-                        controller: () => { },
-                        doc: {
-                            tags: ["SomeTag"]
-                        },
-                    }
-                ],
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { },
-                                    doc: {
-                                        tags: ["SomeTag"]
-                                    },
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { },
-                                    doc: {}
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
 
-                    }
-                ]
-            }
             const outputPath = path.resolve(__dirname, "output.json");
             SwaggerUtils.writeSwaggerJson(
-                mockRouter, outputPath
+                mockRouterWithTopRoutes, outputPath
             );
 
             const file = fs.readFileSync(outputPath);

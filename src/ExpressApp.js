@@ -67,4 +67,4 @@ module.exports = class ExpressApp {
             this.express.use(this.config.errorMiddleware);
         }
     }
-}
+};

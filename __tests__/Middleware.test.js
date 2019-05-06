@@ -37,13 +37,13 @@ describe("Middleware Manager", () => {
                 bodyLimit: "50kb"
             });
             manager.bodyParser = {
-                urlencoded: jest.fn().mockReturnValue(1),
-                json: jest.fn().mockReturnValue(2)
+                urlencoded: jest.fn().mockReturnValue(3),
+                json: jest.fn().mockReturnValue(4)
             };
 
             const result = manager._getBodyParser();
 
-            expect(result).toEqual([1, 2]);
+            expect(result).toEqual([3, 4]);
             expect(manager.bodyParser.urlencoded).toHaveBeenCalledWith({ extended: true });
             expect(manager.bodyParser.json).toHaveBeenCalledWith({
                 limit: "50kb"
