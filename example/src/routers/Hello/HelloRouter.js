@@ -13,7 +13,7 @@ const UserIdParamValidator = require("./validators/UserIdParamValidator");
 const HelloNameValidator = require("./validators/HelloNameValidator");
 
 function customErrorHandler(err, req, res, next) {
-    if (err.message == "Could not find user") {
+    if (err.message === "Could not find user") {
         res.status(404);
         res.send("Not found");
     } else {

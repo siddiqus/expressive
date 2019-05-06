@@ -1,5 +1,44 @@
 import RouteUtil from "../src/RouteUtil";
 
+const mockSubroutes = [
+    {
+        path: "/users",
+        router: {
+            routes: [
+                {
+                    path: "/",
+                    method: "get",
+                    controller: () => { }
+                },
+                {
+                    path: "/",
+                    method: "post",
+                    controller: () => { }
+                }
+            ],
+            subroutes: [
+                {
+                    path: "/:userId/posts",
+                    router: {
+                        routes: [
+                            {
+                                path: "/",
+                                method: "get",
+                                controller: () => { }
+                            },
+                            {
+                                path: "/",
+                                method: "post",
+                                controller: () => { }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+];
+
 describe("RouteUtil", () => {
     describe("getRoutesInfo", () => {
         it("Should register all routes and subroutes", () => {
@@ -20,45 +59,7 @@ describe("RouteUtil", () => {
                         doc: "hello"
                     }
                 ],
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { }
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { }
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-
-                    }
-                ]
+                subroutes: mockSubroutes
             };
 
             const result = RouteUtil.getRoutesInfo(mockRouter);
@@ -74,45 +75,7 @@ describe("RouteUtil", () => {
             ];
 
             const mockRouter = {
-                subroutes: [
-                    {
-                        path: "/users",
-                        router: {
-                            routes: [
-                                {
-                                    path: "/",
-                                    method: "get",
-                                    controller: () => { }
-                                },
-                                {
-                                    path: "/",
-                                    method: "post",
-                                    controller: () => { }
-                                }
-                            ],
-                            subroutes: [
-                                {
-                                    path: "/:userId/posts",
-                                    router: {
-                                        routes: [
-                                            {
-                                                path: "/",
-                                                method: "get",
-                                                controller: () => { }
-                                            },
-                                            {
-                                                path: "/",
-                                                method: "post",
-                                                controller: () => { }
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-
-                    }
-                ]
+                subroutes: mockSubroutes
             };
 
             const result = RouteUtil.getRoutesInfo(mockRouter);
