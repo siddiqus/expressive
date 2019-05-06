@@ -1,5 +1,5 @@
 
-const expressive = require("../src/index");
+const expressive = require("./lib/expressive");
 const router = require("./src/router");
 const swaggerDefinitions = require("./docs/swaggerDefinitions");
 
