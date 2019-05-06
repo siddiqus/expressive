@@ -1,6 +1,7 @@
 [![Expressive Logo](https://raw.githubusercontent.com/siddiqus/expressive/master/logo.png)](https://github.com/siddiqus/expressive/)
 
 [![Build Status](https://travis-ci.org/siddiqus/expressive.svg?branch=master)](https://travis-ci.org/siddiqus/expressive)
+[![Coverage Status](https://coveralls.io/repos/github/siddiqus/expressive/badge.svg?branch=master)](https://coveralls.io/github/siddiqus/expressive?branch=master)
 
 # Expressive
 Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
