@@ -31,10 +31,7 @@
     "unirest": "0.6.0"
   },
   "jest": {
-    "coverageDirectory": "reports/coverage",
-    "collectCoverageFrom": [
-      "src"
-    ]
+    "coverageDirectory": "reports/coverage"
   },
   "devDependencies": {
     "@babel/cli": "7.4.3",
