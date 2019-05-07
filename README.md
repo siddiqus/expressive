@@ -155,49 +155,56 @@ const app = new ExpressApp(router, {
 
 Error handling can be overridden for individual endpoints using the 'errorHandler' property in the route object. Example:
 ```javascript
-{
-    method: RestMethods.GET,
-    path: "/users/:userId",
-    controller: GetSpecificUser,
-    validator: UserIdParamValidator,
-    errorHandler: function customErrorHandler(err, req, res, next) {
-        if (err.message == "Could not find user") {
-            res.status(404);
-            res.send("Not found");
-        } else {
-            res.status(500);
-            res.send("Internal server error");
-        }
-        next();
-    }
+const { Route } = require("@siddiqus/expressive");
+
+function customErrorHandler(err, req, res, next) {
+  if (err.message == "Could not find user") {
+      res.status(404);
+      res.send("Not found");
+  } else {
+      res.status(500);
+      res.send("Internal server error");
+  }
+  next();
 }
+
+const getUserById = Route.get(
+  "/users/:userId", 
+  GetSpecificUser, // some predefined controller
+  {
+    errorHandler: customErrorHandler
+  }
+);
 ```
 
 ### Express validation using express-validator
 Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
 ```javascript
-{
-  path: "/hello",
-  method: "get",
-  controller: someFunction, // express request handler
-  validator: someValidator // optional validator -> an array as defined by Express Validator conventions
-}
-```
+const { Route } = require("@siddiqus/expressive");
 
+const getUserById = Route.get(
+  "/users/:userId", 
+  GetSpecificUser, // some predefined controller
+  {
+    validator: UserIdParamValidator, // some predefined validator
+  }
+);
+```
 
 ### Documentation with Swagger syntax
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
 ```javascript
-{
-    path: "/hello",
-    method: "get",
-    controller: async (req, res) => res.json({ hello:"world" }),
-    doc: helloDoc // json in swagger syntax
-}
+const getUserById = Route.get(
+    "/hello", 
+    GetHelloController, // some predefined controller
+    {
+        doc: GetHelloDocJs // Swagger doc format for an endpoint
+    }
+);
 ```
 
-The 'doc' property could be an object like this:
+The 'GetUserByIdDocJs' JS or JSON could be something like this: 
 ```javascript
 {
     "tags": [
@@ -220,6 +227,7 @@ The 'doc' property could be an object like this:
     }
 }
 ```
+
 In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in *Dev*).
 
 ---
