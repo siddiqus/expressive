@@ -1,5 +1,5 @@
 
-const expressive = require("./lib/expressive");
+const { ExpressApp } = require("./lib/expressive");
 const router = require("./src/router");
 const swaggerDefinitions = require("./docs/swaggerDefinitions");
 
@@ -14,7 +14,7 @@ const swaggerInfo = {
     }
 };
 
-const app = new expressive.ExpressApp(router, {
+const app = new ExpressApp(router, {
     allowCors: true,
     swaggerInfo,
     swaggerDefinitions
