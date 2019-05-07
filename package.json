@@ -11,7 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
-    "coveralls": "jest --coverage && cat reports/coverage/lcov.info | coveralls",
+    "coveralls": "jest --coverage && cat reports/coverage/lcov.info | bash -x && coveralls",
     "rollup": "rollup -c",
     "build": "babel src --out-dir build",
     "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js",
