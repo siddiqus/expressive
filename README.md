@@ -141,7 +141,9 @@ The 'middlewares' property in the app config object is an array of middleware fu
 ### Centralized error handling
 The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
 ```javascript
-const app = new expressive.ExpressApp(router, {
+const { ExpressApp } = require("@siddiqus/expressive");
+
+const app = new ExpressApp(router, {
   errorMiddleware: (error, req, res, next) => {
       res.status(500);
       res.send({
@@ -224,6 +226,8 @@ In Development, Swagger docs can be seen at the url http://localhost:8080/docs (
 
 You can initialize your app with the basic swagger 'info' property as shown below:
 ```javascript
+const { ExpressApp } = require("@siddiqus/expressive");
+
 const swaggerInfo = {
     version: "1.0.0",
     title: "Example Expressive App",
@@ -233,7 +237,7 @@ const swaggerInfo = {
     }
 };
 
-const app = new expressive.ExpressApp(router, {
+const app = new ExpressApp(router, {
     allowCors: true,
     swaggerInfo: swaggerInfo
 });
