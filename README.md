@@ -23,27 +23,28 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
     - Swagger doc can be viewed in development at http://localhost:8080/docs
 
 ## Quickstart
+Install the package:  ```npm i -S @siddiqus/expressive```
+
 Here is a basic example:
 
 ```javascript
-const expressive = require("./lib/expressive");
+const { Route, ExpressApp } = require("@siddiqus/expressive");
+
+const helloGetController = (req, res) => {
+  res.send({
+      hello: "world"
+  })
+};
+
 const router = {
     routes: [
-        {
-            path: "/hello",
-            method: "get",
-            controller: async (req, res) => {
-                res.send({
-                    hello: "world"
-                })
-            }
-        }
+      Route.get("/hello", helloGetController)
     ]
 }
 
-const app = new expressive.ExpressApp(router);
+const app = new ExpressApp(router);
 const port = process.env.PORT || 8080;
-app.express.listen(port, () => console.log("Listening on port " + port));
+app.listen(port, () => console.log("Listening on port " + port));
 ```
 Running this node script will start an Express app on port 8080. A GET request on [http://localhost:8080/hello] will return the following JSON response
 ```json
@@ -51,11 +52,12 @@ Running this node script will start an Express app on port 8080. A GET request o
     "hello": "world"
 }
 ```
-**Notice that the express app is the *express* property of the *app* object.**
+
+**The ExpressJS app can be used from the *express* property of the *app* object e.g.**
 
 
 ## Routing by convention
-It is easy to create routes and nested routes using Expressive. Here are some points:
+It is easy to create routes and nested routes using Expressive. Here are some points to note:
   - The ExpressApp class takes a 'router' parameter in its constructor
   - This 'router' object looks like this:
     ```javascript
@@ -64,16 +66,21 @@ It is easy to create routes and nested routes using Expressive. Here are some po
         subroutes: []
     }
     ```
-  - Each object in the *routes* array looks like this:
+  - Each object in the *routes* array is an instance of the Route class. For example, we can use the Route class's GET method to create a GET endpoint like so:
     ```javascript
-    {
-        path: '/some/path', // required - relative end path of endpoint
-        method: "get", // required - request HTTP method
-        controller: someFunction, // required - express request handler e.g. function (req, res, next) => { }
-        validator: someValidatorArray, // optional - validator array in express-validator format
-        errorHandler: someHandler // optional - express middleware function for error handling, e.g. function(err, req, res, next){}
-    }
+    const { Route } = require("@siddiqus/expressive");
+
+    const helloGetRoute = Route.get(
+      "/some/path", // required - relative end path of endpoint
+      someController, // required - express request handler e.g. function (req, res, next) => { }
+      {
+        doc: someDocJs, // optional - Swagger json format for a given endpoint
+        validator: someExpressValidator, // optional - validator array in express-validator format
+        errorHandler: someErrorHandlerFunction // optional - express middleware to handle errors for this specific endpoint, e.g. function(err, req, res, next){}
+      }
+    );
     ```
+    Similarly, the class methods ```Route.post```, ```Route.put```, ```Route.delete``` are available to create the respective REST routes.
   - Each object in the *subroutes* array looks like this:
     ```javascript
     {
@@ -81,38 +88,31 @@ It is easy to create routes and nested routes using Expressive. Here are some po
        router: someRouter // this is also a router object
     }
     ```
-Let's say we want to create the following routes:
+Let's say we want to create an API with the following routes:
   - GET /hello/
   - GET /hello/users
   - POST /hello/users
 
 We need to define a router object as follows:
 ```javascript
-{
+const { Route } = require("@siddiqus/expressive");
+
+const helloRouter = {
+    routes: [
+        [
+            // with some predefined controller functions
+            Route.get("/", getHelloController), 
+            Route.get("/users", getUsersController),
+            Route.post("/users, postUsersController)
+        ]
+    ]
+}
+
+const apiRouter = {
     subroutes: [
         {
             path: "/hello",
-            router: {
-                routes: [
-                    [
-                        {
-                            path: "/",
-                            method: "get",
-                            controller: getHello // some function
-                        },
-                        {
-                            path: "/users",
-                            method: "get",
-                            controller: getUsersController // some function
-                        },
-                        {
-                            path: "/users",
-                            method: "post",
-                            controller: postUsersController // some function
-                        }
-                    ]
-                ]
-            }
+            router: helloRouter
         }
     ]
 }
