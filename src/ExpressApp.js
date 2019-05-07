@@ -26,7 +26,9 @@ module.exports = class ExpressApp {
             bodyLimit
         };
         this.router = router;
-        this.express = Express();
+
+        this._setExpress();
+
         this.SwaggerUtils = SwaggerUtils;
         this.routerFactory = new RouterFactory();
 
@@ -35,6 +37,11 @@ module.exports = class ExpressApp {
         });
 
         this.registerRoutes();
+    }
+
+    _setExpress() {
+        this.express = Express();
+        this.listen = this.express.listen.bind(this.express);
     }
 
     _registerSwagger() {
