@@ -19,16 +19,16 @@ function convertDocsToSwaggerDoc(
     let tags = [];
 
     infoList.forEach((route) => {
-        if (route.doc) {
-            if (paths[route.path]) {
-                paths[route.path][route.method] = route.doc;
-            } else {
-                paths[route.path] = {
-                    [route.method]: route.doc,
-                };
-            }
-            tags = tags.concat(route.doc.tags);
+        let doc = route.doc;
+        if (!doc) doc = {};
+        if (paths[route.path]) {
+            paths[route.path][route.method] = doc;
+        } else {
+            paths[route.path] = {
+                [route.method]: doc,
+            };
         }
+        tags = tags.concat(doc.tags);
     });
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));

@@ -4,6 +4,8 @@ const GetUsers = require("./controllers/GetUsers");
 const GetUsersDoc = require("./docs/GetUsersDoc");
 
 const GetUserById = require("./controllers/GetUserById");
+const GetUserByIdDoc = require("./docs/GetUserByIdDoc");
+
 const UserIdParamValidator = require("./validators/UserIdParamValidator");
 
 function customErrorHandler(err, req, res, next) {
@@ -24,7 +26,8 @@ module.exports = {
         }),
         Route.get("/:userId", GetUserById, {
             validator: UserIdParamValidator,
-            errorHandler: customErrorHandler
+            errorHandler: customErrorHandler,
+            doc: GetUserByIdDoc
         })
     ]
 };
