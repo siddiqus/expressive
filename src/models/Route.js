@@ -1,10 +1,8 @@
 class Route {
     constructor(
         method, path, controller, {
-            validator = null,
-            doc = null,
-            errorHandler = null
-        }
+            validator, doc, errorHandler
+        } = {}
     ) {
         this.method = method;
         this.path = path;
