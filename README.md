@@ -14,11 +14,11 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - Pluggable middleware with built-ins
     - Inject own middleware just like Express
     - Built in middleware e.g. body-parser, cors, etc.
-  - API validation using Express Validator [https://github.com/express-validator/express-validator]
+  - API validation using Express Validator https://github.com/express-validator/express-validator
     - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
     - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
-  - Doc generation through Swagger ([https://swagger.io/])
+  - Doc generation through Swagger https://swagger.io/
     - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
     - Swagger doc can be viewed in development at http://localhost:8080/docs
 
@@ -53,7 +53,7 @@ Running this node script will start an Express app on port 8080. A GET request o
 }
 ```
 
-**The ExpressJS app can be used from the *express* property of the *app* object e.g.**
+The ExpressJS app can be used from the *express* property of the *app* object e.g. ```app.express```
 
 
 ## Routing by convention
@@ -103,7 +103,7 @@ const helloRouter = {
             // with some predefined controller functions
             Route.get("/", getHelloController), 
             Route.get("/users", getUsersController),
-            Route.post("/users, postUsersController)
+            Route.post("/users, postUsersController" )
         ]
     ]
 }
