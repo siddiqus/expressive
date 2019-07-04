@@ -1,4 +1,4 @@
-const Express = require("express");
+const express = require("express");
 const cors = require("cors");
 const RouterFactory = require("./RouterFactory");
 const SwaggerUtils = require("./SwaggerUtils");
@@ -11,6 +11,7 @@ module.exports = class ExpressApp {
         swaggerInfo = undefined,
         swaggerDefinitions,
         allowCors = false,
+        corsConfig = null,
         middlewares = null,
         errorMiddleware = null,
         bodyLimit = "100kb"
@@ -21,10 +22,12 @@ module.exports = class ExpressApp {
             swaggerDefinitions,
             basePath,
             allowCors,
+            corsConfig,
             middlewares,
             errorMiddleware,
             bodyLimit
         };
+
         this.router = router;
 
         this._setExpress();
@@ -40,7 +43,7 @@ module.exports = class ExpressApp {
     }
 
     _setExpress() {
-        this.express = Express();
+        this.express = express();
         this.listen = this.express.listen.bind(this.express);
     }
 
@@ -60,7 +63,8 @@ module.exports = class ExpressApp {
         }
 
         if (this.config.allowCors) {
-            this.express.use(cors());
+            const corsMiddleware = this.config.corsConfig ? cors(this.config.corsConfig) : cors();
+            this.express.use(corsMiddleware);
         }
 
         this.middlewareManager.registerMiddleware(

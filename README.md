@@ -103,7 +103,7 @@ const helloRouter = {
             // with some predefined controller functions
             Route.get("/", getHelloController), 
             Route.get("/users", getUsersController),
-            Route.post("/users, postUsersController" )
+            Route.post("/users", postUsersController)
         ]
     ]
 }
@@ -125,6 +125,7 @@ The ExpressApp class constructor's second parameter is a configuration object th
     swaggerInfo = null, // this is an optional JSON with the basic swagger info detailed later
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
     allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
+    corsConfig = null, // config for cors based on the 'cors' npm module, if none is provided, then allows all origin
     middlewares = null, // Array of express middlewares can be provided (optional)
     errorMiddleware = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
     basePath = "/", // Root path of the api, default "/"
@@ -137,6 +138,26 @@ The Expressive app comes with the following built-in middleware:
 - [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for eqch request
 
 The 'middlewares' property in the app config object is an array of middleware functions that are injected after the built-in middleware for API request handling.
+
+### CORS
+You can enable CORS through the [cors](https://www.npmjs.com/package/cors) module using Expressive like this:
+```javascript
+const app = new ExpressApp(router, {
+    allowCors: true
+});
+```
+
+This will allow CORS for all origins. If you want to configure CORS as per the module's documentation, you can do so with the 'corsConfig' parameter:
+
+```javascript
+const app = new ExpressApp(router, {
+    allowCors: true,
+    corsConfig: {
+        origin: 'http://example.com',
+        optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    }
+});
+```
 
 ### Centralized error handling
 The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
