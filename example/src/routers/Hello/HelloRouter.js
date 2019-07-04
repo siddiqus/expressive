@@ -1,4 +1,4 @@
-const { Route, subRoute } = require("../../../lib/expressive");
+const { Route, subRoute } = require("../../../../src/index");
 const Hello = require("./controllers/Hello");
 const HelloDoc = require("./docs/HelloDoc");
 

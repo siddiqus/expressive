@@ -1,4 +1,4 @@
-const { Route } = require("../../../lib/expressive");
+const { Route } = require("../../../../src/index");
 
 const GetUsers = require("./controllers/GetUsers");
 const GetUsersDoc = require("./docs/GetUsersDoc");
