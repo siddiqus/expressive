@@ -49,7 +49,24 @@ describe("ExpressApp", () => {
                 middlewares: [() => { }],
                 swaggerDefinitions: {},
                 basePath: "/api",
-                errorMiddleware: () => {},
+                errorMiddleware: () => { },
+                showSwaggerOnlyInDev: false,
+                swaggerInfo: {}
+            });
+
+            expect(app.express).toBeDefined();
+        });
+
+        it("constructor with Cors config", () => {
+            const app = new ExpressApp({}, {
+                allowCors: true,
+                corsConfig: {
+                    origin: "http://somepath"
+                },
+                middlewares: [() => { }],
+                swaggerDefinitions: {},
+                basePath: "/api",
+                errorMiddleware: () => { },
                 showSwaggerOnlyInDev: false,
                 swaggerInfo: {}
             });
