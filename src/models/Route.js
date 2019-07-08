@@ -19,7 +19,7 @@ function getRouteFn(method) {
             validator = null,
             doc = null,
             errorHandler = null
-        }
+        } = {}
     ) => new Route(method, path, controller, {
         validator,
         doc,
