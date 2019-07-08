@@ -41,6 +41,24 @@ describe("Route model", () => {
         testRouteObj(routeObject);
     });
 
+    it("Should have HEAD function available", () => {
+        const routeObject = getRouteObj("head");
+        expect(routeObject.method).toEqual("head");
+        testRouteObj(routeObject);
+    });
+
+    it("Should have PATCH function available", () => {
+        const routeObject = getRouteObj("patch");
+        expect(routeObject.method).toEqual("patch");
+        testRouteObj(routeObject);
+    });
+
+    it("Should have OPTIONS function available", () => {
+        const routeObject = getRouteObj("options");
+        expect(routeObject.method).toEqual("options");
+        testRouteObj(routeObject);
+    });
+
     it("Should set error handler if given", () => {
         const routeObject = Route.get("/some/path", "someOtherController", {
             errorHandler: "someErrorHandler"
@@ -54,5 +72,9 @@ describe("Route model", () => {
         expect(route.method).toEqual("get");
         expect(route.path).toEqual("/");
         expect(route.controller).toEqual("someController");
+    });
+
+    it("getRouteFn: Should allow route without optional parameters", () => {
+        expect(Route.get("/", () => { })).toBeDefined();
     });
 });

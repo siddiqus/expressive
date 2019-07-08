@@ -25,11 +25,11 @@ function getRouteFn(method) {
         doc,
         errorHandler
     });
-}
+};
 
-Route.get = getRouteFn("get");
-Route.post = getRouteFn("post");
-Route.put = getRouteFn("put");
-Route.delete = getRouteFn("delete");
+const methods = ["get", "post", "put", "delete", "patch", "head", "options"];
+methods.forEach((m) => {
+    Route[m] = getRouteFn(m);
+});
 
 module.exports = Route;
