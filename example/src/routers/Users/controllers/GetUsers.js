@@ -1,8 +1,9 @@
-const unirest = require("unirest");
+const request = require("request");
 
 module.exports = async function GetUsers(req, res) {
     const url = "https://jsonplaceholder.typicode.com/users";
-    unirest.get(url).end((response) => {
-        res.send(response.body);
+    request(url, (error, response, body) => {
+        if (error) throw error;
+        res.send(body);
     });
-}
+};

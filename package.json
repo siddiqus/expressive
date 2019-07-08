@@ -27,8 +27,7 @@
     "express": "4.16.3",
     "express-request-id": "1.4.1",
     "express-validator": "5.3.0",
-    "swagger-ui-express": "4.0.1",
-    "unirest": "0.6.0"
+    "swagger-ui-express": "4.0.1"
   },
   "jest": {
     "coverageDirectory": "reports/coverage"
