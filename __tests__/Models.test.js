@@ -1,4 +1,5 @@
 import Route from "../src/models/Route";
+import subroute from "../src/models/subroute";
 
 function getRouteObj(method) {
     return Route[method](
@@ -15,6 +16,17 @@ function testRouteObj(routeObject) {
     expect(routeObject.validator).toEqual("validatorFunction");
     expect(routeObject.doc).toEqual("docJs");
 }
+
+describe("subroute", () => {
+    it("should return object", () => {
+        const someRouter = { some: "router" };
+        const somePath = "/somepath";
+        const obj = subroute(somePath, someRouter);
+        expect(obj.path).toEqual(somePath);
+        expect(obj.router).toEqual(someRouter);
+    });
+
+});
 
 describe("Route model", () => {
     it("Should have GET function available", () => {

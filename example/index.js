@@ -1,6 +1,6 @@
 
 const { ExpressApp } = require("../src/index");
-const router = require("./src/router");
+const router = require("./src/routers/Root/RootRouter");
 const swaggerDefinitions = require("./docs/swaggerDefinitions");
 
 const port = process.env.PORT || 8080;

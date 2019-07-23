@@ -1,4 +1,4 @@
-const { Route, subRoute } = require("../../../../src/index");
+const { Route, subroute } = require("../../../../src");
 const Hello = require("./controllers/Hello");
 const HelloDoc = require("./docs/HelloDoc");
 
@@ -20,6 +20,6 @@ module.exports = {
         })
     ],
     subroutes: [
-        subRoute("/users", UsersRouter)
+        subroute("/users", UsersRouter)
     ]
 };

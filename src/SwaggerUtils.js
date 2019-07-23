@@ -19,7 +19,7 @@ function convertDocsToSwaggerDoc(
     let tags = [];
 
     infoList.forEach((route) => {
-        let doc = route.doc;
+        let { doc } = route;
         if (!doc) doc = {};
         if (paths[route.path]) {
             paths[route.path][route.method] = doc;

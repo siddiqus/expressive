@@ -80,22 +80,27 @@ It is easy to create routes and nested routes using Expressive. Here are some po
       }
     );
     ```
-    Similarly, the class methods ```Route.post```, ```Route.put```, ```Route.delete``` are available to create the respective REST routes.
-  - Each object in the *subroutes* array looks like this:
+    Similarly, the class methods `post`, `put`, `delete`, `patch`, `head`, and `options` are available for the Route class e.g.  `Route.post`.
+
+  - Each object in the *subroutes* array can be constructed using the `subroute` function, like so:
     ```javascript
-    {
-       path: "/some/sub/path",
-       router: someRouter // this is also a router object
-    }
+    const { subroute } = require("@siddiqus/expressive");
+
+    const router = {
+      subroutes: [
+        subroute("/some/sub/path", someRouter) // 'someRouter' is another router object
+      ]
+    };
     ```
 Let's say we want to create an API with the following routes:
+  - GET /
   - GET /hello/
   - GET /hello/users
   - POST /hello/users
 
 We need to define a router object as follows:
 ```javascript
-const { Route } = require("@siddiqus/expressive");
+const { Route, subroute } = require("@siddiqus/expressive");
 
 const helloRouter = {
     routes: [
@@ -109,11 +114,11 @@ const helloRouter = {
 }
 
 const apiRouter = {
+    routes: [
+	    Route.get("/", apiRootController) // some predefined controller
+    ],
     subroutes: [
-        {
-            path: "/hello",
-            router: helloRouter
-        }
+	    subroute("/hello", helloRouter)
     ]
 }
 ```
