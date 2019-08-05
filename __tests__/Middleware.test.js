@@ -56,6 +56,8 @@ describe("Middleware Manager", () => {
             const manager = new MiddlewareManager();
             manager._getBodyParser = jest.fn().mockReturnValue(1);
             manager.addRequestId = jest.fn().mockReturnValue(2);
+            manager.helmet = jest.fn().mockReturnValue(3);
+
 
             const mockExpress = {
                 use: jest.fn()
@@ -64,12 +66,13 @@ describe("Middleware Manager", () => {
             const mockUserMiddleware = "abc";
             manager.registerMiddleware(mockExpress, mockUserMiddleware);
 
-            expect(mockExpress.use).toHaveBeenCalledTimes(4);
+            expect(mockExpress.use).toHaveBeenCalledTimes(5);
 
             expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
             expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
             expect(mockExpress.use.mock.calls[2][0]).toEqual(2);
-            expect(mockExpress.use.mock.calls[3][0]).toEqual(mockUserMiddleware);
+            expect(mockExpress.use.mock.calls[3][0]).toEqual(3);
+            expect(mockExpress.use.mock.calls[4][0]).toEqual(mockUserMiddleware);
         });
 
         it("Should register defaults without user middleware", () => {
@@ -83,11 +86,44 @@ describe("Middleware Manager", () => {
 
             manager.registerMiddleware(mockExpress);
 
-            expect(mockExpress.use).toHaveBeenCalledTimes(3);
+            expect(mockExpress.use).toHaveBeenCalledTimes(4); // registering 4 middlewares
 
             expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
             expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
             expect(mockExpress.use.mock.calls[2][0]).toEqual(2);
+        });
+    });
+
+    describe("_registerHelmet", () => {
+        it("Should register helmet with defaults if no config is given", () => {
+            const middlewareManager = new MiddlewareManager();
+            middlewareManager.helmet = jest.fn().mockReturnValue(123);
+
+            const mockExpress = {
+                use: jest.fn()
+            }
+            middlewareManager._registerHelmet(mockExpress);
+            expect(mockExpress.use).toHaveBeenCalledWith(123);
+            expect(middlewareManager.helmet).toHaveBeenCalledTimes(1);
+            expect(middlewareManager.helmet.mock.calls[0].length).toEqual(0);
+        });
+
+        it("Should register helmet with given config", () => {
+            const mockHelmetOptions = {
+                hello: "world"
+            };
+            const middlewareManager = new MiddlewareManager({
+                helmetOptions: mockHelmetOptions
+            });
+            middlewareManager.helmet = jest.fn().mockReturnValue(123);
+
+            const mockExpress = {
+                use: jest.fn()
+            }
+            middlewareManager._registerHelmet(mockExpress);
+            expect(mockExpress.use).toHaveBeenCalledWith(123);
+            expect(middlewareManager.helmet).toHaveBeenCalledTimes(1);
+            expect(middlewareManager.helmet).toHaveBeenCalledWith(mockHelmetOptions);
         });
     });
 });

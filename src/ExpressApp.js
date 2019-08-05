@@ -14,7 +14,8 @@ module.exports = class ExpressApp {
         corsConfig = null,
         middlewares = null,
         errorMiddleware = null,
-        bodyLimit = "100kb"
+        bodyLimit = "100kb",
+        helmetOptions = null
     } = {}) {
         this.config = {
             swaggerInfo,
@@ -25,7 +26,8 @@ module.exports = class ExpressApp {
             corsConfig,
             middlewares,
             errorMiddleware,
-            bodyLimit
+            bodyLimit,
+            helmetOptions
         };
 
         this.router = router;
@@ -36,7 +38,8 @@ module.exports = class ExpressApp {
         this.routerFactory = new RouterFactory();
 
         this.middlewareManager = new MiddlewareManager({
-            bodyLimit
+            bodyLimit,
+            helmetOptions
         });
 
         this.registerRoutes();
