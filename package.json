@@ -29,7 +29,11 @@
     "swagger-ui-express": "4.0.1"
   },
   "jest": {
-    "coverageDirectory": "reports/coverage"
+    "coverageDirectory": "reports/coverage",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ]
   },
   "devDependencies": {
     "@babel/cli": "7.4.3",
