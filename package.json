@@ -12,9 +12,7 @@
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
     "coveralls": "jest --coverage && cat reports/coverage/lcov.info | coveralls",
-    "rollup": "rollup -c",
     "build": "babel src --out-dir build",
-    "prep:example": "npm run clean && npm run rollup && cp dist/expressive.js example/lib/expressive.js",
     "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html || echo Lint report: reports/lint.html",
     "lintFix": "eslint --fix src || echo Linting done!",
     "dev": "nodemon -w example/index.js --exec node example/index.js"
@@ -51,13 +49,7 @@
     "eslint-plugin-react": "7.12.4",
     "jest": "24.8.0",
     "nodemon": "1.19.0",
-    "rimraf": "2.6.2",
-    "rollup": "1.10.0",
-    "rollup-plugin-commonjs": "9.3.4",
-    "rollup-plugin-node-builtins": "2.1.2",
-    "rollup-plugin-node-resolve": "4.2.3",
-    "rollup-plugin-terser": "4.0.4",
-    "rollup-plugin-uglify": "6.0.2"
+    "rimraf": "2.6.2"
   },
   "homepage": "https://github.com/siddiqus/expressive#readme",
   "bugs": {
