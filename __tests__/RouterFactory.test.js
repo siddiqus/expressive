@@ -1,4 +1,4 @@
-import RouterFactory from "../src/RouterFactory";
+const RouterFactory = require("../src/RouterFactory");
 
 const mockSubroutes = [
     {

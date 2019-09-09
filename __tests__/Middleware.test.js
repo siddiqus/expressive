@@ -1,5 +1,5 @@
-import response from "../src/middleware/response";
-import MiddlewareManager from "../src/middleware/MiddlewareManager";
+const response = require("../src/middleware/response");
+const MiddlewareManager = require("../src/middleware/MiddlewareManager");
 
 describe("response middleware", () => {
     it("Should call fn properly", () => {

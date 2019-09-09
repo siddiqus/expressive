@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs";
-import SwaggerUtils from "../src/SwaggerUtils";
+const path = require("path");
+const fs = require("fs");
+const SwaggerUtils = require("../src/SwaggerUtils");
 
 const mockRouterWithTopRoutes = {
     routes: [

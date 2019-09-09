@@ -1,4 +1,4 @@
-import RouteUtil from "../src/RouteUtil";
+const RouteUtil = require("../src/RouteUtil");
 
 const mockSubroutes = [
     {

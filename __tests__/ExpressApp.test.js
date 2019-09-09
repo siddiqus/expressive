@@ -1,4 +1,4 @@
-import ExpressApp from "../src/ExpressApp";
+const ExpressApp = require("../src/ExpressApp");
 
 describe("ExpressApp", () => {
     it("should be defined", () => {

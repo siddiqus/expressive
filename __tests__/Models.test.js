@@ -1,5 +1,5 @@
-import Route from "../src/models/Route";
-import subroute from "../src/models/subroute";
+const Route = require("../src/models/Route");
+const subroute = require("../src/models/subroute");
 
 function getRouteObj(method) {
     return Route[method](
