@@ -59,6 +59,28 @@ const mockRouterWithTopRoutes = {
 };
 
 describe("SwaggerUtils", () => {
+    describe("_sanitizeSwaggerPath", () => {
+        it("Should sanitize path parameter at the end of the url", () => {
+            const result = SwaggerUtils._sanitizeSwaggerPath("some/:path");
+            expect(result).toEqual("some/{path}");
+        });
+
+        it("Should sanitize path parameter at the end of the url with extra slash", () => {
+            const result = SwaggerUtils._sanitizeSwaggerPath("some/:path/");
+            expect(result).toEqual("some/{path}/");
+        });
+
+        it("Should sanitize path parameter in the middle of url", () => {
+            const result = SwaggerUtils._sanitizeSwaggerPath("/some/:path/other");
+            expect(result).toEqual("/some/{path}/other");
+        });
+
+        it("Should sanitize multiple path parameters", () => {
+            const result = SwaggerUtils._sanitizeSwaggerPath("/some/:path/other/:url/");
+            expect(result).toEqual("/some/{path}/other/{url}/");
+        });
+    });
+
     describe("writeSwaggerJson", () => {
         it("should write json for swagger", () => {
             const sampleSwaggerInfo = {

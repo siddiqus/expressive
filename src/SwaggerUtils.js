@@ -8,6 +8,19 @@ function registerExpress(express, swaggerJson) {
         explorer: true,
     }));
 }
+function _sanitizeSwaggerPath(path) {
+    if (!path.includes(":")) return path;
+
+    let split = path.split("/");
+
+    split.forEach((p, index) => {
+        if (p.includes(":")) {
+            p = `{${p.replace(":", "")}}`;
+            split[index] = p;
+        }
+    });
+    return split.join("/");
+}
 
 function convertDocsToSwaggerDoc(
     router,
@@ -19,13 +32,15 @@ function convertDocsToSwaggerDoc(
     let tags = [];
 
     infoList.forEach((route) => {
-        let { doc } = route;
+        let { doc, path, method } = route;
+        path = _sanitizeSwaggerPath(path);
+
         if (!doc) doc = {};
-        if (paths[route.path]) {
-            paths[route.path][route.method] = doc;
+        if (paths[path]) {
+            paths[path][method] = doc;
         } else {
-            paths[route.path] = {
-                [route.method]: doc,
+            paths[path] = {
+                [method]: doc,
             };
         }
         tags = tags.concat(doc.tags);
@@ -87,4 +102,5 @@ module.exports = {
     registerExpress,
     convertDocsToSwaggerDoc,
     writeSwaggerJson,
+    _sanitizeSwaggerPath
 };
