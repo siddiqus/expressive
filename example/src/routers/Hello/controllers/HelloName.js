@@ -1,7 +1,11 @@
-module.exports = function (req, res) {
-    const { firstName, lastName } = req.body;
+const { BaseController } = require("../../../../expressive");
 
-    res.json({
-        hello: `Hello ${firstName} ${lastName}!`
-    })
+module.exports = class HelloNameController extends BaseController {
+    handleRequest(req, res, next) {
+        const { firstName, lastName } = req.body;
+
+        res.json({
+            hello: `Hello ${firstName} ${lastName}!`
+        })
+    }
 }

@@ -13,5 +13,5 @@ module.exports.getServerlessHandler = function getServerlessHandler(expressApp, 
                 req.apiGatewayContext = context;
             }
         })(event, context, callback);
-    }
-}
+    };
+};

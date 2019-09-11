@@ -1,5 +1,5 @@
 
-const { ExpressApp } = require("../src/index");
+const { ExpressApp } = require("./expressive");
 const router = require("./src/routers/Root/RootRouter");
 const swaggerDefinitions = require("./docs/swaggerDefinitions");
 

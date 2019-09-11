@@ -20,10 +20,11 @@ module.exports = class RouterFactory {
     }
 
     _getWrappedController(controller, errorHandler = null) {
+        const requestHandler = new controller();
         return async (req, res, next) => {
             try {
                 if (!this._hasValidationErrors(req, res)) {
-                    await controller(req, res, next);
+                    await requestHandler.handleRequest(req, res, next);
                 }
             } catch (e) {
                 if (errorHandler) {

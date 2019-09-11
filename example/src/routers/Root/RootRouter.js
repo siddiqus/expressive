@@ -1,4 +1,4 @@
-const { Route, subroute } = require("../../../../src");
+const { Route, subroute } = require("../../../expressive");
 
 const RootGetController = require("./controllers/RootGetController");
 const RootGetDoc = require("./docs/RootGetDoc");

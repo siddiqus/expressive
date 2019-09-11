@@ -27,19 +27,22 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 Install the package:  ```npm i -S @siddiqus/expressive```
 
 Here is a basic example:
+__*It is required for controllers to extend BaseController. This also allows for dependencies to be instantiated inside the constructor, which can be useful for testing.__
 
 ```javascript
-const { Route, ExpressApp } = require("@siddiqus/expressive");
+const { Route, ExpressApp, BaseController } = require("@siddiqus/expressive");
 
-const helloGetController = (req, res) => {
-  res.send({
-      hello: "world"
-  })
-};
+class HelloGetController extends BaseController {
+  handleRequest (req, res) => {
+    res.send({
+        hello: "world"
+    })
+  };
+}
 
 const router = {
     routes: [
-      Route.get("/hello", helloGetController)
+      Route.get("/hello", HelloGetController)
     ]
 }
 
@@ -73,7 +76,7 @@ It is easy to create routes and nested routes using Expressive. Here are some po
 
     const helloGetRoute = Route.get(
       "/some/path", // required - relative end path of endpoint
-      someController, // required - express request handler e.g. function (req, res, next) => { }
+      SomeController, // required - express request handler e.g. function (req, res, next) => { }
       {
         doc: someDocJs, // optional - Swagger json format for a given endpoint
         validator: someExpressValidator, // optional - validator array in express-validator format
@@ -93,6 +96,7 @@ It is easy to create routes and nested routes using Expressive. Here are some po
       ]
     };
     ```
+
 Let's say we want to create an API with the following routes:
   - GET /
   - GET /hello/
@@ -107,16 +111,16 @@ const helloRouter = {
     routes: [
         [
             // with some predefined controller functions
-            Route.get("/", getHelloController), 
-            Route.get("/users", getUsersController),
-            Route.post("/users", postUsersController)
+            Route.get("/", GetHelloController), 
+            Route.get("/users", GetUsersController),
+            Route.post("/users", PostUsersController)
         ]
     ]
 }
 
 const apiRouter = {
     routes: [
-	    Route.get("/", apiRootController) // some predefined controller
+	    Route.get("/", ApiRootController) // some predefined controller
     ],
     subroutes: [
 	    subroute("/hello", helloRouter)

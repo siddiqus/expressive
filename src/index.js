@@ -4,6 +4,7 @@ const SwaggerUtils = require("./SwaggerUtils");
 const Route = require("./models/Route");
 const subroute = require("./models/subroute");
 const serverless = require("./serverless");
+const BaseController = require("./BaseController");
 
 module.exports = exports = {
     ExpressApp,
@@ -11,5 +12,6 @@ module.exports = exports = {
     SwaggerUtils,
     Route,
     subroute,
-    serverless
+    serverless,
+    BaseController
 };
