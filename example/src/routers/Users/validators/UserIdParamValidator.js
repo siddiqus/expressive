@@ -1,4 +1,4 @@
-const { param } = require("express-validator/check");
+const { param } = require("express-validator");
 
 module.exports = [
     param('userId')
