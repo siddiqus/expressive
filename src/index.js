@@ -5,6 +5,7 @@ const Route = require("./models/Route");
 const subroute = require("./models/subroute");
 const serverless = require("./serverless");
 const BaseController = require("./BaseController");
+const expressValidator = require("express-validator");
 
 module.exports = exports = {
     ExpressApp,
@@ -13,5 +14,6 @@ module.exports = exports = {
     Route,
     subroute,
     serverless,
-    BaseController
+    BaseController,
+    expressValidator
 };
