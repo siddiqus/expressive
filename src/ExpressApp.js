@@ -61,7 +61,8 @@ module.exports = class ExpressApp {
     }
 
     registerRoutes() {
-        if (!this.config.showSwaggerOnlyInDev || process.env.NODE_ENV === "development") {
+        if ((this.config.showSwaggerOnlyInDev && process.env.NODE_ENV === "development")
+                || !this.config.showSwaggerOnlyInDev) {
             this._registerSwagger();
         }
 
