@@ -47,12 +47,12 @@ function convertDocsToSwaggerDoc(
     });
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
-    return {
-        ...swaggerHeader,
-        definitions: swaggerDefinitions,
-        tags,
-        paths,
-    };
+
+    const swaggerDoc = Object.assign({}, swaggerHeader);
+    swaggerDoc.definitions = swaggerDefinitions;
+    swaggerDoc.tags = tags;
+    swaggerDoc.paths = paths;
+    return swaggerDoc;
 }
 
 const sampleSwaggerInfo = {
