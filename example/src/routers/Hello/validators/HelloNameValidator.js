@@ -1,4 +1,5 @@
-const { body } = require("express-validator");
+const { expressValidator } = require("../../../../expressive");
+const { body } = expressValidator;
 
 module.exports = [
     body("firstName")
