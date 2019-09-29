@@ -8,10 +8,11 @@ function registerExpress(express, swaggerJson) {
         explorer: true,
     }));
 }
+
 function _sanitizeSwaggerPath(path) {
     if (!path.includes(":")) return path;
 
-    let split = path.split("/");
+    const split = path.split("/");
 
     split.forEach((p, index) => {
         if (p.includes(":")) {
