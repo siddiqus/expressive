@@ -5,18 +5,21 @@ const SwaggerUtils = require("./SwaggerUtils");
 const MiddlewareManager = require("./middleware/MiddlewareManager");
 
 module.exports = class ExpressApp {
-    constructor(router, {
-        basePath = "/",
-        showSwaggerOnlyInDev = true,
-        swaggerInfo = undefined,
-        swaggerDefinitions,
-        allowCors = false,
-        corsConfig = null,
-        middlewares = null,
-        errorMiddleware = null,
-        bodyLimit = "100kb",
-        helmetOptions = null
-    } = {}) {
+    constructor(
+        router,
+        {
+            basePath = "/",
+            showSwaggerOnlyInDev = true,
+            swaggerInfo = undefined,
+            swaggerDefinitions,
+            allowCors = false,
+            corsConfig = null,
+            middlewares = null,
+            errorMiddleware = null,
+            bodyLimit = "100kb",
+            helmetOptions = null
+        } = {}
+    ) {
         this.config = {
             swaggerInfo,
             showSwaggerOnlyInDev,
@@ -52,27 +55,36 @@ module.exports = class ExpressApp {
 
     _registerSwagger() {
         const swaggerHeader = this.SwaggerUtils.getSwaggerHeader(
-            this.config.basePath, this.config.swaggerInfo
+            this.config.basePath,
+            this.config.swaggerInfo
         );
         const swaggerJson = this.SwaggerUtils.convertDocsToSwaggerDoc(
-            this.router, swaggerHeader, this.config.swaggerDefinitions
+            this.router,
+            swaggerHeader,
+            this.config.swaggerDefinitions
         );
         this.SwaggerUtils.registerExpress(this.express, swaggerJson);
     }
 
     registerRoutes() {
-        if ((this.config.showSwaggerOnlyInDev && process.env.NODE_ENV === "development")
-                || !this.config.showSwaggerOnlyInDev) {
+        if (
+            (this.config.showSwaggerOnlyInDev &&
+                process.env.NODE_ENV === "development") ||
+            !this.config.showSwaggerOnlyInDev
+        ) {
             this._registerSwagger();
         }
 
         if (this.config.allowCors) {
-            const corsMiddleware = this.config.corsConfig ? cors(this.config.corsConfig) : cors();
+            const corsMiddleware = this.config.corsConfig
+                ? cors(this.config.corsConfig)
+                : cors();
             this.express.use(corsMiddleware);
         }
 
         this.middlewareManager.registerMiddleware(
-            this.express, this.config.middlewares
+            this.express,
+            this.config.middlewares
         );
 
         const expressRouter = this.routerFactory.getExpressRouter(this.router);

@@ -16,8 +16,7 @@ function _sanitizeSwaggerPath(path) {
 
     split.forEach((p, index) => {
         if (p.includes(":")) {
-            p = `{${p.replace(":", "")}}`;
-            split[index] = p;
+            split[index] = `{${p.replace(":", "")}}`;
         }
     });
     return split.join("/");

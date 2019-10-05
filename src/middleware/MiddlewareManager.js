@@ -3,12 +3,13 @@ const addRequestId = require("express-request-id");
 const helmet = require("helmet");
 const responseMiddleware = require("./response");
 
-
 module.exports = class MiddlewareManager {
-    constructor(options = {
-        bodyLimit: "100kb",
-        helmetOptions: null
-    }) {
+    constructor(
+        options = {
+            bodyLimit: "100kb",
+            helmetOptions: null
+        }
+    ) {
         this.options = options;
 
         this.bodyParser = bodyParser;
@@ -26,7 +27,9 @@ module.exports = class MiddlewareManager {
     }
 
     _registerHelmet(express) {
-        const helmet = this.options.helmetOptions ? this.helmet(this.options.helmetOptions) : this.helmet();
+        const helmet = this.options.helmetOptions
+            ? this.helmet(this.options.helmetOptions)
+            : this.helmet();
         express.use(helmet);
     }
 

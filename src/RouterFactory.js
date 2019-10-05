@@ -19,8 +19,8 @@ module.exports = class RouterFactory {
         } else return false;
     }
 
-    _getWrappedController(controller, errorHandler = null) {
-        const requestHandler = new controller();
+    _getWrappedController(Controller, errorHandler = null) {
+        const requestHandler = new Controller();
         return async (req, res, next) => {
             try {
                 if (!this._hasValidationErrors(req, res)) {
