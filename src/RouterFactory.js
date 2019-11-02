@@ -19,12 +19,19 @@ module.exports = class RouterFactory {
         } else return false;
     }
 
-    _getWrappedController(Controller, errorHandler = null) {
-        const requestHandler = new Controller();
+    _isFunction(functionToCheck) {
+        return functionToCheck && {}.toString.call(functionToCheck) === "[object Function]";
+    }
+
+    _getWrappedController(controller, errorHandler = null) {
         return async (req, res, next) => {
             try {
                 if (!this._hasValidationErrors(req, res)) {
-                    await requestHandler.handleRequest(req, res, next);
+                    if(this._isFunction(controller)) {
+                        await controller(req, res, next);
+                    } else {
+                        await controller._handleRequestBase(req, res, next);
+                    }
                 }
             } catch (e) {
                 if (errorHandler) {
