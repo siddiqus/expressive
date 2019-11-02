@@ -1,17 +1,16 @@
-const util = require("util");
-const request = util.promisify(require("request"));
 const { BaseController } = require("../../../../expressive");
 
 module.exports = class GetUsers extends BaseController {
-    constructor() {
+    constructor(request) {
         super();
         this.request = request;
     }
 
-    async handleRequest(req, res, next) {
+    async handleRequest() {
         const url = "https://jsonplaceholder.typicode.com/users";
-        const { error, response, body } = await request(url);
-        if (error) throw error;
-        res.send(body);
+        this.request.get({ url, json: true }, (err, response, body) => {
+            if (err) throw err;
+            return this.ok(body);
+        });
     }
 }

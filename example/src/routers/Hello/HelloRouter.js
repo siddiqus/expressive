@@ -1,5 +1,4 @@
 const { Route, subroute } = require("../../../expressive");
-const Hello = require("./controllers/Hello");
 const HelloDoc = require("./docs/HelloDoc");
 
 const HelloName = require("./controllers/HelloName");
@@ -11,11 +10,15 @@ const UsersRouter = require("../Users/UsersRouter");
 
 module.exports = {
     routes: [
-        Route.post("/", HelloName, {
+        Route.post("/", new HelloName(), {
             validator: HelloNameValidator,
             doc: HelloNameDoc
         }),
-        Route.get("/", Hello, {
+        Route.get("/", (req, res) => {
+            res.json({
+                hello: "world"
+            });
+        }, {
             doc: HelloDoc
         })
     ],

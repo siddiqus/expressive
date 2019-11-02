@@ -1,21 +1,18 @@
-const request = require("request");
-const util = require("util");
-const requestPromise = util.promisify(request);
-
 const { BaseController } = require("../../../../expressive");
 
 module.exports = class GetUserById extends BaseController {
-    constructor() {
+    constructor(request) {
         super();
         this.request = request;
     }
 
-    async handleRequest(req, res, next) {
-        const { userId } = req.params;
+    async handleRequest() {
+        const { userId } = this.req.params;
         const url = `https://jsonplaceholder.typicode.com/users/${userId}`;
-        
-        const { error, body } = await requestPromise(url);
-        if (error) throw error;
-        res.send(body);
+
+        this.request.get({ url, json: true }, (err, response, body) => {
+            if (err) throw err;
+            return this.ok(body);
+        });
     }
 }

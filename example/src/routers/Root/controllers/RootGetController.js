@@ -1,9 +1,9 @@
 const { BaseController } = require("../../../../expressive");
 
 module.exports = class RootGetController extends BaseController {
-    handleRequest(req, res, next) {
-        res.json({
+    handleRequest() {
+        return this.ok({
             message: "This is the API root."
-        })
+        });
     }
 }
