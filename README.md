@@ -145,7 +145,7 @@ The ExpressApp class constructor's second parameter is a configuration object th
 The Expressive app comes with the following built-in middleware:
 - [body-parser](https://www.npmjs.com/package/body-parser) - manage request body in middleware
 - [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
-- [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for eqch request
+- [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for each request
 - [helmet](https://www.npmjs.com/package/helmet) - Add various HTTP headers for basic security 
 
 The 'middlewares' property in the app config object is an array of middleware functions that are injected after the built-in middleware for API request handling.
