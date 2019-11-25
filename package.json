@@ -62,5 +62,8 @@
     "javascript",
     "rest api",
     "convention based routing"
-  ]
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
