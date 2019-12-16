@@ -27,18 +27,21 @@ describe("BaseController", () => {
         expect(base.next).toEqual(mockNext);
     });
 
-    it("should handle method '_jsonResponse' properly", () => {
+    it("should handle method '_sendJsonResponse' properly with data", () => {
         const controller = new BaseController();
 
         const mockJson = jest.fn().mockReturnValue(123);
         const mockStatus = jest.fn().mockReturnValue({
             json: mockJson
         });
-        controller.res = {
+
+        const mockRes = {
             status: mockStatus
         };
 
-        const result = controller._jsonResponseWithMessage(200, "some message");
+        controller.res = mockRes;
+
+        const result = controller._sendJsonResponse(200, { message: "some message" });
         expect(result).toEqual(123);
         expect(mockStatus).toHaveBeenCalledWith(200);
         expect(mockJson).toHaveBeenCalledWith({
@@ -46,13 +49,55 @@ describe("BaseController", () => {
         });
     });
 
+    it("should handle method '_sendJsonResponse' properly without data", () => {
+        const controller = new BaseController();
+
+        const mockStatus = jest.fn().mockReturnValue(123);
+        const mockRes = {
+            sendStatus: mockStatus
+        };
+
+        controller.res = mockRes;
+
+        const result = controller._sendJsonResponse(200);
+        expect(result).toEqual(123);
+        expect(mockStatus).toHaveBeenCalledWith(200);
+    });
+
+    it("should throw error if handleRequest is not implemented", async () => {
+        class SomeController extends BaseController { }
+
+        const controller = new SomeController();
+
+        let result;
+        try {
+            await controller.handleRequest();
+        } catch (error) {
+            result = error;
+        }
+
+        expect(result).toBeInstanceOf(Error);
+        expect(result.message).toEqual("'handleRequest' not implemented in SomeController");
+    });
+
+    it("_sendJsonResponseWithMessage: should call sendJsonResponse properly", () => {
+        const controller = new BaseController();
+        controller._sendJsonResponse = jest.fn().mockReturnValue(123);
+
+        const result = controller._sendJsonResponseWithMessage(200, "some message");
+        expect(result).toEqual(123);
+        expect(controller._sendJsonResponse).toHaveBeenCalledWith(200, {
+            message: "some message"
+        });
+    });
 
     describe("response", () => {
         const controller = new BaseController();
 
         beforeEach(() => {
             controller.res = jest.fn();
-            controller._jsonResponseWithMessage = jest.fn();
+            controller._sendJsonResponseWithMessage = jest.fn();
+            controller._sendJsonResponse = jest.fn();
         });
 
 

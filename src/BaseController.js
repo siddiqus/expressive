@@ -17,54 +17,54 @@ module.exports = class BaseController {
         throw new Error(`'handleRequest' not implemented in ${this.constructor.name}`);
     }
 
-    _jsonResponseWithMessage(code, message) {
-        return this.res.status(code).json({ message });
+    _sendJsonResponseWithMessage(code, message) {
+        return this._sendJsonResponse(code, { message });
+    }
+
+    _sendJsonResponse(code, data) {
+        return !!data ? this.res.status(code).json(data) : this.res.sendStatus(code);
     }
 
     ok(dto) {
-        if (!!dto) {
-            return this.res.status(200).json(dto);
-        } else {
-            return this.res.sendStatus(200);
-        }
+        return this._sendJsonResponse(200, dto);
     }
 
     created(data = null) {
-        return data ? this.res.status(201).json(data) : this.res.sendStatus(201);
+        return this._sendJsonResponse(201, data);
     }
 
-    clientError(message) {
-        return this._jsonResponseWithMessage(400, message ? message : "Unauthorized");
+    accepted(data = null) {
+        return this._sendJsonResponse(202, data);
+    }
+
+    noContent() {
+        return this._sendJsonResponse(204);
+    }
+
+    badRequest(message) {
+        return this._sendJsonResponseWithMessage(400, message || "Unauthorized");
     }
 
     unauthorized(message) {
-        return this._jsonResponseWithMessage(401, message ? message : "Unauthorized");
-    }
-
-    paymentRequired(message) {
-        return this._jsonResponseWithMessage(402, message ? message : "Payment required");
+        return this._sendJsonResponseWithMessage(401, message || "Unauthorized");
     }
 
     forbidden(message) {
-        return this._jsonResponseWithMessage(403, message ? message : "Forbidden");
+        return this._sendJsonResponseWithMessage(403, message || "Forbidden");
     }
 
     notFound(message) {
-        return this._jsonResponseWithMessage(404, message ? message : "Not found");
-    }
-
-    conflict(message) {
-        return this._jsonResponseWithMessage(409, message ? message : "Conflict");
+        return this._sendJsonResponseWithMessage(404, message || "Not found");
     }
 
     tooMany(message) {
-        return this._jsonResponseWithMessage(429, message ? message : "Too many requests");
+        return this._sendJsonResponseWithMessage(429, message || "Too many requests");
     }
 
-    fail(message, data = undefined) {
-        return this.res.status(500).json({
+    internalServerError(message, body = {}) {
+        return this._sendJsonResponse(500, {
             message,
-            data
+            ...body
         });
     }
 };
