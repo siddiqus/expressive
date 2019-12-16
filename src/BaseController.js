@@ -14,10 +14,10 @@ module.exports = class BaseController {
     }
 
     async handleRequest() {
-
+        throw new Error(`'handleRequest' not implemented in ${this.constructor.name}`);
     }
 
-    _jsonResponse(code, message) {
+    _jsonResponseWithMessage(code, message) {
         return this.res.status(code).json({ message });
     }
 
@@ -34,31 +34,31 @@ module.exports = class BaseController {
     }
 
     clientError(message) {
-        return this._jsonResponse(400, message ? message : "Unauthorized");
+        return this._jsonResponseWithMessage(400, message ? message : "Unauthorized");
     }
 
     unauthorized(message) {
-        return this._jsonResponse(401, message ? message : "Unauthorized");
+        return this._jsonResponseWithMessage(401, message ? message : "Unauthorized");
     }
 
     paymentRequired(message) {
-        return this._jsonResponse(402, message ? message : "Payment required");
+        return this._jsonResponseWithMessage(402, message ? message : "Payment required");
     }
 
     forbidden(message) {
-        return this._jsonResponse(403, message ? message : "Forbidden");
+        return this._jsonResponseWithMessage(403, message ? message : "Forbidden");
     }
 
     notFound(message) {
-        return this._jsonResponse(404, message ? message : "Not found");
+        return this._jsonResponseWithMessage(404, message ? message : "Not found");
     }
 
     conflict(message) {
-        return this._jsonResponse(409, message ? message : "Conflict");
+        return this._jsonResponseWithMessage(409, message ? message : "Conflict");
     }
 
     tooMany(message) {
-        return this._jsonResponse(429, message ? message : "Too many requests");
+        return this._jsonResponseWithMessage(429, message ? message : "Too many requests");
     }
 
     fail(message, data = undefined) {

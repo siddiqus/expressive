@@ -38,7 +38,7 @@ describe("BaseController", () => {
             status: mockStatus
         };
 
-        const result = controller._jsonResponse(200, "some message");
+        const result = controller._jsonResponseWithMessage(200, "some message");
         expect(result).toEqual(123);
         expect(mockStatus).toHaveBeenCalledWith(200);
         expect(mockJson).toHaveBeenCalledWith({
@@ -52,7 +52,7 @@ describe("BaseController", () => {
 
         beforeEach(() => {
             controller.res = jest.fn();
-            controller._jsonResponse = jest.fn();
+            controller._jsonResponseWithMessage = jest.fn();
         });
 
 

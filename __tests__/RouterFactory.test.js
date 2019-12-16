@@ -213,6 +213,22 @@ describe("RouterFactory", () => {
             expect(mockErrorJestFn).not.toHaveBeenCalled();
             expect(mockNext).not.toHaveBeenCalled();
         });
+
+        it("should execute controller if given a function", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+            const fn = factory._getWrappedController(mockFn);
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = 3;
+
+            await fn(someReq, someRes, someNext);
+
+            expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+        });
     });
 
     it("Should get router from method", () => {

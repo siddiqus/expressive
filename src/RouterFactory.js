@@ -8,15 +8,14 @@ module.exports = class RouterFactory {
 
     _hasValidationErrors(req, res) {
         const errors = this.validationResult(req);
-        if (!errors.isEmpty()) {
-            res.status(422);
-            res.json({
-                errors: errors.array({
-                    onlyFirstError: true
-                })
-            });
-            return true;
-        } else return false;
+        if (errors.isEmpty()) return false;
+
+        res.status(422);
+        res.json({
+            errors: errors.array()
+        });
+        
+        return true;
     }
 
     _isFunction(functionToCheck) {
@@ -27,18 +26,10 @@ module.exports = class RouterFactory {
         return async (req, res, next) => {
             try {
                 if (!this._hasValidationErrors(req, res)) {
-                    if(this._isFunction(controller)) {
-                        await controller(req, res, next);
-                    } else {
-                        await controller._handleRequestBase(req, res, next);
-                    }
+                    await (this._isFunction(controller) ? controller(req, res, next) : controller._handleRequestBase(req, res, next));
                 }
             } catch (e) {
-                if (errorHandler) {
-                    errorHandler(e, req, res, next);
-                } else {
-                    next(e);
-                }
+                return errorHandler ? errorHandler(e, req, res, next) : next(e);
             }
         };
     }
