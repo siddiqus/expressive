@@ -25,7 +25,7 @@ module.exports = class BaseController {
         return !!data ? this.res.status(code).json(data) : this.res.sendStatus(code);
     }
 
-    ok(dto) {
+    ok(dto = null) {
         return this._sendJsonResponse(200, dto);
     }
 
@@ -41,27 +41,27 @@ module.exports = class BaseController {
         return this._sendJsonResponse(204);
     }
 
-    badRequest(message) {
-        return this._sendJsonResponseWithMessage(400, message || "Unauthorized");
+    badRequest(message = "Bad request") {
+        return this._sendJsonResponseWithMessage(400, message);
     }
 
-    unauthorized(message) {
-        return this._sendJsonResponseWithMessage(401, message || "Unauthorized");
+    unauthorized(message = "Unauthorized") {
+        return this._sendJsonResponseWithMessage(401, message);
     }
 
-    forbidden(message) {
-        return this._sendJsonResponseWithMessage(403, message || "Forbidden");
+    forbidden(message = "Forbidden") {
+        return this._sendJsonResponseWithMessage(403, message);
     }
 
-    notFound(message) {
-        return this._sendJsonResponseWithMessage(404, message || "Not found");
+    notFound(message = "Not found") {
+        return this._sendJsonResponseWithMessage(404, message);
     }
 
-    tooMany(message) {
-        return this._sendJsonResponseWithMessage(429, message || "Too many requests");
+    tooMany(message = "Too many requests") {
+        return this._sendJsonResponseWithMessage(429, message);
     }
 
-    internalServerError(message, body = {}) {
+    internalServerError(message = "Internal server error", body = {}) {
         return this._sendJsonResponse(500, {
             message,
             ...body
