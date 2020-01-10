@@ -1,6 +1,9 @@
-module.exports = (path, router) => {
+module.exports = (path, router, {
+    middleware: []
+} = {}) => {
     return {
         path,
-        router
+        router,
+        middleware
     };
 };

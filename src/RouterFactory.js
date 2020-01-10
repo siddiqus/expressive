@@ -35,19 +35,24 @@ module.exports = class RouterFactory {
     }
 
     _registerRoute(router, {
-        method, path, controller, validator = [], errorHandler = null
+        method, path, controller, validator = [], errorHandler = null, middleware = []
     }) {
-        router[method](
-            path,
-            validator,
+        const routerArgs = [
+            path, validator, ...middleware,
             this._getWrappedController(controller, errorHandler)
-        );
+        ];
+
+        router[method](...routerArgs);
     }
 
     _registerSubroute(router, {
-        path, router: subrouter, validator = []
+        path, router: subrouter, middleware = []
     }) {
-        router.use(path, validator, this.getExpressRouter(subrouter));
+        const routerArgs = [
+            path, ...middleware,
+            this.getExpressRouter(subrouter) 
+        ];
+        router.use(...routerArgs);
     }
 
     _getRouter() {
