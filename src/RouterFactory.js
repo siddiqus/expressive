@@ -1,6 +1,18 @@
 const { Router } = require("express");
 const { validationResult } = require("express-validator");
 
+const FUNCTION_STRING = "function";
+const CLASS_STRING = "class";
+const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
+
+async function _handleRequestBase(req, res, next) {
+    this.req = req;
+    this.res = res;
+    this.next = next;
+
+    return this.handleRequest();
+}
+
 module.exports = class RouterFactory {
     constructor() {
         this.validationResult = validationResult;
@@ -8,30 +20,30 @@ module.exports = class RouterFactory {
 
     _hasValidationErrors(req, res) {
         const errors = this.validationResult(req);
-        if (!errors.isEmpty()) {
-            res.status(422);
-            res.json({
-                errors: errors.array({
-                    onlyFirstError: true
-                })
-            });
-            return true;
-        } else return false;
+        if (errors.isEmpty()) return false;
+
+        res.status(422);
+        res.json({
+            errors: errors.array()
+        });
+
+        return true;
+    }
+
+    _isFunction(functionToCheck) {
+        const stringPrefix = functionToCheck.toString().substring(0, FUNCTION_STRING_LENGTH);
+        if (stringPrefix.includes(CLASS_STRING)) return false;
+        return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
     }
 
     _getWrappedController(Controller, errorHandler = null) {
-        const requestHandler = new Controller();
         return async (req, res, next) => {
+            if (this._hasValidationErrors(req, res)) return;
+
             try {
-                if (!this._hasValidationErrors(req, res)) {
-                    await requestHandler.handleRequest(req, res, next);
-                }
+                await (this._isFunction(Controller) ? Controller(req, res, next) : _handleRequestBase.call(new Controller(), req, res, next));
             } catch (e) {
-                if (errorHandler) {
-                    errorHandler(e, req, res, next);
-                } else {
-                    next(e);
-                }
+                return errorHandler ? errorHandler(e, req, res, next) : next(e);
             }
         };
     }

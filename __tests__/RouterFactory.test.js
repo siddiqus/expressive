@@ -3,7 +3,7 @@ const BaseController = require("../src/BaseController");
 
 class MockControllerThrowsError extends BaseController { }
 const mockErrorJestFn = jest.fn().mockImplementation(() => {
-    throw new Error()
+    throw new Error("mockErrorJestFn")
 });
 MockControllerThrowsError.prototype.handleRequest = mockErrorJestFn;
 
@@ -165,14 +165,13 @@ describe("RouterFactory", () => {
 
     describe("_getWrappedController", () => {
         it("should handle internal error with error handler", async () => {
-            mockErrorJestFn
-
             const factory = new RouterFactory();
             factory._hasValidationErrors = jest.fn().mockReturnValue(false);
 
             const mockErrorHandler = jest.fn();
             const mockNext = jest.fn();
 
+            MockControllerThrowsError.prototype._handleRequestBase = mockErrorJestFn;
             const fn = factory._getWrappedController(MockControllerThrowsError, mockErrorHandler);
             const mockReq = 1;
             const mockRes = 2;
@@ -180,7 +179,8 @@ describe("RouterFactory", () => {
             await fn(mockReq, mockRes, mockNext);
 
             expect(mockErrorJestFn).toHaveBeenCalled();
-            expect(mockErrorHandler).toHaveBeenCalled();
+            const err = new Error("mockErrorJestFn");
+            expect(mockErrorHandler).toHaveBeenCalledWith(err, mockReq, mockRes, mockNext);
             expect(mockNext).not.toHaveBeenCalled();
         });
 
@@ -190,13 +190,21 @@ describe("RouterFactory", () => {
 
             const mockNext = jest.fn();
 
-            const fn = factory._getWrappedController(MockControllerThrowsError);
+            
+            class SomeMockController extends BaseController {
+                handleRequest(){
+                    throw new Error("some error");
+                }
+            }
+
+            const fn = factory._getWrappedController(SomeMockController);
             const mockReq = 1;
             const mockRes = 2;
 
             await fn(mockReq, mockRes, mockNext);
 
-            expect(mockNext).toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext.mock.calls[0][0].message).toEqual("some error");
         });
 
 
@@ -214,6 +222,40 @@ describe("RouterFactory", () => {
 
             expect(mockErrorJestFn).not.toHaveBeenCalled();
             expect(mockNext).not.toHaveBeenCalled();
+        });
+
+        it("should execute controller if given a function", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+            const fn = factory._getWrappedController(mockFn);
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = 3;
+
+            await fn(someReq, someRes, someNext);
+
+            expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+        });
+        
+        it("should execute controller if given an anonymous function", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+            const fn = factory._getWrappedController((req, res, next) => {
+                mockFn(req, res, next);
+            });
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = 3;
+
+            await fn(someReq, someRes, someNext);
+
+            expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
         });
     });
 
