@@ -9,43 +9,6 @@ describe("BaseController", () => {
         expect(base.handleRequest).toBeDefined();
     });
 
-    it("should handle method '_sendJsonResponse' properly with data", () => {
-        const controller = new BaseController();
-
-        const mockJson = jest.fn().mockReturnValue(123);
-        const mockStatus = jest.fn().mockReturnValue({
-            json: mockJson
-        });
-
-        const mockRes = {
-            status: mockStatus
-        };
-
-        controller.res = mockRes;
-
-        const result = controller._sendJsonResponse(200, { message: "some message" });
-        expect(result).toEqual(123);
-        expect(mockStatus).toHaveBeenCalledWith(200);
-        expect(mockJson).toHaveBeenCalledWith({
-            message: "some message"
-        });
-    });
-
-    it("should handle method '_sendJsonResponse' properly without data", () => {
-        const controller = new BaseController();
-
-        const mockStatus = jest.fn().mockReturnValue(123);
-        const mockRes = {
-            sendStatus: mockStatus
-        };
-
-        controller.res = mockRes;
-
-        const result = controller._sendJsonResponse(200);
-        expect(result).toEqual(123);
-        expect(mockStatus).toHaveBeenCalledWith(200);
-    });
-
     it("should throw error if handleRequest is not implemented", async () => {
         class SomeController extends BaseController { }
 
@@ -62,115 +25,143 @@ describe("BaseController", () => {
         expect(result.message).toEqual("'handleRequest' not implemented in SomeController");
     });
 
-    it("_sendJsonResponseWithMessage: should call sendJsonResponse properly", () => {
-        const controller = new BaseController();
-        controller._sendJsonResponse = jest.fn().mockReturnValue(123);
-
-        const result = controller._sendJsonResponseWithMessage(200, "some message");
-        expect(result).toEqual(123);
-        expect(controller._sendJsonResponse).toHaveBeenCalledWith(200, {
-            message: "some message"
-        });
-    });
-
     describe("response", () => {
         const controller = new BaseController();
-        let mockSendJson;
-        let mockSendJsonWithMessage;
-        
+        let mockSendJson = jest.fn();
+
+        controller.res = {
+            status: jest.fn().mockReturnValue({
+                json: mockSendJson
+            }),
+            sendStatus: jest.fn()
+        }
+
         beforeEach(() => {
-            mockSendJson = jest.fn();
-            mockSendJsonWithMessage = jest.fn();
-            controller.res = jest.fn();
-            controller._sendJsonResponseWithMessage = mockSendJsonWithMessage;
-            controller._sendJsonResponse = mockSendJson;
+            mockSendJson.mockClear();
+            controller.res.sendStatus.mockClear();
+            controller.res.status = jest.fn().mockReturnValue({
+                json: mockSendJson
+            });
         });
 
-        
         it("should handle method 'ok' properly", () => {
             controller.ok();
-            expect(mockSendJson).toHaveBeenCalledWith(200, null);
+            expect(controller.res.sendStatus).toHaveBeenCalledWith(200);
 
             controller.ok(123);
-            expect(mockSendJson).toHaveBeenCalledWith(200, 123);
+            expect(controller.res.status).toHaveBeenCalledWith(200);
+            expect(mockSendJson).toHaveBeenCalledWith(123);
         });
 
         it("should handle method 'created' properly with dto", () => {
             controller.created();
-            expect(mockSendJson).toHaveBeenCalledWith(201, null);
+            expect(controller.res.sendStatus).toHaveBeenCalledWith(201);
 
             controller.created(123);
-            expect(mockSendJson).toHaveBeenCalledWith(201, 123);
+            expect(controller.res.status).toHaveBeenCalledWith(201);
+            expect(mockSendJson).toHaveBeenCalledWith(123);
         });
 
         it("should handle method 'accepted' properly with dto", () => {
             controller.accepted();
-            expect(mockSendJson).toHaveBeenCalledWith(202, null);
+            expect(controller.res.sendStatus).toHaveBeenCalledWith(202);
 
             controller.accepted(123);
-            expect(mockSendJson).toHaveBeenCalledWith(202, 123);
+            expect(controller.res.status).toHaveBeenCalledWith(202);
+            expect(mockSendJson).toHaveBeenCalledWith(123);
         });
 
         it("should handle method 'noContent' properly with dto", () => {
             controller.noContent();
-            expect(mockSendJson).toHaveBeenCalledWith(204);
+            expect(controller.res.sendStatus).toHaveBeenCalledWith(204);
         });
 
         it("should handle method 'badRequest' properly with message", () => {
             controller.badRequest();
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(400, "Bad request");
+            expect(controller.res.status).toHaveBeenCalledWith(400);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "Bad request"
+            });
 
             controller.badRequest("some message");
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(400, "some message");
+            expect(controller.res.status).toHaveBeenCalledWith(400);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "some message"
+            });
         });
-        
+
         it("should handle method 'unauthorized' properly with message", () => {
             controller.unauthorized();
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(401, "Unauthorized");
+            expect(controller.res.status).toHaveBeenCalledWith(401);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "Unauthorized"
+            });
 
             controller.unauthorized("some message");
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(401, "some message");
+            expect(controller.res.status).toHaveBeenCalledWith(401);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "some message"
+            });
         });
-        
+
         it("should handle method 'forbidden' properly with message", () => {
             controller.forbidden();
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(403, "Forbidden");
+            expect(controller.res.status).toHaveBeenCalledWith(403);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "Forbidden"
+            });
 
             controller.forbidden("some message");
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(403, "some message");
+            expect(controller.res.status).toHaveBeenCalledWith(403);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "some message"
+            });
         });
-        
+
         it("should handle method 'notFound' properly with message", () => {
             controller.notFound();
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(404, "Not found");
+            expect(controller.res.status).toHaveBeenCalledWith(404);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "Not Found"
+            });
 
             controller.notFound("some message");
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(404, "some message");
+            expect(controller.res.status).toHaveBeenCalledWith(404);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "some message"
+            });
         });
-        
+
         it("should handle method 'tooMany' properly with message", () => {
             controller.tooMany();
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(429, "Too many requests");
+            expect(controller.res.status).toHaveBeenCalledWith(429);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "Too many requests"
+            });
 
             controller.tooMany("some message");
-            expect(mockSendJsonWithMessage).toHaveBeenCalledWith(429, "some message");
+            expect(controller.res.status).toHaveBeenCalledWith(429);
+            expect(mockSendJson).toHaveBeenCalledWith({
+                message: "some message"
+            });
         });
 
         it("Should handle method 'internalServerError' properly", () => {
             controller.internalServerError();
-            expect(mockSendJson).toHaveBeenCalledWith(500, {
+            expect(controller.res.status).toHaveBeenCalledWith(500);
+            expect(mockSendJson).toHaveBeenCalledWith({
                 message: "Internal server error"
             });
 
             controller.internalServerError("some message");
-            expect(mockSendJson).toHaveBeenCalledWith(500, {
+            expect(mockSendJson).toHaveBeenCalledWith({
                 message: "some message"
             });
 
             controller.internalServerError("some message", {
                 some: "data"
             });
-            expect(mockSendJson).toHaveBeenCalledWith(500, {
+            expect(mockSendJson).toHaveBeenCalledWith({
                 message: "some message",
                 some: "data"
             });
