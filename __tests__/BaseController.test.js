@@ -9,24 +9,6 @@ describe("BaseController", () => {
         expect(base.handleRequest).toBeDefined();
     });
 
-    it("should call handleRequest method on _handleRequestBase", async () => {
-        expect(BaseController).toBeDefined();
-
-        const base = new BaseController();
-        base.handleRequest = jest.fn();
-
-        const mockReq = 1;
-        const mockRes = 2;
-        const mockNext = 3;
-
-        await base._handleRequestBase(mockReq, mockRes, mockNext);
-
-        expect(base.handleRequest).toHaveBeenCalled();
-        expect(base.req).toEqual(mockReq);
-        expect(base.res).toEqual(mockRes);
-        expect(base.next).toEqual(mockNext);
-    });
-
     it("should handle method '_sendJsonResponse' properly with data", () => {
         const controller = new BaseController();
 

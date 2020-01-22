@@ -5,14 +5,6 @@ module.exports = class BaseController {
         this.next = null;
     }
 
-    async _handleRequestBase(req, res, next) {
-        this.req = req;
-        this.res = res;
-        this.next = next;
-
-        await this.handleRequest();
-    }
-
     async handleRequest() {
         throw new Error(`'handleRequest' not implemented in ${this.constructor.name}`);
     }

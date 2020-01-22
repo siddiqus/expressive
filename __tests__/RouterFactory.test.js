@@ -3,9 +3,9 @@ const BaseController = require("../src/BaseController");
 
 class MockControllerThrowsError extends BaseController { }
 const mockErrorJestFn = jest.fn().mockImplementation(() => {
-    throw new Error()
+    throw new Error("mockErrorJestFn")
 });
-MockControllerThrowsError.prototype._handleRequestBase = mockErrorJestFn;
+MockControllerThrowsError.prototype.handleRequest = mockErrorJestFn;
 
 const mockSubroutes = [
     {
@@ -15,12 +15,12 @@ const mockSubroutes = [
                 {
                     path: "/",
                     method: "get",
-                    controller: new BaseController()
+                    controller: BaseController
                 },
                 {
                     path: "/",
                     method: "post",
-                    controller: new BaseController()
+                    controller: BaseController
                 }
             ],
             subroutes: [
@@ -31,12 +31,12 @@ const mockSubroutes = [
                             {
                                 path: "/",
                                 method: "get",
-                                controller: new BaseController()
+                                controller: BaseController
                             },
                             {
                                 path: "/",
                                 method: "post",
-                                controller: new BaseController()
+                                controller: BaseController
                             }
                         ]
                     }
@@ -171,14 +171,16 @@ describe("RouterFactory", () => {
             const mockErrorHandler = jest.fn();
             const mockNext = jest.fn();
 
-            const fn = factory._getWrappedController(new MockControllerThrowsError(), mockErrorHandler);
+            MockControllerThrowsError.prototype._handleRequestBase = mockErrorJestFn;
+            const fn = factory._getWrappedController(MockControllerThrowsError, mockErrorHandler);
             const mockReq = 1;
             const mockRes = 2;
 
             await fn(mockReq, mockRes, mockNext);
 
             expect(mockErrorJestFn).toHaveBeenCalled();
-            expect(mockErrorHandler).toHaveBeenCalled();
+            const err = new Error("mockErrorJestFn");
+            expect(mockErrorHandler).toHaveBeenCalledWith(err, mockReq, mockRes, mockNext);
             expect(mockNext).not.toHaveBeenCalled();
         });
 
@@ -188,13 +190,21 @@ describe("RouterFactory", () => {
 
             const mockNext = jest.fn();
 
-            const fn = factory._getWrappedController(new MockControllerThrowsError());
+            
+            class SomeMockController extends BaseController {
+                handleRequest(){
+                    throw new Error("some error");
+                }
+            }
+
+            const fn = factory._getWrappedController(SomeMockController);
             const mockReq = 1;
             const mockRes = 2;
 
             await fn(mockReq, mockRes, mockNext);
 
-            expect(mockNext).toHaveBeenCalled();
+            expect(mockNext).toHaveBeenCalledTimes(1);
+            expect(mockNext.mock.calls[0][0].message).toEqual("some error");
         });
 
 
@@ -204,7 +214,7 @@ describe("RouterFactory", () => {
 
             const mockNext = jest.fn();
 
-            const fn = factory._getWrappedController(new MockControllerThrowsError());
+            const fn = factory._getWrappedController(MockControllerThrowsError);
             const mockReq = 1;
             const mockRes = 2;
 
@@ -220,6 +230,24 @@ describe("RouterFactory", () => {
 
             const mockFn = jest.fn();
             const fn = factory._getWrappedController(mockFn);
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = 3;
+
+            await fn(someReq, someRes, someNext);
+
+            expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+        });
+        
+        it("should execute controller if given an anonymous function", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+            const fn = factory._getWrappedController((req, res, next) => {
+                mockFn(req, res, next);
+            });
 
             const someReq = 1;
             const someRes = 2;
