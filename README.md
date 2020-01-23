@@ -90,6 +90,8 @@ Here you'll notice that the request object is available with `this.req` and you 
 - tooMany (429)
 - internalServerError (500)
 
+* Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }` 
+
 #### Routes and subroutes
   - The ExpressApp class takes a 'router' parameter in its constructor's first parameter. This 'router' object looks like this:
     ```javascript
@@ -124,7 +126,6 @@ Here you'll notice that the request object is available with `this.req` and you 
       ]
     };
     ```
-* Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }` 
 
 ##### Routing Example
 Let's say we want to create an API with the following routes:
