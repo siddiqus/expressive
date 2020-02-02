@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/siddiqus/expressive/badge.svg?branch=master)](https://coveralls.io/github/siddiqus/expressive?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/533736ee85578f98a732/maintainability)](https://codeclimate.com/github/siddiqus/expressive/maintainability)
 [![codebeat badge](https://codebeat.co/badges/6e3ba61c-d5cf-4a05-9aa7-ee7dd1591fe2)](https://codebeat.co/projects/github-com-siddiqus-expressive-master)
+[![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 
 # Expressive
 Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
@@ -33,10 +34,10 @@ __*It is required for controllers to extend BaseController. This also allows for
 const { Route, ExpressApp, BaseController } = require("@siddiqus/expressive");
 
 class HelloGetController extends BaseController {
-  handleRequest (req, res) => {
-    res.send({
+  handleRequest (req, res) {
+    this.ok({
         hello: "world"
-    })
+    });
   };
 }
 
@@ -50,7 +51,7 @@ const app = new ExpressApp(router);
 const port = process.env.PORT || 8080;
 app.listen(port, () => console.log("Listening on port " + port));
 ```
-Running this node script will start an Express app on port 8080. A GET request on [http://localhost:8080/hello] will return the following JSON response
+Run this node script will start an Express app on port 8080. A GET request on [http://localhost:8080/hello] will return the following JSON response
 ```json
 {
     "hello": "world"
@@ -61,9 +62,38 @@ The ExpressJS app can be used from the *express* property of the *app* object e.
 
 
 ## Routing by convention
-It is easy to create routes and nested routes using Expressive. Here are some points to note:
-  - The ExpressApp class takes a 'router' parameter in its constructor
-  - This 'router' object looks like this:
+It is easy to create routes and nested routes using Expressive, with the focus being on each individual endpoint.
+
+#### BaseController
+Each separate endpoint e.g. 'GET /users' is handled using a _controller_ class, that extends the `BaseController` class provided by Expressive. There is an 'abstract' method called `handleRequest` that requires an implementation for your own controller. The Express `request`, `response` and `next` objects are available in this method using `this`. This `handleRequest` method can be used as an `async` function also. For example:
+
+```javascript
+const { BaseController } = require("@siddiqus/expressive");
+
+class GetUsersController extends BaseController {
+    async handleRequest() {
+        const id = this.req.params.id; // get an id from the path parameter
+        const userData = await someDbModel.getUser(id);
+        this.ok(userData); // base methods available for HTTP responses
+    }
+}
+```
+
+Here you'll notice that the request object is available with `this.req` and you can send a JSON response using the `this.ok` function. This function sends back the data with a `200` status code. There are more methods implemented for various HTTP actions e.g. 
+- created (201)
+- accepted (202)
+- noContent (204)
+- badRequest (400)
+- unauthorized (401)
+- forbidden (403)
+- notFound (404)
+- tooMany (429)
+- internalServerError (500)
+
+* Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }` 
+
+#### Routes and subroutes
+  - The ExpressApp class takes a 'router' parameter in its constructor's first parameter. This 'router' object looks like this:
     ```javascript
     {
         routes: [],
@@ -76,11 +106,11 @@ It is easy to create routes and nested routes using Expressive. Here are some po
 
     const helloGetRoute = Route.get(
       "/some/path", // required - relative end path of endpoint
-      SomeController, // required - express request handler e.g. function (req, res, next) => { }
+      SomeController, // required - a controller function or class
       {
         doc: someDocJs, // optional - Swagger json format for a given endpoint
         validator: someExpressValidator, // optional - validator array in express-validator format
-        errorHandler: someErrorHandlerFunction // optional - express middleware to handle errors for this specific endpoint, e.g. function(err, req, res, next){}
+        errorHandler: function(err, req, res, next){} // optional - middleware to handle errors for this specific endpoint
       }
     );
     ```
@@ -97,6 +127,7 @@ It is easy to create routes and nested routes using Expressive. Here are some po
     };
     ```
 
+##### Routing Example
 Let's say we want to create an API with the following routes:
   - GET /
   - GET /hello/
@@ -145,7 +176,7 @@ The ExpressApp class constructor's second parameter is a configuration object th
 The Expressive app comes with the following built-in middleware:
 - [body-parser](https://www.npmjs.com/package/body-parser) - manage request body in middleware
 - [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
-- [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for eqch request
+- [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for each request
 - [helmet](https://www.npmjs.com/package/helmet) - Add various HTTP headers for basic security 
 
 The 'middlewares' property in the app config object is an array of middleware functions that are injected after the built-in middleware for API request handling.

@@ -1,4 +1,3 @@
-const request = require("request");
 const { Route } = require("../../../expressive");
 
 const GetUsers = require("./controllers/GetUsers");
@@ -22,10 +21,10 @@ function customErrorHandler(err, req, res, next) {
 
 module.exports = {
     routes: [
-        Route.get("/", new GetUsers(request), {
+        Route.get("/", GetUsers, {
             doc: GetUsersDoc
         }),
-        Route.get("/:userId", new GetUserById(request), {
+        Route.get("/:userId", GetUserById, {
             validator: UserIdParamValidator,
             errorHandler: customErrorHandler,
             doc: GetUserByIdDoc

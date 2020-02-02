@@ -1,7 +1,8 @@
+const request = require("request");
 const { BaseController } = require("../../../../expressive");
 
 module.exports = class GetUserById extends BaseController {
-    constructor(request) {
+    constructor() {
         super();
         this.request = request;
     }

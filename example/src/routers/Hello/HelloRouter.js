@@ -10,7 +10,7 @@ const UsersRouter = require("../Users/UsersRouter");
 
 module.exports = {
     routes: [
-        Route.post("/", new HelloName(), {
+        Route.post("/", HelloName, {
             validator: HelloNameValidator,
             doc: HelloNameDoc
         }),

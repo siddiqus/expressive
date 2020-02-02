@@ -1,6 +1,18 @@
 const { Router } = require("express");
 const { validationResult } = require("express-validator");
 
+const FUNCTION_STRING = "function";
+const CLASS_STRING = "class";
+const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
+
+async function _handleRequestBase(req, res, next) {
+    this.req = req;
+    this.res = res;
+    this.next = next;
+
+    return this.handleRequest();
+}
+
 module.exports = class RouterFactory {
     constructor() {
         this.validationResult = validationResult;
@@ -14,20 +26,22 @@ module.exports = class RouterFactory {
         res.json({
             errors: errors.array()
         });
-        
+
         return true;
     }
 
     _isFunction(functionToCheck) {
-        return functionToCheck && {}.toString.call(functionToCheck) === "[object Function]";
+        const stringPrefix = functionToCheck.toString().substring(0, FUNCTION_STRING_LENGTH);
+        if (stringPrefix.includes(CLASS_STRING)) return false;
+        return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
     }
 
-    _getWrappedController(controller, errorHandler = null) {
+    _getWrappedController(Controller, errorHandler = null) {
         return async (req, res, next) => {
+            if (this._hasValidationErrors(req, res)) return;
+
             try {
-                if (!this._hasValidationErrors(req, res)) {
-                    await (this._isFunction(controller) ? controller(req, res, next) : controller._handleRequestBase(req, res, next));
-                }
+                await (this._isFunction(Controller) ? Controller(req, res, next) : _handleRequestBase.call(new Controller(), req, res, next));
             } catch (e) {
                 return errorHandler ? errorHandler(e, req, res, next) : next(e);
             }
