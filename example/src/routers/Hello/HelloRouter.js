@@ -19,10 +19,19 @@ module.exports = {
                 hello: "world"
             });
         }, {
-            doc: HelloDoc
+            doc: HelloDoc,
+            middleware: [
+                (req, res, next) => console.log("from mid 1") || next(),
+                (req, res, next) => console.log("from mid 2") || next(),
+            ]
         })
     ],
     subroutes: [
-        subroute("/users", UsersRouter)
+        subroute("/users", UsersRouter, {
+            middleware: [
+                (req, res, next) => console.log("from mid 1") || next(),
+                (req, res, next) => console.log("from mid 2") || next(),
+            ]
+        })
     ]
 };
