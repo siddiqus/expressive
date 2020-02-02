@@ -10,13 +10,13 @@
 Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
 
 **Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
-  - Built in support for asynchronous request handlers and middleware 
   - Templated Routing
     - Write APIs with declarative endpoints (including nested endpoints) easily
   - Pluggable middleware with built-ins
     - Inject own middleware just like Express
     - Built in middleware e.g. body-parser, cors, etc.
     - Security middleware i.e. helmet
+  - Built in support for asynchronous request handlers and middleware 
   - API validation using Express Validator https://github.com/express-validator/express-validator
     - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
