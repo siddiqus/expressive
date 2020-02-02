@@ -1,9 +1,7 @@
-module.exports = (path, router, {
-    middleware: []
-} = {}) => {
+module.exports = (path, router, { middleware } = {}) => {
     return {
         path,
         router,
-        middleware
+        middleware: middleware || []
     };
 };

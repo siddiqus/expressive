@@ -41,7 +41,9 @@ module.exports = class RouterFactory {
             if (this._hasValidationErrors(req, res)) return;
 
             try {
-                await (this._isFunction(Controller) ? Controller(req, res, next) : _handleRequestBase.call(new Controller(), req, res, next));
+                await (this._isFunction(Controller)
+                    ? Controller(req, res, next)
+                    : _handleRequestBase.call(new Controller(), req, res, next));
             } catch (e) {
                 return errorHandler ? errorHandler(e, req, res, next) : next(e);
             }
