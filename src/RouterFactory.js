@@ -64,7 +64,7 @@ module.exports = class RouterFactory {
     }) {
         const routerArgs = [
             path, ...middleware,
-            this.getExpressRouter(subrouter) 
+            this.getExpressRouter(subrouter)
         ];
         router.use(...routerArgs);
     }
