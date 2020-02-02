@@ -79,6 +79,14 @@ describe("Route model", () => {
         expect(routeObject.errorHandler).toEqual("someErrorHandler");
     });
 
+    it("Should set middleware if given", () => {
+        const routeObject = Route.get("/some/path", "someOtherController", {
+            middleware: "someMiddleware"
+        });
+
+        expect(routeObject.middleware).toEqual("someMiddleware");
+    });
+
     it("Should get route object with all defaults", () => {
         const route = new Route("get", "/", "someController");
         expect(route.method).toEqual("get");
