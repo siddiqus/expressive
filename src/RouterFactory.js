@@ -22,7 +22,11 @@ module.exports = class RouterFactory {
         return middleware.map((mid) => {
             return async (req, res, next) => {
                 try {
-                    mid.length === 3 ? await mid(req, res, next) : await mid(req, res);
+                    await mid(req, res, next);
+
+                    if (mid.length !== 3) {
+                        next();
+                    }
                 } catch (error) {
                     next(error);
                 }
