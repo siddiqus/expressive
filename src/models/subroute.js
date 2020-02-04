@@ -1,7 +1,8 @@
-module.exports = (path, router, { middleware } = {}) => {
+module.exports = (path, router, { authorizer, middleware } = {}) => {
     return {
         path,
         router,
+        authorizer,
         middleware: middleware || []
     };
 };

@@ -46,10 +46,11 @@ describe("ExpressApp", () => {
         it("Should init with all overridden values", () => {
             const app = new ExpressApp({}, {
                 allowCors: true,
-                middlewares: [() => { }],
+                middleware: [() => { }],
                 swaggerDefinitions: {},
                 basePath: "/api",
-                errorMiddleware: () => { },
+                errorHandler: () => { },
+                authorizer: () => {},
                 showSwaggerOnlyInDev: false,
                 swaggerInfo: {}
             });
@@ -63,10 +64,10 @@ describe("ExpressApp", () => {
                 corsConfig: {
                     origin: "http://somepath"
                 },
-                middlewares: [() => { }],
+                middleware: [() => { }],
                 swaggerDefinitions: {},
                 basePath: "/api",
-                errorMiddleware: () => { },
+                errorHandler: () => { },
                 showSwaggerOnlyInDev: false,
                 swaggerInfo: {}
             });

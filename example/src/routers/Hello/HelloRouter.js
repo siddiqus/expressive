@@ -23,7 +23,10 @@ module.exports = {
             middleware: [
                 async (req, res) => console.log("from mid 1"),
                 (req, res, next) => console.log("from mid 2") || next(),
-            ]
+            ],
+            authorizer: (req, res) => {
+                console.log("auth from hello route")
+            }
         })
     ],
     subroutes: [

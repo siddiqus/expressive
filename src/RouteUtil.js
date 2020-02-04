@@ -22,4 +22,18 @@ module.exports = class RouteUtil {
         }
         return paths;
     }
+
+    static getHandlerWithManagedNextCall(handler) {
+        return async (req, res, next) => {
+            try {
+                await handler(req, res, next);
+
+                if (handler.length !== 3) {
+                    next();
+                }
+            } catch (error) {
+                next(error);
+            }
+        };
+    }
 };

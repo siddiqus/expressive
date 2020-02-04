@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const RouterFactory = require("./RouterFactory");
+const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
 const MiddlewareManager = require("./middleware/MiddlewareManager");
 
@@ -14,12 +15,15 @@ module.exports = class ExpressApp {
             swaggerDefinitions,
             allowCors = false,
             corsConfig = null,
-            middlewares = null,
-            errorMiddleware = null,
+            middleware = null,
+            authorizer = null,
+            errorHandler = null,
             bodyLimit = "100kb",
             helmetOptions = null
         } = {}
     ) {
+        this.routeUtil = RouteUtil;
+
         this.config = {
             swaggerInfo,
             showSwaggerOnlyInDev,
@@ -27,10 +31,11 @@ module.exports = class ExpressApp {
             basePath,
             allowCors,
             corsConfig,
-            middlewares,
-            errorMiddleware,
+            middleware,
+            errorHandler,
             bodyLimit,
-            helmetOptions
+            helmetOptions,
+            authorizer
         };
 
         this.router = router;
@@ -82,16 +87,20 @@ module.exports = class ExpressApp {
             this.express.use(corsMiddleware);
         }
 
+        if (this.config.authorizer) {
+            this.express.use(this.routeUtil.getHandlerWithManagedNextCall(this.config.authorizer));
+        }
+
         this.middlewareManager.registerMiddleware(
             this.express,
-            this.config.middlewares
+            this.config.middleware
         );
 
         const expressRouter = this.routerFactory.getExpressRouter(this.router);
         this.express.use(this.config.basePath, expressRouter);
 
-        if (this.config.errorMiddleware) {
-            this.express.use(this.config.errorMiddleware);
+        if (this.config.errorHandler) {
+            this.express.use(this.config.errorHandler);
         }
     }
 };

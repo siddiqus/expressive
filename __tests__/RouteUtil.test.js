@@ -82,4 +82,51 @@ describe("RouteUtil", () => {
             expect(result).toEqual(expectedRoutes);
         });
     });
+
+    describe("getHandlerWithManagedNextCall", () => {
+        it("Should return handler with next call managed if no next defined", async () => {
+            const fn = RouteUtil.getHandlerWithManagedNextCall(
+                async (req, res) => 123
+            );
+
+            const mockReq = 1;
+            const mockRes = 2;
+            const mockNext = jest.fn();
+
+            await fn(mockReq, mockRes, mockNext);
+
+            expect(mockNext).toHaveBeenCalled();
+        });
+
+        it("Should return regular handler if 3 args", async () => {
+            const fn = RouteUtil.getHandlerWithManagedNextCall(
+                async (req, res, next) => next(123)
+            );
+
+            const mockReq = 1;
+            const mockRes = 2;
+            const mockNext = jest.fn();
+
+            await fn(mockReq, mockRes, mockNext);
+
+            expect(mockNext).toHaveBeenCalledWith(123);
+        });
+
+        it("Should return handler with proper catch block", async () => {
+            const someError = new Error("Some error");
+
+            const fn = RouteUtil.getHandlerWithManagedNextCall(
+                async (req, res, next) => { throw someError }
+            );
+
+            const mockReq = 1;
+            const mockRes = 2;
+            const mockNext = jest.fn();
+
+            await fn(mockReq, mockRes, mockNext);
+
+            expect(mockNext).toHaveBeenCalledWith(someError);
+        });
+
+    });
 });
