@@ -129,4 +129,32 @@ describe("RouteUtil", () => {
         });
 
     });
+
+    describe("isFunction", () => {
+        it("Should return false if it is a class", () => {
+            class SomeClass {
+
+            }
+
+            const result = RouteUtil.isFunction(SomeClass);
+
+            expect(result).toBeFalsy();
+        });
+
+        it("Should return true if a named function", () => {
+            function someFunc() {
+
+            }
+
+            const result = RouteUtil.isFunction(someFunc);
+
+            expect(result).toBeTruthy();
+        });
+
+        it("Should return true if an unnamed function", () => {
+            const result = RouteUtil.isFunction(() => { });
+
+            expect(result).toBeTruthy();
+        });
+    });
 });

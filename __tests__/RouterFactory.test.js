@@ -272,6 +272,53 @@ describe("RouterFactory", () => {
 
             expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
         });
+
+        it("should execute given base controller child", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+
+            class SomeController extends BaseController {
+                handleRequest() {
+                    mockFn(this.req, this.res, this.next);
+                }
+            }
+
+            const fn = factory._getWrappedController(SomeController)
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = 3;
+
+            await fn(someReq, someRes, someNext);
+
+            expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+        });
+
+        it("should pass error to next", async () => {
+            const factory = new RouterFactory();
+            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
+
+            const mockFn = jest.fn();
+
+            class SomeController extends BaseController {
+                handleRequest() {
+                    throw new Error("Some error");
+                }
+            }
+
+            const fn = factory._getWrappedController(SomeController)
+
+            const someReq = 1;
+            const someRes = 2;
+            const someNext = jest.fn();
+
+            await fn(someReq, someRes, someNext);
+
+            // expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+            expect(someNext).toHaveBeenCalledWith(new Error("Some error"));
+        });
     });
 
     it("Should get router from method", () => {

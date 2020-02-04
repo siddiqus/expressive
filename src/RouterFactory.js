@@ -2,10 +2,6 @@ const { Router } = require("express");
 const { validationResult } = require("express-validator");
 const RouteUtil = require("./RouteUtil");
 
-const FUNCTION_STRING = "function";
-const CLASS_STRING = "class";
-const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
-
 async function _handleRequestBase(req, res, next) {
     this.req = req;
     this.res = res;
@@ -32,18 +28,12 @@ module.exports = class RouterFactory {
         return true;
     }
 
-    _isFunction(functionToCheck) {
-        const stringPrefix = functionToCheck.toString().substring(0, FUNCTION_STRING_LENGTH);
-        if (stringPrefix.includes(CLASS_STRING)) return false;
-        return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
-    }
-
     _getWrappedController(Controller) {
         return async (req, res, next) => {
             if (this._hasValidationErrors(req, res)) return;
 
             try {
-                await (this._isFunction(Controller)
+                await (this.routeUtil.isFunction(Controller)
                     ? Controller(req, res, next)
                     : _handleRequestBase.call(new Controller(), req, res, next));
             } catch (e) {

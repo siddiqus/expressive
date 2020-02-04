@@ -1,3 +1,7 @@
+const FUNCTION_STRING = "function";
+const CLASS_STRING = "class";
+const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
+
 module.exports = class RouteUtil {
     static getRoutesInfo(router, paths = [], parentPath = "") {
         if (router.routes) {
@@ -35,5 +39,11 @@ module.exports = class RouteUtil {
                 next(error);
             }
         };
+    }
+
+    static isFunction(functionToCheck) {
+        const stringPrefix = functionToCheck.toString().substring(0, FUNCTION_STRING_LENGTH);
+        if (stringPrefix.includes(CLASS_STRING)) return false;
+        return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
     }
 };
