@@ -18,20 +18,18 @@ module.exports = class RouterFactory {
         this.validationResult = validationResult;
     }
 
-    _handleMiddlewareNext(middleware) {
-        return middleware.map((mid) => {
-            return async (req, res, next) => {
-                try {
-                    await mid(req, res, next);
+    _getHandlerWithManagedNextCall(handler) {
+        return async (req, res, next) => {
+            try {
+                await handler(req, res, next);
 
-                    if (mid.length !== 3) {
-                        next();
-                    }
-                } catch (error) {
-                    next(error);
+                if (handler.length !== 3) {
+                    next();
                 }
-            };
-        });
+            } catch (error) {
+                next(error);
+            }
+        };
     }
 
     _hasValidationErrors(req, res) {
@@ -69,7 +67,7 @@ module.exports = class RouterFactory {
     _registerRoute(router, {
         method, path, controller, validator = [], errorHandler = null, middleware = []
     }) {
-        const nextAdjustedMiddleware = this._handleMiddlewareNext(middleware);
+        const nextAdjustedMiddleware = middleware.map(m => this._getHandlerWithManagedNextCall(m));
         const routerArgs = [
             path, validator, ...nextAdjustedMiddleware,
             this._getWrappedController(controller, errorHandler)
@@ -81,7 +79,7 @@ module.exports = class RouterFactory {
     _registerSubroute(router, {
         path, router: subrouter, middleware = []
     }) {
-        const nextAdjustedMiddleware = this._handleMiddlewareNext(middleware);
+        const nextAdjustedMiddleware = middleware.map(m => this._getHandlerWithManagedNextCall(m));
 
         const routerArgs = [
             path, ...nextAdjustedMiddleware,
