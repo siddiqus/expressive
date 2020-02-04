@@ -9,7 +9,34 @@
 # Expressive
 Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
 
-**Expressive** is a NodeJS REST API framework built on ExpressJs, bootstrapped with conventions to minimize code. Features include:
+- [Expressive](#expressive)
+- [Introduction](#introduction)
+- [Quickstart](#quickstart)
+- [Routing](#routing)
+- [The BaseController](#the-basecontroller)
+  * [Routes and subroutes](#routes-and-subroutes)
+  * [Routing Example](#routing-example)
+- [Express App Configuration](#express-app-configuration)
+- [Middleware configuration](#middleware-configuration)
+  * [Configuring your own middleware](#configuring-your-own-middleware)
+  * [Authorization](#authorization)
+  * [Built-in Middleware](#built-in-middleware)
+    + [CORS](#cors)
+    + [Security features with Helmet](#security-features-with-helmet)
+- [Centralized error handling](#centralized-error-handling)
+- [Asynchronous request handlers and middleware](#asynchronous-request-handlers-and-middleware)
+    + [Handling requests](#handling-requests)
+    + [Middleware](#middleware)
+- [Request validation using express-validator](#request-validation-using-express-validator)
+- [Documentation with Swagger syntax](#documentation-with-swagger-syntax)
+- [Example application](#example)
+
+
+*Table of contents generated with [markdown-toc](http://ecotrust-canada.github.io/markdown-toc/)
+
+# Introduction
+
+**Expressive** is a NodeJS REST API framework built on ExpressJs and best practices for smooth development. Features include:
   - Templated Routing
     - Write APIs with declarative endpoints (including nested endpoints) easily
   - Pluggable middleware with built-ins
@@ -25,8 +52,8 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
     - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
     - Swagger doc can be viewed in development at http://localhost:8080/docs
 
-## Quickstart
-Install the package:  ```npm i -S @siddiqus/expressive```
+# Quickstart
+Install the package: ```npm i -S @siddiqus/expressive```
 
 Here is a basic example:
 __*It is required for controllers to extend BaseController. This also allows for dependencies to be instantiated inside the constructor, which can be useful for testing.__
@@ -62,10 +89,10 @@ Run this node script will start an Express app on port 8080. A GET request on [h
 The ExpressJS app can be used from the *express* property of the *app* object e.g. ```app.express```
 
 
-## Routing by convention
+# Routing
 It is easy to create routes and nested routes using Expressive, with the focus being on each individual endpoint.
 
-#### BaseController
+# The BaseController
 Each separate endpoint e.g. 'GET /users' is handled using a _controller_ class, that extends the `BaseController` class provided by Expressive. There is an 'abstract' method called `handleRequest` that requires an implementation for your own controller. The Express `request`, `response` and `next` objects are available in this method using `this`. This `handleRequest` method can be used as an `async` function also. For example:
 
 ```javascript
@@ -93,7 +120,7 @@ Here you'll notice that the request object is available with `this.req` and you 
 
 * Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }` 
 
-#### Routes and subroutes
+## Routes and subroutes
   - The ExpressApp class takes a 'router' parameter in its constructor's first parameter. This 'router' object looks like this:
     ```javascript
     {
@@ -128,7 +155,7 @@ Here you'll notice that the request object is available with `this.req` and you 
     };
     ```
 
-##### Routing Example
+## Routing Example
 Let's say we want to create an API with the following routes:
   - GET /
   - GET /hello/
@@ -146,9 +173,10 @@ const helloRouter = {
             Route.get("/", GetHelloController), 
             Route.get("/users", GetUsersController),
             Route.post("/users", PostUsersController)
+            // get /users and post /users can also be refactored into a separate subroute for "/users"
         ]
     ]
-}
+};
 
 const apiRouter = {
     routes: [
@@ -160,27 +188,82 @@ const apiRouter = {
 }
 ```
 
-### Express App Configuration with middleware and error handling
+# Express App Configuration
 The ExpressApp class constructor's second parameter is a configuration object that looks like this: 
 ```javascript
 {
     swaggerInfo = null, // this is an optional JSON with the basic swagger info detailed later
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
     allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
-    corsConfig = null, // config for cors based on the 'cors' npm module, if none is provided, then allows all origin
-    middlewares = null, // Array of express middlewares can be provided (optional)
-    errorMiddleware = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
+    corsConfig = null, // config for cors based on the 'cors' npm module, allows all origin by default
+    middleware = null, // Array of express middlewares can be provided (optional)
+    authorizer = null, // some middleware function used for authorization, this executes first
+    errorHandler = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
     basePath = "/", // Root path of the api, default "/"
+    bodyLimit = "100kb",
+    helmetOptions = null // options for the 'helmet' middleware
 }
 ```
+
+# Middleware configuration
+Expressive comes with some built-in middleware at the application level. Middlware can be defined at any level - the application level (top), the route level (individual endpoint), and the subroute level (group of endpoints).
+
+*Please* be aware of using the `next()` function accordingly inside your middleware.
+
+## Configuring your own middleware
+ **Bear in mind** since the routes follow a hierarchical structure, the middleware will be executed in the order of:
+1. route level
+2. subroute level
+3. ExpressApp level
+
+These are examples on how to declare middleware accross the Expressive application.
+
+### At the application level
+```javascript
+    const expressApp = new ExpressApp(router, {
+        middleware: [] // some array of middleware
+    })
+```
+
+### At the sub route level
+```javascript
+    const { subroute } = require("@siddiqus/expressive");
+    
+    const router = {
+        subroutes: [
+            subroute("/hello", someHelloRouter, {
+                middleware: [] // some array of middleware to execute for all routes under /hello
+            })
+        ]
+    }
+```
+
+### At the sub route level
+```javascript
+    const { subroute } = require("@siddiqus/expressive");
+    
+    const router = {
+        subroutes: [
+            subroute("/hello", someHelloRouter, {
+                middleware: [] // some array of middleware to execute for all routes under /hello
+            })
+        ]
+    }
+```
+
+## Authorization
+Authorizer functions can be declared the same way as middleware, except with the `authorizer` property in options. The authorizer function can be declared at 3 levels as well, with the major difference being their execution order. If an authorizer function is declared on all levels i.e. app, subroute and routes, then the request will be authorized in the following order:
+1. application level (through ExpressApp constructor)
+2. subroute level (on a group of endpoints)
+3. route level (on an individual endpoint)
+
+## Built-in Middleware
 
 The Expressive app comes with the following built-in middleware:
 - [body-parser](https://www.npmjs.com/package/body-parser) - manage request body in middleware
 - [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
 - [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for each request
 - [helmet](https://www.npmjs.com/package/helmet) - Add various HTTP headers for basic security 
-
-The 'middlewares' property in the app config object is an array of middleware functions that are injected after the built-in middleware for API request handling.
 
 ### CORS
 You can enable CORS through the [cors](https://www.npmjs.com/package/cors) module using Expressive like this:
@@ -202,46 +285,79 @@ const app = new ExpressApp(router, {
 });
 ```
 
-### Centralized error handling
-The API endpoint controllers are all wrapped with a common try/catch block, allowing centralized error handling. To catch an error from any controller, pass an error handling middleware function to the ExpressApp constructor options parameter. For example,
+### Security features with Helmet
+The `helmet` middleware is enabled with default configuration, and can be configured manually through the ExpressApp constructor, like so: 
+
+```javascript
+const app = new ExpressApp(router, {
+    helmetConfig: {
+        // some helmet configuration, see https://www.npmjs.com/package/helmet
+    }
+});
+```
+
+# Centralized error handling
+To catch an error from any controller, pass an error handling function using the 'errorHandler' property in the options parameter for the ExpressApp constructor. For example:
 ```javascript
 const { ExpressApp } = require("@siddiqus/expressive");
 
-const app = new ExpressApp(router, {
-  errorMiddleware: (error, req, res, next) => {
-      res.status(500);
-      res.send({
+function centralizedErrorHandling (err, req, res, next) {
+    res.status(500);
+    res.send({
         message: "There was an internal error."
-      });
-  }
+    });
+}
+
+const app = new ExpressApp(router, {
+  errorMiddleware: centralizedErrorHandling // all errors go here
 }
 ```
+It is recommended that you define custom Error classes to throw from inside your controllers, and then handle them in a switch in your central error handler.
 
-Error handling can be overridden for individual endpoints using the 'errorHandler' property in the route object. Example:
+# Asynchronous request handlers and middleware
+Expressive does some work under the covers to manage async request handlers as well as async middleware.
+
+### Handling requests
+In any controller (that extends the `BaseController` of course), you can declare the `handleRequest` function as async, but this is optional.
+So both of these are okay:
 ```javascript
-const { Route } = require("@siddiqus/expressive");
-
-function customErrorHandler(err, req, res, next) {
-  if (err.message == "Could not find user") {
-      res.status(404);
-      res.send("Not found");
-  } else {
-      res.status(500);
-      res.send("Internal server error");
+class SomeController extends BaseController {
+  handleRequest(req, res, next) {
+    // some non-async code
   }
-  next();
 }
-
-const getUserById = Route.get(
-  "/users/:userId", 
-  GetSpecificUser, // some predefined controller
-  {
-    errorHandler: customErrorHandler
-  }
-);
 ```
 
-### Express validation using express-validator
+And this is also okay:
+```javascript
+class SomeController extends BaseController {
+  async handleRequest(req, res, next) {
+    // some async code
+  }
+}
+```
+
+### Middleware
+This example shows both async and non-async middleware being passed to multiple levels e.g. routes and subroutes.
+
+```javascript
+Route.get("/hello", (req, res) => {
+    res.json({
+        hello: "world"
+    });
+}, {
+    middleware: [
+        async (req, res, next) => console.log("from mid 1") || next(), // this works
+        (req, res, next) => console.log("from mid 2") || next(), // this works too
+        (req, res) => console.log("from mid 2"), // this works too
+    ]
+})
+```
+Notice how the three middleware functions are different:
+- One is async, another is a normal one, but the other one does not have the `next` function parameter used, but this is still okay because Expressive calls it internally
+- These cases are handled by Expressive internally and allows you to declare middleware in a flexible way
+
+# Request validation using express-validator
 Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
 ```javascript
 const { Route } = require("@siddiqus/expressive");
@@ -255,7 +371,7 @@ const getUserById = Route.get(
 );
 ```
 
-### Documentation with Swagger syntax
+# Documentation with Swagger syntax
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
 ```javascript
@@ -333,5 +449,5 @@ SwaggerUtils.writeSwaggerJson(
 )
 ```
 
-### Example
+# Example Application
 See the 'example' folder in this repo.
