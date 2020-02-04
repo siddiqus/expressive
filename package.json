@@ -19,7 +19,7 @@
     "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "1.19.0",
     "cors": "2.8.4",
