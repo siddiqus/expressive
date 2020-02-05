@@ -15,7 +15,7 @@
     "build": "babel src --out-dir build",
     "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html || echo Lint report: reports/lint.html",
     "lintFix": "eslint --fix src || echo Linting done!",
-    "dev": "set NODE_ENV=development&& nodemon -w example --exec node example/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon -w example --exec node example/index.js",
     "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
