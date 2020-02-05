@@ -71,7 +71,7 @@
     "convention based routing"
   ],
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/"
   },
   "husky": {
     "hooks": {
