@@ -1,9 +1,7 @@
+/* eslint-disable no-invalid-this */
 const { Router } = require("express");
 const { validationResult } = require("express-validator");
-
-const FUNCTION_STRING = "function";
-const CLASS_STRING = "class";
-const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
+const RouteUtil = require("./RouteUtil");
 
 async function _handleRequestBase(req, res, next) {
     this.req = req;
@@ -16,6 +14,7 @@ async function _handleRequestBase(req, res, next) {
 module.exports = class RouterFactory {
     constructor() {
         this.validationResult = validationResult;
+        this.routeUtil = RouteUtil;
     }
 
     _hasValidationErrors(req, res) {
@@ -30,38 +29,69 @@ module.exports = class RouterFactory {
         return true;
     }
 
-    _isFunction(functionToCheck) {
-        const stringPrefix = functionToCheck.toString().substring(0, FUNCTION_STRING_LENGTH);
-        if (stringPrefix.includes(CLASS_STRING)) return false;
-        return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
+    async _executeController(controller, req, res, next) {
+        if (this.routeUtil.isFunction(controller)) {
+            return controller(req, res, next);
+        }
+
+        const Controller = controller;
+        return _handleRequestBase.call(new Controller(), req, res, next);
     }
 
-    _getWrappedController(Controller, errorHandler = null) {
+    _getWrappedController(controller) {
         return async (req, res, next) => {
             if (this._hasValidationErrors(req, res)) return;
 
             try {
-                await (this._isFunction(Controller) ? Controller(req, res, next) : _handleRequestBase.call(new Controller(), req, res, next));
+                await this._executeController(controller, req, res, next);
             } catch (e) {
-                return errorHandler ? errorHandler(e, req, res, next) : next(e);
+                return next(e);
             }
         };
     }
 
     _registerRoute(router, {
-        method, path, controller, validator = [], errorHandler = null
+        method, path, controller, validator = [], authorizer = null, middleware = []
     }) {
-        router[method](
-            path,
+        const nextAdjustedMiddleware = middleware
+            .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+
+        const routerArgs = [
+            path
+        ];
+
+        if (authorizer) {
+            routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
+        }
+
+        routerArgs.push(
             validator,
-            this._getWrappedController(controller, errorHandler)
+            ...nextAdjustedMiddleware,
+            this._getWrappedController(controller)
         );
+        router[method](...routerArgs);
     }
 
     _registerSubroute(router, {
-        path, router: subrouter, validator = []
+        path, router: subrouter, middleware = [], authorizer
     }) {
-        router.use(path, validator, this.getExpressRouter(subrouter));
+        const nextAdjustedMiddleware = middleware
+            .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+
+        const routerArgs = [
+            path
+        ];
+
+        if (authorizer) {
+            routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
+        }
+
+        routerArgs.push(
+            ...nextAdjustedMiddleware,
+            this.getExpressRouter(subrouter)
+        );
+
+        router.use(...routerArgs);
     }
 
     _getRouter() {

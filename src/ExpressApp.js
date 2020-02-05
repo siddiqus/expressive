@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const RouterFactory = require("./RouterFactory");
+const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
 const MiddlewareManager = require("./middleware/MiddlewareManager");
 
@@ -14,8 +15,9 @@ module.exports = class ExpressApp {
             swaggerDefinitions,
             allowCors = false,
             corsConfig = null,
-            middlewares = null,
-            errorMiddleware = null,
+            middleware = null,
+            authorizer = null,
+            errorHandler = null,
             bodyLimit = "100kb",
             helmetOptions = null
         } = {}
@@ -27,25 +29,30 @@ module.exports = class ExpressApp {
             basePath,
             allowCors,
             corsConfig,
-            middlewares,
-            errorMiddleware,
+            middleware,
+            errorHandler,
             bodyLimit,
-            helmetOptions
+            helmetOptions,
+            authorizer
         };
-
         this.router = router;
 
-        this._setExpress();
+        this._init();
 
+        this.registerRoutes();
+    }
+
+    _init() {
+        this.routeUtil = RouteUtil;
         this.SwaggerUtils = SwaggerUtils;
         this.routerFactory = new RouterFactory();
 
         this.middlewareManager = new MiddlewareManager({
-            bodyLimit,
-            helmetOptions
+            bodyLimit: this.config.bodyLimit,
+            helmetOptions: this.config.helmetOptions
         });
 
-        this.registerRoutes();
+        this._setExpress();
     }
 
     _setExpress() {
@@ -54,6 +61,13 @@ module.exports = class ExpressApp {
     }
 
     _registerSwagger() {
+        const shouldRegister = (
+            this.config.showSwaggerOnlyInDev
+            && process.env.NODE_ENV === "development"
+        ) || !this.config.showSwaggerOnlyInDev;
+
+        if (!shouldRegister) return;
+
         const swaggerHeader = this.SwaggerUtils.getSwaggerHeader(
             this.config.basePath,
             this.config.swaggerInfo
@@ -66,32 +80,38 @@ module.exports = class ExpressApp {
         this.SwaggerUtils.registerExpress(this.express, swaggerJson);
     }
 
-    registerRoutes() {
-        if (
-            (this.config.showSwaggerOnlyInDev &&
-                process.env.NODE_ENV === "development") ||
-            !this.config.showSwaggerOnlyInDev
-        ) {
-            this._registerSwagger();
-        }
+    _configureCors() {
+        if (!this.config.allowCors) return;
 
-        if (this.config.allowCors) {
-            const corsMiddleware = this.config.corsConfig
-                ? cors(this.config.corsConfig)
-                : cors();
-            this.express.use(corsMiddleware);
+        const corsMiddleware = this.config.corsConfig
+            ? cors(this.config.corsConfig)
+            : cors();
+        this.express.use(corsMiddleware);
+    }
+
+    _registerRoutes() {
+        const expressRouter = this.routerFactory.getExpressRouter(this.router);
+        this.express.use(this.config.basePath, expressRouter);
+    }
+
+    registerRoutes() {
+        this._registerSwagger();
+
+        this._configureCors();
+
+        if (this.config.authorizer) {
+            this.express.use(this.routeUtil.getHandlerWithManagedNextCall(this.config.authorizer));
         }
 
         this.middlewareManager.registerMiddleware(
             this.express,
-            this.config.middlewares
+            this.config.middleware
         );
 
-        const expressRouter = this.routerFactory.getExpressRouter(this.router);
-        this.express.use(this.config.basePath, expressRouter);
+        this._registerRoutes();
 
-        if (this.config.errorMiddleware) {
-            this.express.use(this.config.errorMiddleware);
+        if (this.config.errorHandler) {
+            this.express.use(this.config.errorHandler);
         }
     }
 };

@@ -12,6 +12,10 @@ module.exports = {
         })
     ],
     subroutes: [
-        subroute("/hello", HelloRouter)
+        subroute("/hello", HelloRouter, {
+            authorizer: (req, res) => {
+                console.log("auth from hello subroute")
+            }
+        })
     ]
 };

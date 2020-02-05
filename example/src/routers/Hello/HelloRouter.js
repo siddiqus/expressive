@@ -19,10 +19,22 @@ module.exports = {
                 hello: "world"
             });
         }, {
-            doc: HelloDoc
+            doc: HelloDoc,
+            middleware: [
+                async (req, res) => console.log("from mid 1"),
+                (req, res, next) => console.log("from mid 2") || next(),
+            ],
+            authorizer: (req, res) => {
+                console.log("auth from hello route")
+            }
         })
     ],
     subroutes: [
-        subroute("/users", UsersRouter)
+        subroute("/users", UsersRouter, {
+            middleware: [
+                async (req, res) => console.log("from mid 1"),
+                (req, res) => console.log("from mid 2"),
+            ]
+        })
     ]
 };

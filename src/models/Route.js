@@ -1,7 +1,7 @@
 class Route {
     constructor(
         method, path, controller, {
-            validator, doc, errorHandler
+            validator, doc, authorizer, middleware
         } = {}
     ) {
         this.method = method;
@@ -9,7 +9,8 @@ class Route {
         this.controller = controller;
         if (validator) this.validator = validator;
         if (doc) this.doc = doc;
-        if (errorHandler) this.errorHandler = errorHandler;
+        if (authorizer) this.authorizer = authorizer;
+        if (middleware) this.middleware = middleware;
     }
 }
 
@@ -18,12 +19,14 @@ function getRouteFn(method) {
         path, controller, {
             validator = null,
             doc = null,
-            errorHandler = null
+            middleware = null,
+            authorizer
         } = {}
     ) => new Route(method, path, controller, {
         validator,
         doc,
-        errorHandler
+        authorizer,
+        middleware
     });
 };
 

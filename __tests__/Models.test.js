@@ -71,12 +71,20 @@ describe("Route model", () => {
         testRouteObj(routeObject);
     });
 
-    it("Should set error handler if given", () => {
+    it("Should set authorizer if given", () => {
         const routeObject = Route.get("/some/path", "someOtherController", {
-            errorHandler: "someErrorHandler"
+            authorizer: "someAuthorizer"
         });
 
-        expect(routeObject.errorHandler).toEqual("someErrorHandler");
+        expect(routeObject.authorizer).toEqual("someAuthorizer");
+    });
+
+    it("Should set middleware if given", () => {
+        const routeObject = Route.get("/some/path", "someOtherController", {
+            middleware: "someMiddleware"
+        });
+
+        expect(routeObject.middleware).toEqual("someMiddleware");
     });
 
     it("Should get route object with all defaults", () => {

@@ -2,6 +2,7 @@ const bodyParser = require("body-parser");
 const addRequestId = require("express-request-id");
 const helmet = require("helmet");
 const responseMiddleware = require("./response");
+const RouteUtil = require("../RouteUtil");
 
 module.exports = class MiddlewareManager {
     constructor(
@@ -15,6 +16,8 @@ module.exports = class MiddlewareManager {
         this.bodyParser = bodyParser;
         this.addRequestId = addRequestId;
         this.helmet = helmet;
+
+        this.routeUtil = RouteUtil;
     }
 
     _getBodyParser() {
@@ -41,7 +44,9 @@ module.exports = class MiddlewareManager {
         this._registerHelmet(express);
 
         if (userMiddleware) {
-            express.use(userMiddleware);
+            const nextManagedMiddlewares = userMiddleware
+                .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+            express.use(nextManagedMiddlewares);
         }
     }
 };

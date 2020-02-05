@@ -14,10 +14,20 @@ const swaggerInfo = {
     }
 };
 
+function centralizedErrorHandler(err, req, res, next) {
+    res.status(500).json({
+        message: err.message
+    });
+}
+
 const app = new ExpressApp(router, {
     allowCors: true,
     swaggerInfo,
-    swaggerDefinitions
+    swaggerDefinitions,
+    errorHandler: centralizedErrorHandler,
+    authorizer: (req, res) => {
+        console.log("auth from top");
+    }
 });
 
 app.listen(port, () => console.log("Listening on port " + port));

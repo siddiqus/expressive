@@ -57,13 +57,15 @@ describe("Middleware Manager", () => {
             manager._getBodyParser = jest.fn().mockReturnValue(1);
             manager.addRequestId = jest.fn().mockReturnValue(2);
             manager.helmet = jest.fn().mockReturnValue(3);
-
+            manager.routeUtil = {
+                getHandlerWithManagedNextCall: jest.fn().mockImplementation((d) => d)
+            };
 
             const mockExpress = {
                 use: jest.fn()
             };
 
-            const mockUserMiddleware = "abc";
+            const mockUserMiddleware = ["abc"];
             manager.registerMiddleware(mockExpress, mockUserMiddleware);
 
             expect(mockExpress.use).toHaveBeenCalledTimes(5);
@@ -86,7 +88,7 @@ describe("Middleware Manager", () => {
 
             manager.registerMiddleware(mockExpress);
 
-            expect(mockExpress.use).toHaveBeenCalledTimes(4); // registering 4 middlewares
+            expect(mockExpress.use).toHaveBeenCalledTimes(4); // registering 4 middleware
 
             expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
             expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
