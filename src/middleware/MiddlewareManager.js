@@ -45,7 +45,7 @@ module.exports = class MiddlewareManager {
 
         if (userMiddleware) {
             const nextManagedMiddlewares = userMiddleware
-                .map(m => this.routeUtil.getHandlerWithManagedNextCall(m))
+                .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
             express.use(nextManagedMiddlewares);
         }
     }

@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this */
 const { Router } = require("express");
 const { validationResult } = require("express-validator");
 const RouteUtil = require("./RouteUtil");
@@ -28,14 +29,21 @@ module.exports = class RouterFactory {
         return true;
     }
 
-    _getWrappedController(Controller) {
+    async _executeController(controller, req, res, next) {
+        if (this.routeUtil.isFunction(controller)) {
+            return controller(req, res, next);
+        }
+
+        const Controller = controller;
+        return _handleRequestBase.call(new Controller(), req, res, next);
+    }
+
+    _getWrappedController(controller) {
         return async (req, res, next) => {
             if (this._hasValidationErrors(req, res)) return;
 
             try {
-                await (this.routeUtil.isFunction(Controller)
-                    ? Controller(req, res, next)
-                    : _handleRequestBase.call(new Controller(), req, res, next));
+                await this._executeController(controller, req, res, next);
             } catch (e) {
                 return next(e);
             }
@@ -45,13 +53,16 @@ module.exports = class RouterFactory {
     _registerRoute(router, {
         method, path, controller, validator = [], authorizer = null, middleware = []
     }) {
-        const nextAdjustedMiddleware = middleware.map(m => this.routeUtil.getHandlerWithManagedNextCall(m));
+        const nextAdjustedMiddleware = middleware
+            .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+
         const routerArgs = [
             path
         ];
 
-        if (authorizer)
+        if (authorizer) {
             routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
+        }
 
         routerArgs.push(
             validator,
@@ -64,14 +75,16 @@ module.exports = class RouterFactory {
     _registerSubroute(router, {
         path, router: subrouter, middleware = [], authorizer
     }) {
-        const nextAdjustedMiddleware = middleware.map(m => this.routeUtil.getHandlerWithManagedNextCall(m));
+        const nextAdjustedMiddleware = middleware
+            .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
 
         const routerArgs = [
             path
         ];
 
-        if (authorizer)
+        if (authorizer) {
             routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
+        }
 
         routerArgs.push(
             ...nextAdjustedMiddleware,

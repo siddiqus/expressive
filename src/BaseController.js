@@ -1,9 +1,9 @@
-function _sendJsonResponseWithMessage(code, message) {
-    return _sendJsonResponse.call(this, code, { message });
+function _sendJsonResponseWithMessage(res, code, message) {
+    return _sendJsonResponse(res, code, { message });
 }
 
-function _sendJsonResponse(code, data) {
-    return !!data ? this.res.status(code).json(data) : this.res.sendStatus(code);
+function _sendJsonResponse(res, code, data) {
+    return !!data ? res.status(code).json(data) : res.sendStatus(code);
 }
 
 module.exports = class BaseController {
@@ -18,43 +18,43 @@ module.exports = class BaseController {
     }
 
     ok(dto = null) {
-        return _sendJsonResponse.call(this, 200, dto);
+        return _sendJsonResponse(this.res, 200, dto);
     }
 
     created(data = null) {
-        return _sendJsonResponse.call(this, 201, data);
+        return _sendJsonResponse(this.res, 201, data);
     }
 
     accepted(data = null) {
-        return _sendJsonResponse.call(this, 202, data);
+        return _sendJsonResponse(this.res, 202, data);
     }
 
     noContent() {
-        return _sendJsonResponse.call(this, 204);
+        return _sendJsonResponse(this.res, 204);
     }
 
     badRequest(message = "Bad request") {
-        return _sendJsonResponseWithMessage.call(this, 400, message);
+        return _sendJsonResponseWithMessage(this.res, 400, message);
     }
 
     unauthorized(message = "Unauthorized") {
-        return _sendJsonResponseWithMessage.call(this, 401, message);
+        return _sendJsonResponseWithMessage(this.res, 401, message);
     }
 
     forbidden(message = "Forbidden") {
-        return _sendJsonResponseWithMessage.call(this, 403, message);
+        return _sendJsonResponseWithMessage(this.res, 403, message);
     }
 
     notFound(message = "Not Found") {
-        return _sendJsonResponseWithMessage.call(this, 404, message);
+        return _sendJsonResponseWithMessage(this.res, 404, message);
     }
 
     tooMany(message = "Too many requests") {
-        return _sendJsonResponseWithMessage.call(this, 429, message);
+        return _sendJsonResponseWithMessage(this.res, 429, message);
     }
 
     internalServerError(message = "Internal server error", body = {}) {
-        return _sendJsonResponse.call(this, 500, {
+        return _sendJsonResponse(this.res, 500, {
             message,
             ...body
         });
