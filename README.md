@@ -9,6 +9,8 @@
 # Expressive
 Fast, opinionated, minimalist, and conventional REST API framework for [node](http://nodejs.org).
 
+Find the package on npm - https://www.npmjs.com/package/@siddiqus/expressive
+
 - [Expressive](#expressive)
 - [Introduction](#introduction)
 - [Quickstart](#quickstart)
