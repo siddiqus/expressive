@@ -23,7 +23,7 @@ module.exports = {
       "error",
       process.platform === "win32" ? "windows" : "unix"
     ],
-    "max-len": "warn",
+    "max-len": [1, 100, 4],
     "no-underscore-dangle": 0,
     "no-param-reassign": ["error", { "props": false }],
     "prefer-destructuring": "warn",
