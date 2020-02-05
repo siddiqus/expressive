@@ -47,6 +47,7 @@
     "eslint-config-google": "0.12.0",
     "eslint-detailed-reporter": "0.8.0",
     "eslint-plugin-react": "7.12.4",
+    "husky": "^4.2.1",
     "jest": "24.8.0",
     "jest-stare": "1.26.0",
     "nodemon": "1.19.0",
@@ -71,5 +72,11 @@
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test || npm run lintFix || git add -A",
+      "pre-push": "npm test"
+    }
   }
 }
