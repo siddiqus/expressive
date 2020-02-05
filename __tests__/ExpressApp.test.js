@@ -16,7 +16,8 @@ describe("ExpressApp", () => {
             };
             const app = new ExpressApp(mockRouter, {
                 swaggerInfo,
-                swaggerDefinitions: mockSwaggerDefinitions
+                swaggerDefinitions: mockSwaggerDefinitions,
+                showSwaggerOnlyInDev: false
             });
 
             const mockSwaggerHeader = { some: "Header" };

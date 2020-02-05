@@ -26,7 +26,7 @@ const app = new ExpressApp(router, {
     swaggerDefinitions,
     errorHandler: centralizedErrorHandler,
     authorizer: (req, res) => {
-        console.log("auth from top")
+        console.log("auth from top");
     }
 });
 
