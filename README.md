@@ -28,7 +28,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
     + [Handling requests](#handling-requests)
     + [Middleware](#middleware)
 - [Request validation using express-validator](#request-validation-using-express-validator)
-- [Documentation with Swagger syntax](#documentation-with-swagger-syntax)
+- [Documentation with Swagger and OpenAPI](#documentation-with-swagger-syntax)
 - [Example application](#example)
 
 
@@ -48,9 +48,10 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
     - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response. 
   - Centralized error handling
     - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
-  - Doc generation through Swagger https://swagger.io/
+  - Built-in doc generation through Swagger https://swagger.io/
     - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
-    - Swagger doc can be viewed in development at http://localhost:8080/docs
+    - Swagger doc can be viewed with SwaggerUI in development at http://localhost:8080/docs
+    - Documentation can also be viewed with [Redoc](https://github.com/Redocly/redoc) at http://localhost:8080/docs/redoc
 
 # Quickstart
 Install the package: ```npm i -S @siddiqus/expressive```
@@ -371,7 +372,7 @@ const getUserById = Route.get(
 );
 ```
 
-# Documentation with Swagger syntax
+# Documentation with Swagger and OpenAPI
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
 ```javascript
@@ -409,6 +410,11 @@ The 'GetUserByIdDocJs' JS or JSON could be something like this:
 ```
 
 In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in *Dev*).
+
+### Documentation Viewer UIs
+Currently there are actually two UI's built-in with Expressive
+1. SwaggerUI - this runs on http://localhost:8080/docs and http://localhost:8080/docs/swagger
+2. [Redoc](https://github.com/Redocly/redoc) - this runs at http://localhost:8080/docs/redoc
 
 ---
 

@@ -2,11 +2,12 @@ const fs = require("fs");
 const SwaggerUi = require("swagger-ui-express");
 const RouteUtil = require("./RouteUtil.js");
 
-
-function registerExpress(express, swaggerJson) {
-    express.use("/docs", SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
+function registerExpress(app, swaggerJson, url) {
+    app.use(url, SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
         explorer: true,
     }));
+
+    app.get("/docs", (_, res) => res.redirect(url));
 }
 
 function _sanitizeSwaggerPath(path) {
@@ -43,7 +44,7 @@ function convertDocsToSwaggerDoc(
                 [method]: doc,
             };
         }
-        tags = tags.concat(doc.tags);
+        tags = doc.tags ? tags.concat(doc.tags) : tags;
     });
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));

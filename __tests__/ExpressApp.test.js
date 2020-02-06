@@ -34,7 +34,7 @@ describe("ExpressApp", () => {
             expect(app.SwaggerUtils.convertDocsToSwaggerDoc).toHaveBeenCalledWith(
                 mockRouter, mockSwaggerHeader, mockSwaggerDefinitions
             );
-            expect(app.SwaggerUtils.registerExpress).toHaveBeenCalledWith(app.express, mockSwaggerJson);
+            expect(app.SwaggerUtils.registerExpress).toHaveBeenCalledWith(app.express, mockSwaggerJson, "/docs/swagger");
         });
     });
 

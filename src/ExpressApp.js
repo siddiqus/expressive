@@ -3,6 +3,7 @@ const cors = require("cors");
 const RouterFactory = require("./RouterFactory");
 const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
+const registerRedoc = require("./redoc/registerRedoc");
 const MiddlewareManager = require("./middleware/MiddlewareManager");
 
 module.exports = class ExpressApp {
@@ -45,6 +46,7 @@ module.exports = class ExpressApp {
     _init() {
         this.routeUtil = RouteUtil;
         this.SwaggerUtils = SwaggerUtils;
+        this.registerRedoc = registerRedoc;
         this.routerFactory = new RouterFactory();
 
         this.middlewareManager = new MiddlewareManager({
@@ -77,7 +79,8 @@ module.exports = class ExpressApp {
             swaggerHeader,
             this.config.swaggerDefinitions
         );
-        this.SwaggerUtils.registerExpress(this.express, swaggerJson);
+        this.SwaggerUtils.registerExpress(this.express, swaggerJson, "/docs/swagger");
+        this.registerRedoc(this.express, swaggerJson, "/docs/redoc");
     }
 
     _configureCors() {
