@@ -160,7 +160,30 @@ describe("RouteUtil", () => {
 
     describe("isUrlPath", () => {
         it("Should return true for valid urls", () => {
-            expect(1).toEqual(2);
+            [
+                "/hehe/some",
+                "/hehe",
+                "/hehe-blah/:id/ahhs/:someId/hash"
+            ].forEach(str => {
+                expect(RouteUtil.isUrlPath(str)).toBeTruthy();
+            });
+        });
+
+        it("Should return false for invalid urls", () => {
+            [
+                "ajdlasjdksad",
+                "10980du90",
+                "/hh*ehe",
+                "hehe/",
+                "/heheh   ooo"
+            ].forEach(str => {
+                expect(RouteUtil.isUrlPath(str)).toBeFalsy();
+            });
+        });
+
+        it("Should return false if non string input is given", () => {
+            expect(RouteUtil.isUrlPath(() => { })).toBeFalsy();
+            expect(RouteUtil.isUrlPath(class SomeClass {})).toBeFalsy();
         });
     });
 });
