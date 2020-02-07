@@ -30,6 +30,10 @@ module.exports = class RouterFactory {
     }
 
     async _executeController(controller, req, res, next) {
+        if(this.routeUtil.isUrlPath(controller)) {
+            return res.redirect(controller);
+        }
+        
         if (this.routeUtil.isFunction(controller)) {
             return controller(req, res, next);
         }
