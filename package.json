@@ -75,7 +75,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test || npm run lintFix || git add -A",
+      "pre-commit": "npm test && npm run lintFix || git add -A",
       "pre-push": "npm test"
     }
   }

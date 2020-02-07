@@ -157,4 +157,10 @@ describe("RouteUtil", () => {
             expect(result).toBeTruthy();
         });
     });
+
+    describe("isUrlPath", () => {
+        it("Should return true for valid urls", () => {
+            expect(1).toEqual(2);
+        });
+    });
 });

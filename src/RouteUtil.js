@@ -46,4 +46,10 @@ module.exports = class RouteUtil {
         if (stringPrefix.includes(CLASS_STRING)) return false;
         return functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING;
     }
+
+    static isUrlPath(string) {
+        if (typeof string !== "string") return false;
+        const regex = /^(\/[a-zA-Z0-9\-:]+)+\/?$/g;
+        return regex.test(string);
+    }
 };
