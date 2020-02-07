@@ -14,4 +14,4 @@ module.exports = function registerRedoc(app, swaggerJson, url) {
             specUrl
         }));
     });
-}
+};
