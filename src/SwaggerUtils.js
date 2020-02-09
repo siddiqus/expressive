@@ -41,7 +41,6 @@ function _handleRedirects(paths, route) {
     let { redirectUrl } = route;
 
     if (!redirectUrl) return;
-    console.log("redirectUrl", redirectUrl);
     if (redirectUrl.charAt(redirectUrl.length - 1) !== "/") redirectUrl = `${redirectUrl}/`;
 
     if (!paths[redirectUrl]) return;

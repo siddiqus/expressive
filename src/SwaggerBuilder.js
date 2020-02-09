@@ -1,4 +1,19 @@
-class SwaggerEndpoint {
+function _addParam(
+    parameters,
+    paramType,
+    { name, description, type, required, schema }
+) {
+    parameters.push({
+        in: paramType,
+        name,
+        description,
+        type,
+        required,
+        schema
+    });
+}
+
+module.exports = class SwaggerEndpoint {
     constructor(summary, description) {
         this.summary = summary;
         this.description = description;
@@ -21,21 +36,19 @@ class SwaggerEndpoint {
     }
 
     addPathParam({ name, description, type, required, schema }) {
-        this.parameters.push({
+        _addParam(this.parameters, "path", {
             name,
             description,
-            type,
-            required,
             schema,
-            in: "path"
+            required,
+            type
         });
         return this;
     }
 
     addRequestBody({ description, required, schema, name = "body" }) {
-        this.parameters.push({
+        _addParam(this.parameters, "body", {
             name,
-            in: "body",
             description,
             schema,
             required
@@ -44,17 +57,12 @@ class SwaggerEndpoint {
     }
 
     addQueryParam({ name, description, required, schema }) {
-        this.parameters.push({
+        _addParam(this.parameters, "query", {
             name,
-            in: "query",
             description,
             schema,
             required
         });
         return this;
     }
-}
-
-module.exports = {
-    SwaggerEndpoint
 };
