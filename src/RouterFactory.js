@@ -29,7 +29,7 @@ module.exports = class RouterFactory {
         return true;
     }
 
-    async _executeController(controller, req, res, next) {
+    async _executeController(controller, { req, res, next }) {
         if (this.routeUtil.isUrlPath(controller)) {
             return res.redirect(controller);
         }
@@ -47,7 +47,7 @@ module.exports = class RouterFactory {
             if (this._hasValidationErrors(req, res)) return;
 
             try {
-                await this._executeController(controller, req, res, next);
+                await this._executeController(controller, { req, res, next } );
             } catch (e) {
                 return next(e);
             }

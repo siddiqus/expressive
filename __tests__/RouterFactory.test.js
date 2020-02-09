@@ -328,7 +328,7 @@ describe("RouterFactory", () => {
                 redirect: jest.fn()
             };
 
-            factory._executeController("/somepath", null, mockRes, null);
+            factory._executeController("/somepath", { req: null, res: mockRes, next: null });
 
             expect(mockRes.redirect).toHaveBeenCalledWith("/somepath");
         });
@@ -340,7 +340,5 @@ describe("RouterFactory", () => {
         const result = factory._getRouter();
 
         expect(result).toBeDefined();
-
     });
-
 });

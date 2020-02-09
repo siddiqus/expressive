@@ -23,6 +23,19 @@ function _sanitizeSwaggerPath(path) {
     return split.join("/");
 }
 
+function _addPathDoc(paths, route, tags) {
+    let { doc, path } = route;
+    const { method } = route;
+    path = _sanitizeSwaggerPath(path);
+
+    if (!doc) doc = {};
+
+    if (!paths[path]) paths[path] = {};
+    paths[path][method] = doc;
+
+    if (doc.tags) tags.push(...doc.tags);
+}
+
 function convertDocsToSwaggerDoc(
     router,
     swaggerHeader,
@@ -32,20 +45,7 @@ function convertDocsToSwaggerDoc(
     const paths = {};
     let tags = [];
 
-    infoList.forEach((route) => {
-        let { doc, path, method } = route;
-        path = _sanitizeSwaggerPath(path);
-
-        if (!doc) doc = {};
-        if (paths[path]) {
-            paths[path][method] = doc;
-        } else {
-            paths[path] = {
-                [method]: doc,
-            };
-        }
-        tags = doc.tags ? tags.concat(doc.tags) : tags;
-    });
+    infoList.forEach((route) => _addPathDoc(paths, route, tags));
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
 
