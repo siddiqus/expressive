@@ -1,0 +1,8 @@
+example/
+node_modules
+.sonarlint
+dist
+coverage
+.coverage
+reports
+build
