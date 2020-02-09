@@ -9,12 +9,13 @@ module.exports = {
     routes: [
         Route.get("/", RootGetController, {
             doc: RootGetDoc
-        })
+        }),
+        Route.get("/hey", "/hehehe")
     ],
     subroutes: [
         subroute("/hello", HelloRouter, {
             authorizer: (req, res) => {
-                console.log("auth from hello subroute")
+                console.log("auth from hello subroute");
             }
         })
     ]

@@ -23,6 +23,34 @@ function _sanitizeSwaggerPath(path) {
     return split.join("/");
 }
 
+function _addPathDoc(paths, route, tags) {
+    let { doc, path } = route;
+    const { method } = route;
+    path = _sanitizeSwaggerPath(path);
+
+    if (!doc) doc = {};
+
+    if (!paths[path]) paths[path] = {};
+    paths[path][method] = doc;
+
+    if (doc.tags) tags.push(...doc.tags);
+}
+
+function _handleRedirects(paths, route) {
+    const { method, path } = route;
+    let { redirectUrl } = route;
+
+    if (!redirectUrl) return;
+    if (redirectUrl.charAt(redirectUrl.length - 1) !== "/") redirectUrl = `${redirectUrl}/`;
+
+    if (!paths[redirectUrl]) return;
+
+    const doc = { ...paths[redirectUrl][method] };
+    doc.description = `[Redirected to ${redirectUrl}] ${doc.description || ""}`;
+    doc.summary = `[Redirected to ${redirectUrl}] ${doc.summary || ""}`;
+    paths[path][method] = doc;
+}
+
 function convertDocsToSwaggerDoc(
     router,
     swaggerHeader,
@@ -32,20 +60,8 @@ function convertDocsToSwaggerDoc(
     const paths = {};
     let tags = [];
 
-    infoList.forEach((route) => {
-        let { doc, path, method } = route;
-        path = _sanitizeSwaggerPath(path);
-
-        if (!doc) doc = {};
-        if (paths[path]) {
-            paths[path][method] = doc;
-        } else {
-            paths[path] = {
-                [method]: doc,
-            };
-        }
-        tags = doc.tags ? tags.concat(doc.tags) : tags;
-    });
+    infoList.forEach((route) => _addPathDoc(paths, route, tags));
+    infoList.forEach((route) => _handleRedirects(paths, route));
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
 

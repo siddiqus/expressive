@@ -321,13 +321,24 @@ describe("RouterFactory", () => {
         });
     });
 
+    describe("_executeController", () => {
+        it("Should redirect if route url", () => {
+            const factory = new RouterFactory();
+            const mockRes = {
+                redirect: jest.fn()
+            };
+
+            factory._executeController("/somepath", { req: null, res: mockRes, next: null });
+
+            expect(mockRes.redirect).toHaveBeenCalledWith("/somepath");
+        });
+    });
+
     it("Should get router from method", () => {
         const factory = new RouterFactory();
 
         const result = factory._getRouter();
 
         expect(result).toBeDefined();
-
     });
-
 });

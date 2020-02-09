@@ -103,6 +103,28 @@ describe("SwaggerUtils", () => {
         });
     });
 
+    describe("convertDocsToSwaggerDoc", () => {
+        it("Should write json for swagger with redirects", () => {
+            const mockRoutes1 = { ...mockRouterWithTopRoutes };
+            mockRoutes1.routes.push({
+                path: "/hey",
+                controller: "/users",
+                method: "get"
+            });
+
+            let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+            mockRoutes1.routes.push({
+                path: "/hey",
+                controller: "/heheheh/",
+                method: "get"
+            });
+            swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+            expect(swaggerDoc).toBeDefined();
+        });
+    });
+
     describe("writeSwaggerJson", () => {
         it("should write json for swagger", () => {
             const sampleSwaggerInfo = {
@@ -126,7 +148,6 @@ describe("SwaggerUtils", () => {
         });
 
         it("should write json for swagger using defaults", () => {
-
             const outputPath = path.resolve(__dirname, "output.json");
             SwaggerUtils.writeSwaggerJson(
                 mockRouterWithTopRoutes, outputPath

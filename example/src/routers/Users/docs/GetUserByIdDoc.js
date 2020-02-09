@@ -1,6 +1,6 @@
 module.exports = {
-    tags: ["Users"],
-    parameters: [
+    "tags": ["Users"],
+    "parameters": [
         {
             "name": "userId",
             "in": "path",
@@ -11,6 +11,7 @@ module.exports = {
             }
         }
     ],
+    "description": "Get user by id",
     "responses": {
         "200": {
             "description": "Specific user object",
@@ -19,4 +20,4 @@ module.exports = {
             }
         }
     }
-}
+};

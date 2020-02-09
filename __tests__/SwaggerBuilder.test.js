@@ -1,4 +1,4 @@
-const { SwaggerEndpoint } = require("../src/SwaggerBuilder");
+const SwaggerEndpoint = require("../src/SwaggerBuilder");
 
 const expectedOutput = {
     summary: "Get a list of CVs for a given job description",
