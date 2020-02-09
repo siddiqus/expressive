@@ -5,8 +5,12 @@ const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
 function _addRouteToPaths(paths, parentPath, route) {
     const routeData = {
         method: route.method,
-        path: `${parentPath}${route.path}`,
+        path: `${parentPath}${route.path}`
     };
+
+    if (RouteUtil.isUrlPath(route.controller)) {
+        routeData.redirectUrl = `${parentPath}${route.controller}`;
+    }
 
     if (route.doc) {
         routeData.doc = route.doc;
@@ -55,7 +59,7 @@ class RouteUtil {
 
     static isUrlPath(string) {
         if (typeof string !== "string") return false;
-        const regex = /^(\/[a-zA-Z0-9\-:]+)+\/?$/g;
+        const regex = /^(\/[a-zA-Z0-9\-:]+)*\/?$/g;
         return regex.test(string);
     }
 };

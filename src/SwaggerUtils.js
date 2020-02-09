@@ -36,6 +36,22 @@ function _addPathDoc(paths, route, tags) {
     if (doc.tags) tags.push(...doc.tags);
 }
 
+function _handleRedirects(paths, route) {
+    const { method, path } = route;
+    let { redirectUrl } = route;
+
+    if (!redirectUrl) return;
+    console.log("redirectUrl", redirectUrl)
+    if (redirectUrl.charAt(redirectUrl.length - 1) !== "/") redirectUrl = `${redirectUrl}/`;
+
+    if (!paths[redirectUrl]) return;
+
+    const doc = { ...paths[redirectUrl][method] };
+    doc.description = `[Redirected to ${redirectUrl}] ${doc.description || ""}`;
+    doc.summary = `[Redirected to ${redirectUrl}] ${doc.summary || ""}`;
+    paths[path][method] = doc;
+}
+
 function convertDocsToSwaggerDoc(
     router,
     swaggerHeader,
@@ -46,6 +62,7 @@ function convertDocsToSwaggerDoc(
     let tags = [];
 
     infoList.forEach((route) => _addPathDoc(paths, route, tags));
+    infoList.forEach((route) => _handleRedirects(paths, route));
 
     tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
 

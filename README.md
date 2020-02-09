@@ -146,7 +146,7 @@ Here you'll notice that the request object is available with `this.req` and you 
     );
     ```
     Similarly, the class methods `post`, `put`, `delete`, `patch`, `head`, and `options` are available for the Route class e.g.  `Route.post`.
-  - You can redirect a route by simply passing the redirect url to the controller parameter e.g. `Route.get("/some-url", "/another-url")`
+  - You can redirect a route by simply passing the redirect url to the controller parameter e.g. `Route.get("/some-url", "/another-url")`. If there is any Swagger documentation provided for the redirect url, then that documentation will automatically get assigned for the new endpoint.
   - Each object in the *subroutes* array can be constructed using the `subroute` function, like so:
     ```javascript
     const { subroute } = require("@siddiqus/expressive");
