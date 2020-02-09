@@ -6,3 +6,4 @@ coverage
 .coverage
 reports
 build
+__tests__/
