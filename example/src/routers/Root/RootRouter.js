@@ -10,7 +10,7 @@ module.exports = {
         Route.get("/", RootGetController, {
             doc: RootGetDoc
         }),
-        Route.get("/hey", "/hehehe")
+        Route.get("/hey", "/hello")
     ],
     subroutes: [
         subroute("/hello", HelloRouter, {
