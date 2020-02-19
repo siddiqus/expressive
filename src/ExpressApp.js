@@ -13,7 +13,7 @@ module.exports = class ExpressApp {
             basePath = "/",
             showSwaggerOnlyInDev = true,
             swaggerInfo = undefined,
-            swaggerDefinitions,
+            swaggerDefinitions = undefined,
             allowCors = false,
             corsConfig = null,
             middleware = null,

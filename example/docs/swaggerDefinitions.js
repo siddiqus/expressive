@@ -9,8 +9,8 @@ module.exports = {
                 "type": "string"
             }
         },
-        required: [
+        "required": [
             "firstName", "lastName"
         ]
     }
-}
+};
