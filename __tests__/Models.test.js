@@ -1,12 +1,13 @@
-const Route = require("../src/models/Route");
-const subroute = require("../src/models/subroute");
+const Route = require("../src/Route");
+const subroute = require("../src/subroute");
 
 function getRouteObj(method) {
     return Route[method](
-        "/somepath", "someController", {
-        validator: "validatorFunction",
-        doc: "docJs"
-    }
+        "/somepath", "someController",
+        {
+            validator: "validatorFunction",
+            doc: "docJs"
+        }
     );
 }
 
@@ -25,7 +26,6 @@ describe("subroute", () => {
         expect(obj.path).toEqual(somePath);
         expect(obj.router).toEqual(someRouter);
     });
-
 });
 
 describe("Route model", () => {

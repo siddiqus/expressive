@@ -2,7 +2,7 @@ class Endpoint {
     constructor(
         method, path, controller, {
             validator, doc, authorizer, middleware
-        } = {}
+        }
     ) {
         this.method = method;
         this.path = path;
