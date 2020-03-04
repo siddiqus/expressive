@@ -1,4 +1,4 @@
-const bodyParser = require("body-parser");
+const express = require("express");
 const addRequestId = require("express-request-id");
 const helmet = require("helmet");
 const responseMiddleware = require("./response");
@@ -13,20 +13,11 @@ module.exports = class MiddlewareManager {
     ) {
         this.options = options;
 
-        this.bodyParser = bodyParser;
+        this.express = express;
         this.addRequestId = addRequestId;
         this.helmet = helmet;
 
         this.routeUtil = RouteUtil;
-    }
-
-    _getBodyParser() {
-        return [
-            this.bodyParser.urlencoded({ extended: true }),
-            this.bodyParser.json({
-                limit: this.options.bodyLimit
-            })
-        ];
     }
 
     _registerHelmet(express) {
@@ -37,7 +28,9 @@ module.exports = class MiddlewareManager {
     }
 
     registerMiddleware(express, userMiddleware) {
-        express.use(this._getBodyParser());
+        express.use(this.express.json({
+            limit: this.options.bodyLimit
+        }));
         express.use(responseMiddleware);
         express.use(this.addRequestId());
 

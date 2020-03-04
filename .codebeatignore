@@ -1,4 +1,5 @@
 example/
+ts-example/
 node_modules
 .sonarlint
 dist

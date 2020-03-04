@@ -1,9 +1,10 @@
-const Route = require("../src/models/Route");
-const subroute = require("../src/models/subroute");
+const Route = require("../src/Route");
+const subroute = require("../src/subroute");
 
 function getRouteObj(method) {
     return Route[method](
-        "/somepath", "someController", {
+        "/somepath", "someController",
+        {
             validator: "validatorFunction",
             doc: "docJs"
         }
@@ -25,7 +26,6 @@ describe("subroute", () => {
         expect(obj.path).toEqual(somePath);
         expect(obj.router).toEqual(someRouter);
     });
-
 });
 
 describe("Route model", () => {
@@ -85,13 +85,6 @@ describe("Route model", () => {
         });
 
         expect(routeObject.middleware).toEqual("someMiddleware");
-    });
-
-    it("Should get route object with all defaults", () => {
-        const route = new Route("get", "/", "someController");
-        expect(route.method).toEqual("get");
-        expect(route.path).toEqual("/");
-        expect(route.controller).toEqual("someController");
     });
 
     it("getRouteFn: Should allow route without optional parameters", () => {
