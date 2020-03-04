@@ -6,7 +6,9 @@ const html = `<!DOCTYPE html>
       <title>[[title]]</title>
       <meta charset="utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+      <link
+        href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700"
+        rel="stylesheet">
       <style>
         body {
           margin: 0;

@@ -1,8 +1,8 @@
-class Route {
+class Endpoint {
     constructor(
         method, path, controller, {
             validator, doc, authorizer, middleware
-        } = {}
+        }
     ) {
         this.method = method;
         this.path = path;
@@ -22,20 +22,20 @@ function getRouteFn(method) {
             middleware = null,
             authorizer
         } = {}
-    ) => new Route(method, path, controller, {
+    ) => new Endpoint(method, path, controller, {
         validator,
         doc,
         authorizer,
         middleware
     });
+}
+
+module.exports = {
+    get: getRouteFn("get"),
+    post: getRouteFn("post"),
+    put: getRouteFn("put"),
+    delete: getRouteFn("delete"),
+    patch: getRouteFn("patch"),
+    head: getRouteFn("head"),
+    options: getRouteFn("options")
 };
-
-Route.get = getRouteFn("get");
-Route.post = getRouteFn("post");
-Route.put = getRouteFn("put");
-Route.delete = getRouteFn("delete");
-Route.patch = getRouteFn("patch");
-Route.head = getRouteFn("head");
-Route.options = getRouteFn("options");
-
-module.exports = Route;

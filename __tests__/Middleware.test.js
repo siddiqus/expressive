@@ -15,46 +15,12 @@ describe("response middleware", () => {
 });
 
 describe("Middleware Manager", () => {
-    describe("_getBodyParser", () => {
-        it("should return array of body parser configs with default", () => {
-            const manager = new MiddlewareManager();
-            manager.bodyParser = {
-                urlencoded: jest.fn().mockReturnValue(1),
-                json: jest.fn().mockReturnValue(2)
-            };
-
-            const result = manager._getBodyParser();
-
-            expect(result).toEqual([1, 2]);
-            expect(manager.bodyParser.urlencoded).toHaveBeenCalledWith({ extended: true });
-            expect(manager.bodyParser.json).toHaveBeenCalledWith({
-                limit: "100kb"
-            });
-        });
-
-        it("should return array of body parser configs with configured bodyLimit", () => {
-            const manager = new MiddlewareManager({
-                bodyLimit: "50kb"
-            });
-            manager.bodyParser = {
-                urlencoded: jest.fn().mockReturnValue(3),
-                json: jest.fn().mockReturnValue(4)
-            };
-
-            const result = manager._getBodyParser();
-
-            expect(result).toEqual([3, 4]);
-            expect(manager.bodyParser.urlencoded).toHaveBeenCalledWith({ extended: true });
-            expect(manager.bodyParser.json).toHaveBeenCalledWith({
-                limit: "50kb"
-            });
-        });
-    });
-
     describe("registerMiddleware", () => {
         it("Should register defaults and user middleware", () => {
             const manager = new MiddlewareManager();
-            manager._getBodyParser = jest.fn().mockReturnValue(1);
+            manager.express = {
+                json: jest.fn().mockReturnValue(1)
+            }
             manager.addRequestId = jest.fn().mockReturnValue(2);
             manager.helmet = jest.fn().mockReturnValue(3);
             manager.routeUtil = {
@@ -70,6 +36,10 @@ describe("Middleware Manager", () => {
 
             expect(mockExpress.use).toHaveBeenCalledTimes(5);
 
+            expect(manager.express.json).toHaveBeenCalledWith({
+                limit: manager.options.bodyLimit
+            });
+
             expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
             expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
             expect(mockExpress.use.mock.calls[2][0]).toEqual(2);
@@ -79,7 +49,9 @@ describe("Middleware Manager", () => {
 
         it("Should register defaults without user middleware", () => {
             const manager = new MiddlewareManager();
-            manager._getBodyParser = jest.fn().mockReturnValue(1);
+            manager.express = {
+                json: jest.fn().mockReturnValue(1)
+            }
             manager.addRequestId = jest.fn().mockReturnValue(2);
 
             const mockExpress = {
@@ -89,6 +61,10 @@ describe("Middleware Manager", () => {
             manager.registerMiddleware(mockExpress);
 
             expect(mockExpress.use).toHaveBeenCalledTimes(4); // registering 4 middleware
+
+            expect(manager.express.json).toHaveBeenCalledWith({
+                limit: manager.options.bodyLimit
+            });
 
             expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
             expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
