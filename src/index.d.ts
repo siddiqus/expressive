@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, Handler, Application, Express } from "express";
+import { Request, Response, ErrorRequestHandler, NextFunction, Handler, Application, Express } from "express";
 import { CorsOptions } from "cors"
 import { IHelmetConfiguration } from "helmet"
 
@@ -14,7 +14,31 @@ export declare interface ISwaggerInfo {
 }
 
 export declare class BaseController {
-    handleRequest(req: Request, res: Response, next?: NextFunction): Promise<void>
+    handleRequest(): Promise<void>
+
+    req: Request
+    res: Response
+    next: NextFunction
+
+    ok(data?: any): void
+
+    created(data?: any): void
+
+    accepted(data?: any): void
+
+    noContent(): void
+
+    badRequest(message?: string): void
+
+    unauthorized(message?: string): void
+
+    forbidden(message?: string): void
+
+    notFound(message?: string): void
+
+    tooMany(message?: string): void
+
+    internalServerError(message?: string, body?: any): void
 }
 
 export declare interface IRouteParams {
@@ -30,49 +54,49 @@ export declare class Route {
     constructor(
         method: RouteMethod,
         path: string,
-        controller: Handler | BaseController,
+        controller: Handler | typeof BaseController,
         routeParams?: IRouteParams
     )
 
     static get(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static post(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static put(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static delete(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static head(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static patch(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 
     static options(
         path: string,
-        controller: BaseController | Handler | string,
+        controller: Handler | string | typeof BaseController,
         options?: IRouteParams
     ): Route
 }
@@ -95,7 +119,7 @@ export declare function subroute(
 
 export declare interface IExpressiveRouter {
     routes?: Route[]
-    subroutes?: typeof subroute[]
+    subroutes?: ISubroute[]
 }
 
 export interface IExpressiveOptions {
@@ -103,13 +127,13 @@ export interface IExpressiveOptions {
     showSwaggerOnlyInDev?: boolean;
     swaggerInfo?: ISwaggerInfo;
     swaggerDefinitions?: any;
-    allowCors: boolean
-    corsConfig: CorsOptions
-    middleware: Handler[]
-    authorizer: Handler
-    errorHandler: Handler
-    bodyLimit: string
-    helmetOptions: IHelmetConfiguration
+    allowCors?: boolean
+    corsConfig?: CorsOptions
+    middleware?: Handler[]
+    authorizer?: Handler
+    errorHandler?: ErrorRequestHandler
+    bodyLimit?: string
+    helmetOptions?: IHelmetConfiguration
 }
 
 export declare class ExpressApp {

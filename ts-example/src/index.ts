@@ -1,17 +1,40 @@
-import { ExpressApp, IExpressiveRouter, Route, subroute } from "../../src"
-import express from "express"
+import { BaseController, ExpressApp, IExpressiveRouter, Route, subroute } from "../../src";
 
-const router: IExpressiveRouter = {
+class HelloController extends BaseController {
+    async handleRequest() {
+        const name = this.req.body.name;
+        return this.ok({
+            message: `hello, ${name}`
+        })
+    }
+}
+
+const helloRouter: IExpressiveRouter = {
     routes: [
         Route.get("/hello", (req, res) => {
             res.json({
                 hello: "ts world"
             })
         }),
-        Route.get("/hey", "/hello")
+        Route.get("/hey", "/hello"),
+        Route.post("/hello", HelloController)
     ]
 }
 
-const app = new ExpressApp(router);
+const router: IExpressiveRouter = {
+    subroutes: [
+        subroute("/v1", helloRouter)
+    ]
+}
 
-app.express.listen(3001, () => console.log("Running on port 3001"))
+const app = new ExpressApp(router, {
+    errorHandler(err, req, res, next) {
+        console.log(err);
+        res.status(500)
+        res.json({
+            message: err.message
+        })
+    }
+});
+
+app.listen(3001, () => console.log("Running on port 3001"))
