@@ -1,4 +1,4 @@
-import { BaseController, ExpressApp, IExpressiveRouter, Route, subroute } from "../../src";
+import { BaseController, ExpressApp, IExpressiveRouter, Route } from "../../src";
 
 class HelloController extends BaseController {
     async handleRequest() {
@@ -22,8 +22,14 @@ const helloRouter: IExpressiveRouter = {
 }
 
 const router: IExpressiveRouter = {
+    routes: [
+        Route.get("/", (req, res) => res.json({ hello: "root" }))
+    ],
     subroutes: [
-        subroute("/v1", helloRouter)
+        {
+            path: "/v1",
+            router: helloRouter
+        }
     ]
 }
 

@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "start": "ts-node-dev --respawn --no-notify src/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^13.7.4",
-    "typescript": "^3.8.2"
+    "@types/node": "13.7.4",
+    "ts-node-dev": "1.0.0-pre.44",
+    "typescript": "3.8.2"
   },
   "dependencies": {}
 }

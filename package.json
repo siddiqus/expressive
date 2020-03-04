@@ -12,9 +12,8 @@
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
     "coveralls": "jest --coverage && cat reports/coverage/lcov.info | coveralls",
-    "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html",
+    "lint": "eslint src -f node_modules/eslint-detailed-reporter/lib/detailed.js -o reports/lint.html || echo Lint report: reports/lint.html",
     "lintFix": "eslint --fix src || echo Linting done!",
-    "lint:silent": "npm run lint || echo Lint report: reports/lint.html",
     "dev": "cross-env NODE_ENV=development nodemon -w example -w src --exec node example/index.js",
     "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare"
   },
@@ -77,7 +76,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test && npm run lint",
+      "pre-commit": "npm test && eslint src --fix",
       "pre-push": "npm test"
     }
   },

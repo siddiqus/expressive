@@ -50,6 +50,16 @@ export declare interface IRouteParams {
 
 export declare type RouteMethod = "get" | "post" | "put" | "delete" | "head" | "patch" | "options"
 
+export declare interface IEndpoint {
+    method: RouteMethod
+    path: string
+    controller: string | Handler | typeof BaseController
+    validator?: Handler
+    doc?: any
+    authorizer?: Handler
+    middleware?: Handler[]
+}
+
 export declare class Route {
     constructor(
         method: RouteMethod,
@@ -113,12 +123,8 @@ export declare interface ISubrouteOptions {
     middleware?: Handler[]
 }
 
-export declare function subroute(
-    path: string, router: IExpressiveRouter, options?: ISubrouteOptions
-): ISubroute
-
 export declare interface IExpressiveRouter {
-    routes?: Route[]
+    routes?: Route[] | IEndpoint[]
     subroutes?: ISubroute[]
 }
 
