@@ -1,6 +1,7 @@
 class Endpoint {
     constructor(
-        method, path, controller, {
+        {
+            method, path, controller,
             validator, doc, authorizer, middleware
         }
     ) {
@@ -20,9 +21,10 @@ function getRouteFn(method) {
             validator = null,
             doc = null,
             middleware = null,
-            authorizer
+            authorizer = null
         } = {}
-    ) => new Endpoint(method, path, controller, {
+    ) => new Endpoint({
+        method, path, controller,
         validator,
         doc,
         authorizer,
