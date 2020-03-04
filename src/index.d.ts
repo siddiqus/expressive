@@ -1,6 +1,8 @@
-import { Request, Response, ErrorRequestHandler, NextFunction, Handler, Application, Express } from "express";
-import { CorsOptions } from "cors"
-import { IHelmetConfiguration } from "helmet"
+import { CorsOptions } from "cors";
+import { ErrorRequestHandler, Express, Handler, NextFunction, Request, Response } from "express";
+import { ValidationChain } from "express-validator";
+import { IHelmetConfiguration } from "helmet";
+
 
 export declare interface ISwaggerInfoContact {
     name?: string
@@ -14,7 +16,7 @@ export declare interface ISwaggerInfo {
 }
 
 export declare class BaseController {
-    handleRequest(): Promise<void>
+    handleRequest(): Promise<void> | void
 
     req: Request
     res: Response
@@ -42,7 +44,7 @@ export declare class BaseController {
 }
 
 export declare interface IRouteParams {
-    validator?: any | any[]
+    validator?: ValidationChain[]
     authorizer?: Handler
     doc?: any
     middleware?: Handler[]
@@ -54,7 +56,7 @@ export declare interface IEndpoint {
     method: RouteMethod
     path: string
     controller: string | Handler | typeof BaseController
-    validator?: Handler
+    validator?: ValidationChain[]
     doc?: any
     authorizer?: Handler
     middleware?: Handler[]
@@ -150,12 +152,11 @@ export declare class ExpressApp {
 
 export declare interface Expressive {
     ExpressApp: ExpressApp
+    Route: Route,
+    BaseController: BaseController
     // RouteUtil:
     // SwaggerUtils,
-    Route: Route
-    subroute: typeof subroute
     // serverless,
-    BaseController: BaseController
     // expressValidator,
     // SwaggerBuilder
 }
