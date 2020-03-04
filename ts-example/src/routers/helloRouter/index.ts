@@ -1,4 +1,4 @@
-import { body } from "express-validator"
+import { expressValidator } from "../../../../src"
 import { IExpressiveRouter, Route } from "../../../../src"
 import { GetHello } from "./getHello"
 import { PostHello } from "./postHello"
@@ -9,7 +9,7 @@ const getHey = Route.get("/hey", "/hello")
 
 const postHello = Route.post("/hello", PostHello, {
     validator: [
-        body("name")
+        expressValidator.body("name")
             .not().isEmpty().withMessage("Must provide 'name' parameter.")
             .not().isEmpty().withMessage("'name' parameter must not be empty")
             .isString().withMessage("'name' parameter must be a string")

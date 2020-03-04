@@ -1,8 +1,31 @@
-import { CorsOptions } from "cors";
-import { ErrorRequestHandler, Express, Handler, NextFunction, Request, Response } from "express";
-import { ValidationChain } from "express-validator";
-import { IHelmetConfiguration } from "helmet";
+import { CorsOptions as ICorsOptions } from "cors";
+import {
+    ErrorRequestHandler as IErrorRequestHandler,
+    Express as IExpress,
+    Handler as IHandler,
+    NextFunction as INextFunction,
+    Request as IRequest,
+    Response as IResponse
+} from "express";
 
+import * as ExpressValidator from "express-validator";
+import { ValidationChain as IValidationChain } from "express-validator"
+
+import { IHelmetConfiguration as IHelmetConfigFromHelment } from "helmet";
+
+export declare const expressValidator: typeof ExpressValidator
+export * from "express-validator"
+
+export declare interface Request extends IRequest { }
+export declare interface Response extends IResponse { }
+export declare interface NextFunction extends INextFunction { }
+export declare interface Handler extends IHandler { }
+export declare interface Express extends IExpress { }
+export declare interface ErrorRequestHandler extends IErrorRequestHandler { }
+export declare interface ValidationChain extends IValidationChain { }
+
+export declare interface IHelmetConfiguration extends IHelmetConfigFromHelment { }
+export declare interface CorsOptions extends ICorsOptions { }
 
 export declare interface ISwaggerInfoContact {
     name?: string
@@ -136,7 +159,7 @@ export interface IExpressiveOptions {
     swaggerInfo?: ISwaggerInfo;
     swaggerDefinitions?: any;
     allowCors?: boolean
-    corsConfig?: CorsOptions
+    corsConfig?: ICorsOptions
     middleware?: Handler[]
     authorizer?: Handler
     errorHandler?: ErrorRequestHandler
@@ -157,6 +180,6 @@ export declare interface Expressive {
     // RouteUtil:
     // SwaggerUtils,
     // serverless,
-    // expressValidator,
+    expressValidator: expressValidator
     // SwaggerBuilder
 }

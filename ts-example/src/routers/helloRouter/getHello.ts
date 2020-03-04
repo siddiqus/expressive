@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from "../../../../src";
 
 export function GetHello(req: Request, res: Response) {
     res.json({
