@@ -40,6 +40,9 @@
     ]
   },
   "devDependencies": {
+    "@types/cors": "2.8.6",
+    "@types/express": "4.17.3",
+    "@types/helmet": "0.0.45",
     "coveralls": "3.0.3",
     "cross-env": "5.2.0",
     "eslint": "5.16.0",
@@ -77,5 +80,6 @@
       "pre-commit": "npm test && npm run lint",
       "pre-push": "npm test"
     }
-  }
+  },
+  "types": "./src/index.d.ts"
 }
