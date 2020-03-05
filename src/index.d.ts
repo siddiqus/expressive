@@ -8,13 +8,12 @@ import {
     Response as IResponse
 } from "express";
 
-import * as ExpressValidator from "express-validator";
+import ExpressValidator from "express-validator";
 import { ValidationChain as IValidationChain } from "express-validator"
 
 import { IHelmetConfiguration as IHelmetConfigFromHelment } from "helmet";
 
 export declare const expressValidator: typeof ExpressValidator
-export * from "express-validator"
 
 export declare interface Request extends IRequest { }
 export declare interface Response extends IResponse { }
@@ -173,13 +172,3 @@ export declare class ExpressApp {
     listen(port: number, cb: Function): void
 }
 
-export declare interface Expressive {
-    ExpressApp: ExpressApp
-    Route: Route,
-    BaseController: BaseController
-    // RouteUtil:
-    // SwaggerUtils,
-    // serverless,
-    expressValidator: expressValidator
-    // SwaggerBuilder
-}
