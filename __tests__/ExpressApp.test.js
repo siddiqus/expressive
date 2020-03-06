@@ -1,4 +1,5 @@
 const ExpressApp = require("../src/ExpressApp");
+const Route = require("../src/Route");
 
 describe("ExpressApp", () => {
     it("should be defined", () => {
@@ -74,6 +75,36 @@ describe("ExpressApp", () => {
             });
 
             expect(app.express).toBeDefined();
+        });
+
+        it("Should throw error if duplicate urls", () => {
+            let response;
+            const mockRoutes = {
+                routes: [
+                    Route.get("/hello", () => {}),
+                    Route.get("/hello", () => {}),
+                    Route.get("/v1/hey", () => {}),
+                ],
+                subroutes: [
+                    {
+                        path: "/v1",
+                        router: {
+                            routes: [
+                                Route.get("/hey", () => {}),
+                            ]
+                        }
+                    }
+                ]
+            };
+            try {
+                new ExpressApp(mockRoutes);
+            } catch (error) {
+            response = error;
+            }
+
+            expect(response.message).toEqual(
+                "Duplicate endpoints detected! -> get /hello, get /v1/hey"
+            );
         });
     });
 });
