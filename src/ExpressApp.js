@@ -63,10 +63,10 @@ module.exports = class ExpressApp {
     }
 
     _registerSwagger() {
-        const shouldRegister = (
-            this.config.showSwaggerOnlyInDev
-            && process.env.NODE_ENV === "development"
-        ) || !this.config.showSwaggerOnlyInDev;
+        const shouldRegister =
+            (this.config.showSwaggerOnlyInDev &&
+                process.env.NODE_ENV === "development") ||
+            !this.config.showSwaggerOnlyInDev;
 
         if (!shouldRegister) return;
 
@@ -79,7 +79,11 @@ module.exports = class ExpressApp {
             swaggerHeader,
             this.config.swaggerDefinitions
         );
-        this.SwaggerUtils.registerExpress(this.express, swaggerJson, "/docs/swagger");
+        this.SwaggerUtils.registerExpress(
+            this.express,
+            swaggerJson,
+            "/docs/swagger"
+        );
         this.registerRedoc(this.express, swaggerJson, "/docs/redoc");
     }
 
@@ -92,7 +96,30 @@ module.exports = class ExpressApp {
         this.express.use(corsMiddleware);
     }
 
+    _getDuplicateUrls() {
+        const routeList = this.routeUtil.getRoutesInfo(this.router);
+        const urlStrings = routeList.map(({ path, method }) => {
+            const sanitizedPath =
+                path.charAt(path.length - 1) === "/"
+                    ? path.substring(0, path.length - 1)
+                    : path;
+            return `${method} ${sanitizedPath}`;
+        });
+
+        const duplicates = urlStrings.filter(
+            (item, index) => urlStrings.indexOf(item) !== index
+        );
+        return duplicates;
+    }
+
     _registerRoutes() {
+        const duplicateUrls = this._getDuplicateUrls();
+        if (duplicateUrls.length > 0) {
+            throw new Error(
+                `Duplicate endpoints detected! -> ${duplicateUrls.join(", ")}`
+            );
+        }
+
         const expressRouter = this.routerFactory.getExpressRouter(this.router);
         this.express.use(this.config.basePath, expressRouter);
     }
@@ -103,7 +130,11 @@ module.exports = class ExpressApp {
         this._configureCors();
 
         if (this.config.authorizer) {
-            this.express.use(this.routeUtil.getHandlerWithManagedNextCall(this.config.authorizer));
+            this.express.use(
+                this.routeUtil.getHandlerWithManagedNextCall(
+                    this.config.authorizer
+                )
+            );
         }
 
         this.middlewareManager.registerMiddleware(

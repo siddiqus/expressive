@@ -28,17 +28,20 @@ module.exports = class MiddlewareManager {
     }
 
     registerMiddleware(express, userMiddleware) {
-        express.use(this.express.json({
-            limit: this.options.bodyLimit
-        }));
+        express.use(
+            this.express.json({
+                limit: this.options.bodyLimit
+            })
+        );
         express.use(responseMiddleware);
         express.use(this.addRequestId());
 
         this._registerHelmet(express);
 
         if (userMiddleware) {
-            const nextManagedMiddlewares = userMiddleware
-                .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+            const nextManagedMiddlewares = userMiddleware.map((m) =>
+                this.routeUtil.getHandlerWithManagedNextCall(m)
+            );
             express.use(nextManagedMiddlewares);
         }
     }
