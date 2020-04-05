@@ -2,9 +2,12 @@ function getRouteFn(method) {
     return (
         ...args
     ) => {
-        const path = args[0];
+        const [path] = args;
 
-        if (args.length === 2 && args[1].__proto__.constructor.name === "Object") { // 2nd is not object
+        if (
+            args.length === 2
+            && args[1].__proto__.constructor.name === "Object"
+        ) { // 2nd is not object
             return {
                 method,
                 path,
