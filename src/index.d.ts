@@ -82,38 +82,56 @@ export declare interface IEndpoint extends IRouteParams {
     path: string
 }
 
-export declare type RouteFn = (path: string,
-    options?: IRouteParams
-) => IEndpoint
-
-export declare type RouteFnWithCtrl = (
-    path: string,
-    controller: string | Handler | typeof BaseController,
-    options?: Omit<IRouteParams, "controller">
-) => IEndpoint
-
 export declare type IRouteProps = Omit<IRouteParams, "controller">
 
 export declare class Route {
-    static get(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static get(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static get(path: string, params?: IRouteParams): IEndpoint
 
-    static post(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static post(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static post(path: string, params?: IRouteParams): IEndpoint
 
-    static delete(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static delete(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static delete(path: string, params?: IRouteParams): IEndpoint
 
-    static put(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static put(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static put(path: string, params?: IRouteParams): IEndpoint
 
-    static head(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static head(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static head(path: string, params?: IRouteParams): IEndpoint
 
-    static options(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static options(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static options(path: string, params?: IRouteParams): IEndpoint
 
-    static patch(path: string, controller: string | Handler | typeof BaseController, params?: IRouteProps): IEndpoint
+    static patch(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
     static patch(path: string, params?: IRouteParams): IEndpoint
 }
 
@@ -130,7 +148,7 @@ export declare interface ISubrouteOptions {
 }
 
 export declare interface IExpressiveRouter {
-    routes?: Route[] | IEndpoint[]
+    routes?: IEndpoint[]
     subroutes?: ISubroute[]
 }
 
