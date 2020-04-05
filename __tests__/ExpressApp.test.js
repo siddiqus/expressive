@@ -52,7 +52,7 @@ describe("ExpressApp", () => {
                 swaggerDefinitions: {},
                 basePath: "/api",
                 errorHandler: () => { },
-                authorizer: () => {},
+                authorizer: () => { },
                 showSwaggerOnlyInDev: false,
                 swaggerInfo: {}
             });
@@ -81,16 +81,16 @@ describe("ExpressApp", () => {
             let response;
             const mockRoutes = {
                 routes: [
-                    Route.get("/hello", () => {}),
-                    Route.get("/hello", () => {}),
-                    Route.get("/v1/hey", () => {}),
+                    Route.get("/hello", () => { }),
+                    Route.get("/hello/", () => { }),
+                    Route.get("/v1/hey", () => { }),
                 ],
                 subroutes: [
                     {
                         path: "/v1",
                         router: {
                             routes: [
-                                Route.get("/hey", () => {}),
+                                Route.get("/hey", () => { }),
                             ]
                         }
                     }
@@ -99,7 +99,7 @@ describe("ExpressApp", () => {
             try {
                 new ExpressApp(mockRoutes);
             } catch (error) {
-            response = error;
+                response = error;
             }
 
             expect(response.message).toEqual(

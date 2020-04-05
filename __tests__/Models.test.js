@@ -93,4 +93,11 @@ describe("Route model", () => {
     it("getRouteFn: Should allow route without optional parameters", () => {
         expect(Route.get("/", () => { })).toBeDefined();
     });
+
+    it("getRouteFn: Should work with both 3 and 2 args", () => {
+        expect(Route.get("/", "someController").controller).toEqual("someController");
+        expect(Route.get("/", {
+            controller: "someController"
+        }).controller).toEqual("someController");
+    });
 });

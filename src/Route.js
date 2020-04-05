@@ -1,21 +1,25 @@
 function getRouteFn(method) {
     return (
-        path, {
+        ...args
+    ) => {
+        const path = args[0];
+
+        if (args.length === 2 && args[1].__proto__.constructor.name === "Object") { // 2nd is not object
+            return {
+                method,
+                path,
+                ...args[1]
+            };
+        };
+
+        const [, controller, params = {}] = args;
+        return {
+            method,
+            path,
             controller,
-            middleware = [],
-            validator = undefined,
-            doc = undefined,
-            authorizer = undefined
-        } = {}
-    ) => ({
-        method,
-        path,
-        controller,
-        validator,
-        doc,
-        authorizer,
-        middleware
-    });
+            ...params
+        };
+    };
 }
 
 module.exports = {
