@@ -66,6 +66,7 @@ export declare class BaseController {
 }
 
 export declare interface IRouteParams {
+    controller?: string | Handler | typeof BaseController
     validator?: ValidationChain[]
     authorizer?: Handler
     doc?: any
@@ -74,65 +75,23 @@ export declare interface IRouteParams {
 
 export declare type RouteMethod = "get" | "post" | "put" | "delete" | "head" | "patch" | "options"
 
-export declare interface IEndpoint {
+export declare interface IEndpoint extends IRouteParams {
     method: RouteMethod
     path: string
-    controller: string | Handler | typeof BaseController
-    validator?: ValidationChain[]
-    doc?: any
-    authorizer?: Handler
-    middleware?: Handler[]
 }
 
+export declare type RouteFn = (path: string,
+    options?: IRouteParams
+) => IEndpoint
+
 export declare class Route {
-    constructor(
-        method: RouteMethod,
-        path: string,
-        controller: Handler | typeof BaseController,
-        routeParams?: IRouteParams
-    )
-
-    static get(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static post(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static put(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static delete(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static head(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static patch(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static options(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+    static get: RouteFn
+    static post: RouteFn
+    put: RouteFn
+    delete: RouteFn
+    head: RouteFn
+    patch: RouteFn
+    options: RouteFn
 }
 
 export declare interface ISubroute {

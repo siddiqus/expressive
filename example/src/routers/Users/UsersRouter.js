@@ -21,10 +21,12 @@ function customErrorHandler(err, req, res, next) {
 
 module.exports = {
     routes: [
-        Route.get("/", GetUsers, {
+        Route.get("/", {
+            controller: GetUsers,
             doc: GetUsersDoc
         }),
-        Route.get("/:userId", GetUserById, {
+        Route.get("/:userId", {
+            controller: GetUserById,
             validator: UserIdParamValidator,
             errorHandler: customErrorHandler,
             doc: GetUserByIdDoc

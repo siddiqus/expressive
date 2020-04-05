@@ -3,11 +3,16 @@ import { IExpressiveRouter, Route } from "../../../../src"
 import { GetHello } from "./getHello"
 import { PostHello } from "./postHello"
 
-const getHello = Route.get("/hello", GetHello)
+const getHello = Route.get("/hello", {
+    controller: GetHello
+})
 
-const getHey = Route.get("/hey", "/hello")
+const getHey = Route.get("/hey", {
+    controller: "/hello"
+})
 
-const postHello = Route.post("/hello", PostHello, {
+const postHello = Route.post("/hello", {
+    controller: PostHello,
     validator: [
         expressValidator.body("name")
             .not().isEmpty().withMessage("Must provide 'name' parameter.")

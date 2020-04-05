@@ -1,30 +1,16 @@
-class Endpoint {
-    constructor(
-        {
-            method, path, controller,
-            validator, doc, authorizer, middleware
-        }
-    ) {
-        this.method = method;
-        this.path = path;
-        this.controller = controller;
-        if (validator) this.validator = validator;
-        if (doc) this.doc = doc;
-        if (authorizer) this.authorizer = authorizer;
-        if (middleware) this.middleware = middleware;
-    }
-}
-
 function getRouteFn(method) {
     return (
-        path, controller, {
-            validator = null,
-            doc = null,
-            middleware = null,
-            authorizer = null
+        path, {
+            controller,
+            middleware = [],
+            validator = undefined,
+            doc = undefined,
+            authorizer = undefined
         } = {}
-    ) => new Endpoint({
-        method, path, controller,
+    ) => ({
+        method,
+        path,
+        controller,
         validator,
         doc,
         authorizer,
