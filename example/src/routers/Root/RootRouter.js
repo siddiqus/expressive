@@ -7,7 +7,8 @@ const HelloRouter = require("../../routers/Hello/HelloRouter");
 
 module.exports = {
     routes: [
-        Route.get("/", RootGetController, {
+        Route.get("/", {
+            controller: RootGetController,
             doc: RootGetDoc
         }),
         Route.get("/hey", "/hello")

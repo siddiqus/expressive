@@ -3,7 +3,9 @@ import { helloRouter } from "./routers/helloRouter";
 
 export const router: IExpressiveRouter = {
     routes: [
-        Route.get("/health", (req, res) => res.json({ hello: "world" }))
+        Route.get("/health", {
+            controller: (req, res) => res.json({ hello: "world" })
+        })
     ],
     subroutes: [
         {

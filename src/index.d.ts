@@ -65,7 +65,10 @@ export declare class BaseController {
     internalServerError(message?: string, body?: any): void
 }
 
+type controller = string | Handler | typeof BaseController;
+
 export declare interface IRouteParams {
+    controller: string | Handler | typeof BaseController
     validator?: ValidationChain[]
     authorizer?: Handler
     doc?: any
@@ -74,65 +77,62 @@ export declare interface IRouteParams {
 
 export declare type RouteMethod = "get" | "post" | "put" | "delete" | "head" | "patch" | "options"
 
-export declare interface IEndpoint {
+export declare interface IEndpoint extends IRouteParams {
     method: RouteMethod
     path: string
-    controller: string | Handler | typeof BaseController
-    validator?: ValidationChain[]
-    doc?: any
-    authorizer?: Handler
-    middleware?: Handler[]
 }
 
-export declare class Route {
-    constructor(
-        method: RouteMethod,
-        path: string,
-        controller: Handler | typeof BaseController,
-        routeParams?: IRouteParams
-    )
+export declare type IRouteProps = Omit<IRouteParams, "controller">
 
+export declare class Route {
     static get(
         path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static get(path: string, params?: IRouteParams): IEndpoint
 
     static post(
         path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static put(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static post(path: string, params?: IRouteParams): IEndpoint
 
     static delete(
         path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static delete(path: string, params?: IRouteParams): IEndpoint
+
+    static put(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static put(path: string, params?: IRouteParams): IEndpoint
 
     static head(
         path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
-
-    static patch(
-        path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static head(path: string, params?: IRouteParams): IEndpoint
 
     static options(
         path: string,
-        controller: Handler | string | typeof BaseController,
-        options?: IRouteParams
-    ): Route
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static options(path: string, params?: IRouteParams): IEndpoint
+
+    static patch(
+        path: string,
+        controller: string | Handler | typeof BaseController,
+        params?: IRouteProps
+    ): IEndpoint
+    static patch(path: string, params?: IRouteParams): IEndpoint
 }
 
 export declare interface ISubroute {
@@ -148,7 +148,7 @@ export declare interface ISubrouteOptions {
 }
 
 export declare interface IExpressiveRouter {
-    routes?: Route[] | IEndpoint[]
+    routes?: IEndpoint[]
     subroutes?: ISubroute[]
 }
 

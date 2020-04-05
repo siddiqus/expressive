@@ -1,35 +1,28 @@
-class Endpoint {
-    constructor(
-        {
-            method, path, controller,
-            validator, doc, authorizer, middleware
-        }
-    ) {
-        this.method = method;
-        this.path = path;
-        this.controller = controller;
-        if (validator) this.validator = validator;
-        if (doc) this.doc = doc;
-        if (authorizer) this.authorizer = authorizer;
-        if (middleware) this.middleware = middleware;
-    }
-}
-
 function getRouteFn(method) {
     return (
-        path, controller, {
-            validator = null,
-            doc = null,
-            middleware = null,
-            authorizer = null
-        } = {}
-    ) => new Endpoint({
-        method, path, controller,
-        validator,
-        doc,
-        authorizer,
-        middleware
-    });
+        ...args
+    ) => {
+        const [path] = args;
+
+        if (
+            args.length === 2
+            && args[1].__proto__.constructor.name === "Object"
+        ) { // 2nd is not object
+            return {
+                method,
+                path,
+                ...args[1]
+            };
+        };
+
+        const [, controller, params = {}] = args;
+        return {
+            method,
+            path,
+            controller,
+            ...params
+        };
+    };
 }
 
 module.exports = {

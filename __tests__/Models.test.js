@@ -3,8 +3,9 @@ const subroute = require("../src/subroute");
 
 function getRouteObj(method) {
     return Route[method](
-        "/somepath", "someController",
+        "/somepath",
         {
+            controller: "someController",
             validator: "validatorFunction",
             doc: "docJs"
         }
@@ -72,7 +73,8 @@ describe("Route model", () => {
     });
 
     it("Should set authorizer if given", () => {
-        const routeObject = Route.get("/some/path", "someOtherController", {
+        const routeObject = Route.get("/some/path", {
+            controller: "someOtherController",
             authorizer: "someAuthorizer"
         });
 
@@ -80,7 +82,8 @@ describe("Route model", () => {
     });
 
     it("Should set middleware if given", () => {
-        const routeObject = Route.get("/some/path", "someOtherController", {
+        const routeObject = Route.get("/some/path", {
+            controller: "someOtherController",
             middleware: "someMiddleware"
         });
 
@@ -89,5 +92,12 @@ describe("Route model", () => {
 
     it("getRouteFn: Should allow route without optional parameters", () => {
         expect(Route.get("/", () => { })).toBeDefined();
+    });
+
+    it("getRouteFn: Should work with both 3 and 2 args", () => {
+        expect(Route.get("/", "someController").controller).toEqual("someController");
+        expect(Route.get("/", {
+            controller: "someController"
+        }).controller).toEqual("someController");
     });
 });

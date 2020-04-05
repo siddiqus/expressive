@@ -10,15 +10,17 @@ const UsersRouter = require("../Users/UsersRouter");
 
 module.exports = {
     routes: [
-        Route.post("/", HelloName, {
+        Route.post("/", {
+            controller: HelloName,
             validator: HelloNameValidator,
             doc: HelloNameDoc
         }),
-        Route.get("/", (req, res) => {
-            res.json({
-                hello: "world"
-            });
-        }, {
+        Route.get("/", {
+            controller: (req, res) => {
+                res.json({
+                    hello: "world"
+                });
+            },
             doc: HelloDoc,
             middleware: [
                 async (req, res) => console.log("from mid 1"),

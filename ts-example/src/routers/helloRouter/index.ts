@@ -7,7 +7,8 @@ const getHello = Route.get("/hello", GetHello)
 
 const getHey = Route.get("/hey", "/hello")
 
-const postHello = Route.post("/hello", PostHello, {
+const postHello = Route.post("/hello", {
+    controller: PostHello,
     validator: [
         expressValidator.body("name")
             .not().isEmpty().withMessage("Must provide 'name' parameter.")
