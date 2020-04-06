@@ -3,10 +3,15 @@ function _sendJsonResponseWithMessage(res, code, message) {
 }
 
 function _sendJsonResponse(res, code, data) {
-    return !!data ? res.status(code).json(data) : res.sendStatus(code);
+    const wrappedData = BaseController.bodyWrapper(data);
+    return !!data ? res.status(code).json(wrappedData) : res.sendStatus(code);
 }
 
-module.exports = class BaseController {
+class BaseController {
+    static bodyWrapper(data) {
+        return data;
+    }
+
     constructor() {
         this.req = null;
         this.res = null;
@@ -60,3 +65,5 @@ module.exports = class BaseController {
         });
     }
 };
+
+module.exports = BaseController;

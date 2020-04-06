@@ -13,7 +13,4 @@ describe("module index", () => {
     it("should have subroute", () => {
         expect(expressive.subroute).toBeDefined();
     });
-    it("should have serverless", () => {
-        expect(expressive.serverless).toBeDefined();
-    });
 });

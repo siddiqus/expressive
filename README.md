@@ -31,7 +31,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 - [Asynchronous request handlers and middleware](#asynchronous-request-handlers-and-middleware)
   - [Handling requests](#handling-requests)
   - [Middleware](#middleware)
-- [Request validation using express-validator](#request-validation-using-express-validator)
+- [Request validation using Celebrate](#request-validation-using-celebrate)
 - [Documentation with Swagger syntax](#documentation-with-swagger-syntax)
 - [Example applications (Both TypeScript and ES5)](#example)
 
@@ -48,8 +48,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - Built in middleware e.g. body-parser, cors, etc.
   - Security middleware i.e. helmet
 - Built in support for asynchronous request handlers and middleware
-- API validation using Express Validator https://github.com/express-validator/express-validator
-  - Validate each endpoint with Express Validator functions, and error messages will be automatically sent in the response.
+- API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas
 - Centralized error handling
   - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
 - Doc generation through Swagger https://swagger.io/
@@ -146,7 +145,9 @@ Here you'll notice that the request object is available with `this.req` and you 
     SomeController, // required - a controller function or class
     {
       doc: someDocJs, // optional - Swagger json format for a given endpoint
-      validator: someExpressValidator, // optional - validator array in express-validator format
+      validationSchema: {
+        query: someJoiSchemaForQueryParams
+      }, // validationSchema optional - object with Joi schemas for body, query, params, etc.
       errorHandler: function(err, req, res, next) {} // optional - middleware to handle errors for this specific endpoint
     }
   );
@@ -386,18 +387,25 @@ Notice how the three middleware functions are different:
 - One is async, another is a normal one, but the other one does not have the `next` function parameter used, but this is still okay because Expressive calls it internally
 - These cases are handled by Expressive internally and allows you to declare middleware in a flexible way
 
-# Request validation using express-validator
+# Request validation using Celebrate
 
-Expressive uses express-validator [https://github.com/express-validator/express-validator] for API endpoint validations. A validator can be added to any endpoint using the 'validator' property of a route.
+Expressive uses [celebrate](https://www.npmjs.com/package/celebrate) for API endpoint validations. A schema can be added to any endpoint using the 'validationSchema' property of a route.
 
 ```javascript
-const { Route } = require("@siddiqus/expressive");
+const { Route, Joi } = require("@siddiqus/expressive");
 
 const getUserById = Route.get(
   "/users/:userId",
   GetSpecificUser, // some predefined controller
   {
-    validator: UserIdParamValidator // some predefined validator
+    validationSchema: {
+      params: {
+        userId: Joi.number().required()
+      },
+      body: {}, // keys with Joi schema
+      query: {}, 
+      headers: {} // and others based on celebrate's documentation
+    } 
   }
 );
 ```

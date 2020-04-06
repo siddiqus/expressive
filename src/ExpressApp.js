@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const { errors: celebrateErrors } = require("celebrate");
 const RouterFactory = require("./RouterFactory");
 const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
@@ -20,7 +21,8 @@ module.exports = class ExpressApp {
             authorizer = null,
             errorHandler = null,
             bodyLimit = "100kb",
-            helmetOptions = null
+            helmetOptions = null,
+            celebrateErrorHandler = null
         } = {}
     ) {
         this.config = {
@@ -34,13 +36,14 @@ module.exports = class ExpressApp {
             errorHandler,
             bodyLimit,
             helmetOptions,
-            authorizer
+            authorizer,
+            celebrateErrorHandler
         };
         this.router = router;
 
         this._init();
 
-        this.registerRoutes();
+        this.registerHandlers();
     }
 
     _init() {
@@ -124,7 +127,15 @@ module.exports = class ExpressApp {
         this.express.use(this.config.basePath, expressRouter);
     }
 
-    registerRoutes() {
+    _registerCelebrateMiddleware() {
+        if (this.config.celebrateErrorHandler) {
+            this.express.use(this.config.celebrateErrorHandler);
+        } else {
+            this.express.use(celebrateErrors());
+        }
+    }
+
+    registerHandlers() {
         this._registerSwagger();
 
         this._configureCors();
@@ -143,6 +154,8 @@ module.exports = class ExpressApp {
         );
 
         this._registerRoutes();
+
+        this._registerCelebrateMiddleware();
 
         if (this.config.errorHandler) {
             this.express.use(this.config.errorHandler);

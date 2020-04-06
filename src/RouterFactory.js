@@ -1,7 +1,7 @@
 /* eslint-disable no-invalid-this */
 const { Router } = require("express");
-const { validationResult } = require("express-validator");
 const RouteUtil = require("./RouteUtil");
+const { celebrate: celebrateMiddleware } = require("celebrate");
 
 async function _handleRequestBase(req, res, next) {
     this.req = req;
@@ -13,20 +13,8 @@ async function _handleRequestBase(req, res, next) {
 
 module.exports = class RouterFactory {
     constructor() {
-        this.validationResult = validationResult;
         this.routeUtil = RouteUtil;
-    }
-
-    _hasValidationErrors(req, res) {
-        const errors = this.validationResult(req);
-        if (errors.isEmpty()) return false;
-
-        res.status(422);
-        res.json({
-            errors: errors.array()
-        });
-
-        return true;
+        this.celebrateMiddleware = celebrateMiddleware;
     }
 
     async _executeController(controller, { req, res, next }) {
@@ -44,10 +32,8 @@ module.exports = class RouterFactory {
 
     _getWrappedController(controller) {
         return async (req, res, next) => {
-            if (this._hasValidationErrors(req, res)) return;
-
             try {
-                await this._executeController(controller, { req, res, next } );
+                await this._executeController(controller, { req, res, next });
             } catch (e) {
                 return next(e);
             }
@@ -55,24 +41,30 @@ module.exports = class RouterFactory {
     }
 
     _registerRoute(router, {
-        method, path, controller, validator = [], authorizer = null, middleware = []
+        method, path, controller, validationSchema = null, authorizer = null, middleware = null
     }) {
-        const nextAdjustedMiddleware = middleware
-            .map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
-
         const routerArgs = [
             path
         ];
+
+        if (validationSchema) {
+            routerArgs.push(this.celebrateMiddleware(validationSchema, {
+                abortEarly: false
+            }));
+        }
 
         if (authorizer) {
             routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
         }
 
+        const nextAdjustedMiddleware = !middleware ? []
+            : middleware.map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+
         routerArgs.push(
-            validator,
             ...nextAdjustedMiddleware,
             this._getWrappedController(controller)
         );
+
         router[method](...routerArgs);
     }
 

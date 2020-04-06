@@ -1,30 +1,21 @@
 import { CorsOptions as ICorsOptions } from "cors";
-import {
-    ErrorRequestHandler as IErrorRequestHandler,
-    Express as IExpress,
-    Handler as IHandler,
-    NextFunction as INextFunction,
-    Request as IRequest,
-    Response as IResponse
-} from "express";
-
-import ExpressValidator from "express-validator";
-import { ValidationChain as IValidationChain } from "express-validator"
-
+import { ErrorRequestHandler as IErrorRequestHandler, Express as IExpress, Handler as IHandler, NextFunction as INextFunction, Request as IRequest, Response as IResponse } from "express";
 import { IHelmetConfiguration as IHelmetConfigFromHelment } from "helmet";
 
-export declare const expressValidator: typeof ExpressValidator
-
+export declare type express = typeof import("express")
 export declare interface Request extends IRequest { }
 export declare interface Response extends IResponse { }
 export declare interface NextFunction extends INextFunction { }
 export declare interface Handler extends IHandler { }
 export declare interface Express extends IExpress { }
 export declare interface ErrorRequestHandler extends IErrorRequestHandler { }
-export declare interface ValidationChain extends IValidationChain { }
 
 export declare interface IHelmetConfiguration extends IHelmetConfigFromHelment { }
 export declare interface CorsOptions extends ICorsOptions { }
+
+export declare const Joi: typeof import("celebrate").Joi;
+export declare const isValidationError: typeof import("celebrate").isCelebrate;
+export declare const celebrate: typeof import("celebrate");
 
 export declare interface ISwaggerInfoContact {
     name?: string
@@ -38,6 +29,8 @@ export declare interface ISwaggerInfo {
 }
 
 export declare class BaseController {
+    static bodyWrapper(): any
+
     handleRequest(): Promise<void> | void
 
     req: Request
@@ -67,9 +60,18 @@ export declare class BaseController {
 
 type controller = string | Handler | typeof BaseController;
 
+export declare interface ValidationSchema {
+    body?: object
+    params?: object
+    query?: object
+    headers?: object
+    cookies?: object
+    signedCookies?: object
+}
+
 export declare interface IRouteParams {
     controller: string | Handler | typeof BaseController
-    validator?: ValidationChain[]
+    validationSchema?: ValidationSchema
     authorizer?: Handler
     doc?: any
     middleware?: Handler[]
@@ -136,7 +138,7 @@ export declare class Route {
 }
 
 export declare interface ISubroute {
-    path: String
+    path: string
     router: IExpressiveRouter
     authorizer?: Handler
     middleware?: Handler[]
@@ -161,9 +163,10 @@ export interface IExpressiveOptions {
     corsConfig?: ICorsOptions
     middleware?: Handler[]
     authorizer?: Handler
-    errorHandler?: ErrorRequestHandler
+    errorHandler?: ErrorRequestHandler | ErrorRequestHandler[]
     bodyLimit?: string
     helmetOptions?: IHelmetConfiguration
+    celebrateErrorHandler?: ErrorRequestHandler
 }
 
 export declare class ExpressApp {

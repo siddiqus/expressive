@@ -4,15 +4,13 @@ const HelloDoc = require("./docs/HelloDoc");
 const HelloName = require("./controllers/HelloName");
 const HelloNameDoc = require("./docs/HelloNameDoc");
 
-const HelloNameValidator = require("./validators/HelloNameValidator");
-
 const UsersRouter = require("../Users/UsersRouter");
 
 module.exports = {
     routes: [
         Route.post("/", {
             controller: HelloName,
-            validator: HelloNameValidator,
+            // validator: HelloNameValidator,
             doc: HelloNameDoc
         }),
         Route.get("/", {

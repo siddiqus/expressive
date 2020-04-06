@@ -119,50 +119,6 @@ describe("RouterFactory", () => {
         });
     });
 
-    describe("_hasValidationErrors", () => {
-        it("Should return true if validation errors", () => {
-            const factory = new RouterFactory();
-            const errors = {
-                isEmpty: jest.fn().mockReturnValue(false),
-                array: jest.fn().mockReturnValue([1, 2, 3])
-            }
-            factory.validationResult = jest.fn().mockReturnValue(errors);
-
-            const mockRes = {
-                status: jest.fn(),
-                json: jest.fn()
-            };
-            const mockReq = { name: "some name" };
-            const result = factory._hasValidationErrors(mockReq, mockRes);
-
-            expect(result).toEqual(true);
-            expect(mockRes.status).toHaveBeenCalledWith(422);
-            expect(mockRes.json).toHaveBeenCalledWith({
-                errors: [1, 2, 3]
-            });
-        });
-
-        it("Should return false if no validation errors", () => {
-            const factory = new RouterFactory();
-            const errors = {
-                isEmpty: jest.fn().mockReturnValue(true),
-                array: jest.fn().mockReturnValue([])
-            }
-            factory.validationResult = jest.fn().mockReturnValue(errors);
-
-            const mockRes = {
-                status: jest.fn(),
-                json: jest.fn()
-            };
-            const mockReq = { name: "some name" };
-            const result = factory._hasValidationErrors(mockReq, mockRes);
-
-            expect(result).toEqual(false);
-            expect(mockRes.status).not.toHaveBeenCalled();
-            expect(mockRes.json).not.toHaveBeenCalled();
-        });
-    });
-
     describe("_registerRoute", () => {
         it("Should register route with middleware properly", () => {
             const factory = new RouterFactory();
@@ -171,11 +127,11 @@ describe("RouterFactory", () => {
                 get: jest.fn(),
                 use: jest.fn(),
                 post: jest.fn()
-            }
+            };
 
             factory.routeUtil = {
                 getHandlerWithManagedNextCall: jest.fn()
-            }
+            };
 
             factory._registerRoute(mockExpressRouter, {
                 method: "get",
@@ -188,6 +144,46 @@ describe("RouterFactory", () => {
                 authorizer: (req, res) => { }
             });
 
+            expect(factory.routeUtil.getHandlerWithManagedNextCall).toHaveBeenCalledTimes(3);
+            expect(mockExpressRouter.get).toHaveBeenCalled();
+        });
+
+        it("Should use celebrate validation schema", () => {
+            const factory = new RouterFactory();
+
+            factory.celebrateMiddleware = jest.fn().mockReturnValue(1);
+
+            const mockExpressRouter = {
+                get: jest.fn(),
+                use: jest.fn(),
+                post: jest.fn()
+            };
+
+            factory.routeUtil = {
+                getHandlerWithManagedNextCall: jest.fn()
+            };
+
+            const schema = {
+                body: {
+                    someId: 1
+                }
+            };
+
+            factory._registerRoute(mockExpressRouter, {
+                method: "get",
+                path: "/",
+                controller: BaseController,
+                middleware: [
+                    (req, res) => 1,
+                    (req, res) => 2,
+                ],
+                authorizer: (req, res) => { },
+                validationSchema: schema
+            });
+
+            expect(factory.celebrateMiddleware).toHaveBeenCalledWith(schema, {
+                abortEarly: false
+            });
             expect(factory.routeUtil.getHandlerWithManagedNextCall).toHaveBeenCalledTimes(3);
             expect(mockExpressRouter.get).toHaveBeenCalled();
         });
@@ -223,25 +219,8 @@ describe("RouterFactory", () => {
     });
 
     describe("_getWrappedController", () => {
-        it("should handle if there is validation error", async () => {
-            const factory = new RouterFactory();
-            factory._hasValidationErrors = jest.fn().mockReturnValue(true);
-
-            const mockNext = jest.fn();
-
-            const fn = factory._getWrappedController(MockControllerThrowsError);
-            const mockReq = 1;
-            const mockRes = 2;
-
-            await fn(mockReq, mockRes, mockNext);
-
-            expect(mockErrorJestFn).not.toHaveBeenCalled();
-            expect(mockNext).not.toHaveBeenCalled();
-        });
-
         it("should execute controller if given a function", async () => {
             const factory = new RouterFactory();
-            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
 
             const mockFn = jest.fn();
             const fn = factory._getWrappedController(mockFn);
@@ -257,7 +236,6 @@ describe("RouterFactory", () => {
 
         it("should execute controller if given an anonymous function", async () => {
             const factory = new RouterFactory();
-            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
 
             const mockFn = jest.fn();
             const fn = factory._getWrappedController((req, res, next) => {
@@ -275,7 +253,6 @@ describe("RouterFactory", () => {
 
         it("should execute given base controller child", async () => {
             const factory = new RouterFactory();
-            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
 
             const mockFn = jest.fn();
 
@@ -298,9 +275,6 @@ describe("RouterFactory", () => {
 
         it("should pass error to next", async () => {
             const factory = new RouterFactory();
-            factory._hasValidationErrors = jest.fn().mockReturnValue(false);
-
-            const mockFn = jest.fn();
 
             class SomeController extends BaseController {
                 handleRequest() {
