@@ -5,7 +5,8 @@ const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
 function _addRouteToPaths(paths, parentPath, route) {
     const routeData = {
         method: route.method,
-        path: `${parentPath}${route.path}`
+        path: `${parentPath}${route.path}`,
+        validationSchema: route.validationSchema
     };
 
     if (RouteUtil.isUrlPath(route.controller)) {

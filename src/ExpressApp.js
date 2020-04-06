@@ -82,6 +82,7 @@ module.exports = class ExpressApp {
             swaggerHeader,
             this.config.swaggerDefinitions
         );
+
         this.SwaggerUtils.registerExpress(
             this.express,
             swaggerJson,

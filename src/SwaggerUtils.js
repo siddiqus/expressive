@@ -23,12 +23,52 @@ function _sanitizeSwaggerPath(path) {
     return split.join("/");
 }
 
+function _getParametersFromValidationSchema(validationSchema) {
+    const parameters = [];
+    if (!validationSchema) return parameters;
+
+    const { params, query, body, headers } = validationSchema;
+
+    const parameterKeyMap = {
+        path: params,
+        query,
+        body,
+        headers
+    };
+
+    Object.keys(parameterKeyMap).forEach((parameterName) => {
+        if (parameterKeyMap[parameterName]) {
+            Object.keys(parameterKeyMap[parameterName]).forEach((key) => {
+                const parameterSchema = parameterKeyMap[parameterName][key];
+                const isRequired = parameterSchema._flags.presence === "required";
+                const defaultValue = parameterSchema._flags.default;
+                const type = parameterSchema.type;
+                parameters.push({
+                    name: key,
+                    in: parameterName,
+                    required: isRequired,
+                    schema: {
+                        type,
+                        default: defaultValue
+                    }
+                });
+            });
+        }
+    });
+
+    return parameters;
+}
+
 function _addPathDoc(paths, route, tags) {
-    let { doc, path } = route;
+    let { doc, path, validationSchema } = route;
     const { method } = route;
     path = _sanitizeSwaggerPath(path);
 
     if (!doc) doc = {};
+
+    if (!doc.parameters) {
+        doc.parameters = _getParametersFromValidationSchema(validationSchema);
+    }
 
     if (!paths[path]) paths[path] = {};
     paths[path][method] = doc;
