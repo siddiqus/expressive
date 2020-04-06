@@ -38,7 +38,7 @@ module.exports = class MiddlewareManager {
 
         this._registerHelmet(express);
 
-        if (userMiddleware) {
+        if (userMiddleware && userMiddleware.length > 0) {
             const nextManagedMiddlewares = userMiddleware.map((m) =>
                 this.routeUtil.getHandlerWithManagedNextCall(m)
             );

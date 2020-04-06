@@ -6,8 +6,6 @@ const GetUsersDoc = require("./docs/GetUsersDoc");
 const GetUserById = require("./controllers/GetUserById");
 const GetUserByIdDoc = require("./docs/GetUserByIdDoc");
 
-const UserIdParamValidator = require("./validators/UserIdParamValidator");
-
 function customErrorHandler(err, req, res, next) {
     if (err.message === "Could not find user") {
         res.status(404);
@@ -27,7 +25,7 @@ module.exports = {
         }),
         Route.get("/:userId", {
             controller: GetUserById,
-            validator: UserIdParamValidator,
+            // validator: UserIdParamValidator,
             errorHandler: customErrorHandler,
             doc: GetUserByIdDoc
         })

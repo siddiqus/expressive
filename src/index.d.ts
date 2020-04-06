@@ -8,12 +8,7 @@ import {
     Response as IResponse
 } from "express";
 
-import ExpressValidator from "express-validator";
-import { ValidationChain as IValidationChain } from "express-validator"
-
 import { IHelmetConfiguration as IHelmetConfigFromHelment } from "helmet";
-
-export declare const expressValidator: typeof ExpressValidator
 
 export declare interface Request extends IRequest { }
 export declare interface Response extends IResponse { }
@@ -38,6 +33,8 @@ export declare interface ISwaggerInfo {
 }
 
 export declare class BaseController {
+    static bodyWrapper(): any
+
     handleRequest(): Promise<void> | void
 
     req: Request
@@ -67,9 +64,16 @@ export declare class BaseController {
 
 type controller = string | Handler | typeof BaseController;
 
+export declare interface ValidationSchema {
+    body?: object
+    params?: object
+    query?: object
+    headers?: object
+}
+
 export declare interface IRouteParams {
     controller: string | Handler | typeof BaseController
-    validator?: ValidationChain[]
+    validator?: ValidationSchema
     authorizer?: Handler
     doc?: any
     middleware?: Handler[]
@@ -136,7 +140,7 @@ export declare class Route {
 }
 
 export declare interface ISubroute {
-    path: String
+    path: string
     router: IExpressiveRouter
     authorizer?: Handler
     middleware?: Handler[]
