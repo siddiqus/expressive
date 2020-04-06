@@ -1,9 +1,16 @@
 const ExpressApp = require("../src/ExpressApp");
 const Route = require("../src/Route");
 
+jest.mock("celebrate");
+const celebrate = require("celebrate");
+
 describe("ExpressApp", () => {
     it("should be defined", () => {
         expect(ExpressApp).toBeDefined();
+    });
+
+    beforeEach(() => {
+        celebrate.__clearMocks();
     });
 
     describe("_registerSwagger", () => {
@@ -105,6 +112,30 @@ describe("ExpressApp", () => {
             expect(response.message).toEqual(
                 "Duplicate endpoints detected! -> get /hello, get /v1/hey"
             );
+        });
+    });
+
+    describe("_registerCelebrateMiddleware", () => {
+        it("Should register celebrate error middleware if custom is not provided", () => {
+            new ExpressApp({});
+            expect(celebrate.errors).toHaveBeenCalled();
+        });
+        it("Should register celebrate error middleware if custom is provided", () => {
+            const customCelebrateHandler = jest.fn();
+
+            const app = new ExpressApp({}, {
+                celebrateErrorHandler: customCelebrateHandler
+            });
+
+            const mockUse = jest.fn();
+
+            app.express = {
+                use: mockUse
+            };
+
+            app._registerCelebrateMiddleware();
+
+            expect(mockUse).toHaveBeenCalledWith(customCelebrateHandler);
         });
     });
 });

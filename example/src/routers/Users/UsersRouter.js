@@ -6,6 +6,8 @@ const GetUsersDoc = require("./docs/GetUsersDoc");
 const GetUserById = require("./controllers/GetUserById");
 const GetUserByIdDoc = require("./docs/GetUserByIdDoc");
 
+const { Joi } = require("../../../expressive");
+
 function customErrorHandler(err, req, res, next) {
     if (err.message === "Could not find user") {
         res.status(404);
@@ -25,7 +27,11 @@ module.exports = {
         }),
         Route.get("/:userId", {
             controller: GetUserById,
-            // validator: UserIdParamValidator,
+            validationSchema: {
+                params: {
+                    userId: Joi.number().required()
+                }
+            },
             errorHandler: customErrorHandler,
             doc: GetUserByIdDoc
         })

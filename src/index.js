@@ -1,3 +1,6 @@
+const express = require("express");
+const { Joi, isCelebrate: isValidationError } = require("celebrate");
+const celebrate = require("celebrate");
 const ExpressApp = require("./ExpressApp");
 const RouteUtil = require("./RouteUtil");
 const SwaggerUtils = require("./SwaggerUtils");
@@ -13,7 +16,11 @@ const Expressive = {
     subroute,
     BaseController,
     SwaggerUtils,
-    SwaggerBuilder
+    SwaggerBuilder,
+    express,
+    Joi,
+    isValidationError,
+    celebrate
 };
 
 module.exports = Expressive;

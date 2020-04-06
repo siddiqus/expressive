@@ -1,6 +1,7 @@
 /* eslint-disable no-invalid-this */
 const { Router } = require("express");
 const RouteUtil = require("./RouteUtil");
+const { celebrate: celebrateMiddleware } = require("celebrate");
 
 async function _handleRequestBase(req, res, next) {
     this.req = req;
@@ -13,6 +14,7 @@ async function _handleRequestBase(req, res, next) {
 module.exports = class RouterFactory {
     constructor() {
         this.routeUtil = RouteUtil;
+        this.celebrateMiddleware = celebrateMiddleware;
     }
 
     async _executeController(controller, { req, res, next }) {
@@ -39,14 +41,16 @@ module.exports = class RouterFactory {
     }
 
     _registerRoute(router, {
-        method, path, controller, validator = null, authorizer = null, middleware = null
+        method, path, controller, validationSchema = null, authorizer = null, middleware = null
     }) {
         const routerArgs = [
             path
         ];
 
-        if (validator) {
-            routerArgs.push(validator);
+        if (validationSchema) {
+            routerArgs.push(this.celebrateMiddleware(validationSchema, {
+                abortEarly: false
+            }));
         }
 
         if (authorizer) {
@@ -60,6 +64,7 @@ module.exports = class RouterFactory {
             ...nextAdjustedMiddleware,
             this._getWrappedController(controller)
         );
+
         router[method](...routerArgs);
     }
 
