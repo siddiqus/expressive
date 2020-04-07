@@ -48,10 +48,11 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - Built in middleware e.g. body-parser, cors, etc.
   - Security middleware i.e. helmet
 - Built in support for asynchronous request handlers and middleware
-- API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas
+- API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas (Using Joi schemas also yields generated Swagger documentation!)
 - Centralized error handling
   - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
 - Doc generation through Swagger https://swagger.io/
+  - Request parameter docs are generated if `validationSchema` property is provided with Joi schemas!
   - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
   - Swagger doc can be viewed in development at http://localhost:8080/docs
 
@@ -207,15 +208,16 @@ The ExpressApp class constructor's second parameter is a configuration object th
 
 ```javascript
 {
-  (swaggerInfo = null), // this is an optional JSON with the basic swagger info detailed later
+    swaggerInfo = null, // this is an optional JSON with the basic swagger info detailed later
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
-    (allowCors = false), // this uses the 'cors' npm module to allow CORS in the express app, default false
-    (corsConfig = null), // config for cors based on the 'cors' npm module, allows all origin by default
-    (middleware = null), // Array of express middlewares can be provided (optional)
-    (errorHandler = null), // express middleware function to handle errors e.g. function(err, req, res, next){}
-    (basePath = "/"), // Root path of the api, default "/"
-    (bodyLimit = "100kb"),
-    (helmetOptions = null); // options for the 'helmet' middleware
+    allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
+    corsConfig = null, // config for cors based on the 'cors' npm module, allows all origin by default
+    middleware = null, // Array of express middlewares can be provided (optional)
+    errorHandler = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
+    basePath = "/", // Root path of the api, default "/"
+    bodyLimit = "100kb",
+    helmetOptions = null, // options for the 'helmet' middleware
+    celebrateErrorHandler = null // optional, handler to replace default celebrate 'errors' middleware
 }
 ```
 
