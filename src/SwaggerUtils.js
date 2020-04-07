@@ -1,6 +1,7 @@
 const fs = require("fs");
 const SwaggerUi = require("swagger-ui-express");
 const RouteUtil = require("./RouteUtil.js");
+const { schemaToSwaggerRequestParameters } = require("./JoiUtils");
 
 function registerExpress(app, swaggerJson, url) {
     app.use(url, SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
@@ -23,42 +24,6 @@ function _sanitizeSwaggerPath(path) {
     return split.join("/");
 }
 
-function _getParametersFromValidationSchema(validationSchema) {
-    const parameters = [];
-    if (!validationSchema) return parameters;
-
-    const { params, query, body, headers } = validationSchema;
-
-    const parameterKeyMap = {
-        path: params,
-        query,
-        body,
-        headers
-    };
-
-    Object.keys(parameterKeyMap).forEach((parameterName) => {
-        if (parameterKeyMap[parameterName]) {
-            Object.keys(parameterKeyMap[parameterName]).forEach((key) => {
-                const parameterSchema = parameterKeyMap[parameterName][key];
-                const isRequired = parameterSchema._flags.presence === "required";
-                const defaultValue = parameterSchema._flags.default;
-                const type = parameterSchema.type;
-                parameters.push({
-                    name: key,
-                    in: parameterName,
-                    required: isRequired,
-                    schema: {
-                        type,
-                        default: defaultValue
-                    }
-                });
-            });
-        }
-    });
-
-    return parameters;
-}
-
 function _addPathDoc(paths, route, tags) {
     let { doc, path, validationSchema } = route;
     const { method } = route;
@@ -69,7 +34,7 @@ function _addPathDoc(paths, route, tags) {
     if (!doc.summary) doc.summary = path;
 
     if (!doc.parameters) {
-        doc.parameters = _getParametersFromValidationSchema(validationSchema);
+        doc.parameters = schemaToSwaggerRequestParameters(validationSchema);
     }
 
     if (!paths[path]) paths[path] = {};
