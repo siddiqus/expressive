@@ -1,6 +1,7 @@
 const fs = require("fs");
 const SwaggerUi = require("swagger-ui-express");
 const RouteUtil = require("./RouteUtil.js");
+const { schemaToSwaggerRequestParameters } = require("./JoiUtils");
 
 function registerExpress(app, swaggerJson, url) {
     app.use(url, SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
@@ -24,11 +25,17 @@ function _sanitizeSwaggerPath(path) {
 }
 
 function _addPathDoc(paths, route, tags) {
-    let { doc, path } = route;
+    let { doc, path, validationSchema } = route;
     const { method } = route;
     path = _sanitizeSwaggerPath(path);
 
     if (!doc) doc = {};
+
+    if (!doc.summary) doc.summary = path;
+
+    if (!doc.parameters) {
+        doc.parameters = schemaToSwaggerRequestParameters(validationSchema);
+    }
 
     if (!paths[path]) paths[path] = {};
     paths[path][method] = doc;
@@ -36,18 +43,23 @@ function _addPathDoc(paths, route, tags) {
     if (doc.tags) tags.push(...doc.tags);
 }
 
+function _normalizeEndSlash(path) {
+    if (path && path.charAt(path.length - 1) !== "/") return `${path}/`;
+    return path;
+}
+
 function _handleRedirects(paths, route) {
     const { method, path } = route;
-    let { redirectUrl } = route;
-
+    const redirectUrl = _normalizeEndSlash(route.redirectUrl);
     if (!redirectUrl) return;
-    if (redirectUrl.charAt(redirectUrl.length - 1) !== "/") redirectUrl = `${redirectUrl}/`;
 
-    if (!paths[redirectUrl]) return;
+    const doc = paths[redirectUrl] && paths[redirectUrl][method]
+        ? { ...paths[redirectUrl][method] }
+        : {};
 
-    const doc = { ...paths[redirectUrl][method] };
     doc.description = `[Redirected to ${redirectUrl}] ${doc.description || ""}`;
     doc.summary = `[Redirected to ${redirectUrl}] ${doc.summary || ""}`;
+
     paths[path][method] = doc;
 }
 

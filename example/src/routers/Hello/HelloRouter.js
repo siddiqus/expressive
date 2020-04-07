@@ -1,4 +1,4 @@
-const { Route, subroute } = require("../../../expressive");
+const { Route, subroute, Joi } = require("../../../expressive");
 const HelloDoc = require("./docs/HelloDoc");
 
 const HelloName = require("./controllers/HelloName");
@@ -10,7 +10,12 @@ module.exports = {
     routes: [
         Route.post("/", {
             controller: HelloName,
-            // validator: HelloNameValidator,
+            validationSchema: {
+                body: {
+                    firstName: Joi.string(),
+                    lastName: Joi.string()
+                }
+            },
             doc: HelloNameDoc
         }),
         Route.get("/", {

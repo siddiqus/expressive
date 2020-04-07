@@ -109,14 +109,17 @@ describe("SwaggerUtils", () => {
             mockRoutes1.routes.push({
                 path: "/hey",
                 controller: "/users",
-                method: "get"
+                method: "get",
+                doc: {
+                    summary: "hey route"
+                }
             });
 
             let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
 
             mockRoutes1.routes.push({
-                path: "/hey",
-                controller: "/heheheh/",
+                path: "/hello",
+                controller: "/hey/",
                 method: "get"
             });
             swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
