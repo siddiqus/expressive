@@ -24,7 +24,7 @@ function _getMinMaxFromSchemaDefition(schemaProperty) {
     };
 }
 
-function _setMinMaxInSwaggerSchema(schemaProperty, type, schema) {
+function _setMinMaxInSwaggerSchema(type, schemaProperty, schema) {
     const { min, max } = _getMinMaxFromSchemaDefition(schemaProperty);
 
     let minKey = "minimum";
@@ -68,29 +68,40 @@ function _setSwaggerPropsForArray(type, schemaProperty, schema) {
     schema.items = hasItemSchema && _getSchemaDefinitionForSwagger(itemSchema) || {};
 }
 
-function _getSchemaDefinitionForSwagger(schemaProperty) {
-    const defaultValue = schemaProperty._flags.default;
+function _setMultipleOfSwaggerSchema(schemaProperty, schema) {
+    const multipleOf = schemaProperty._rules.find((r) => r.name === "multiple");
+    schema.multipleOf = multipleOf && multipleOf.args.base || null;
+}
 
+function _setPatternSwaggerSchema(schemaProperty, schema) {
+    const pattern = schemaProperty._rules.find((r) => r.name === "pattern");
+    schema.pattern = pattern && String(pattern.args.regex) || null;
+}
+
+function _setDefaultValueForSwaggerSchema(schemaProperty, schema) {
+    const defaultValue = schemaProperty._flags.default;
+    schema.default = defaultValue && JSON.stringify(defaultValue) || null;
+}
+
+function _clearNullValuesInObject(obj) {
+    Object.keys(obj).forEach((key) => obj[key] === null && delete obj[key]);
+}
+
+function _getSchemaDefinitionForSwagger(schemaProperty) {
     const type = _getTypeFromSchemaProperty(schemaProperty);
 
     const schema = {
         type
     };
 
-    const multipleOf = schemaProperty._rules.find((r) => r.name === "multiple");
-    schema.multipleOf = multipleOf && multipleOf.args.base || null;
-
-    const pattern = schemaProperty._rules.find((r) => r.name === "pattern");
-    schema.pattern = pattern && String(pattern.args.regex) || null;
-
-    _setMinMaxInSwaggerSchema(schemaProperty, type, schema);
-
-    schema.default = defaultValue && JSON.stringify(defaultValue) || null;
-
+    _setDefaultValueForSwaggerSchema(schemaProperty, schema);
+    _setMultipleOfSwaggerSchema(schemaProperty, schema);
+    _setPatternSwaggerSchema(schemaProperty, schema);
+    _setMinMaxInSwaggerSchema(type, schemaProperty, schema);
     _setSwaggerPropsForObject(type, schemaProperty, schema);
     _setSwaggerPropsForArray(type, schemaProperty, schema);
 
-    Object.keys(schema).forEach((key) => schema[key] === null && delete schema[key]);
+    _clearNullValuesInObject(schema);
 
     return schema;
 }
