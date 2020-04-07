@@ -8,4 +8,4 @@ module.exports = {
             "description": "Get list of users"
         }
     }
-}
+};

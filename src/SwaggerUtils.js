@@ -66,6 +66,8 @@ function _addPathDoc(paths, route, tags) {
 
     if (!doc) doc = {};
 
+    if (!doc.summary) doc.summary = path;
+
     if (!doc.parameters) {
         doc.parameters = _getParametersFromValidationSchema(validationSchema);
     }
