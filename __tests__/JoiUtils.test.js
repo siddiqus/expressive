@@ -60,7 +60,7 @@ describe("JoiUtils", () => {
                 name: Joi.string().required(),
                 age: Joi.number().integer().required(),
                 income: Joi.number().required(),
-                dob: Joi.date().optional().default(new Date(2020, 1, 1)),
+                dob: Joi.date().optional().default(new Date("2020-01-31T18:00:00.000Z")),
                 email: Joi.string().email().optional(),
                 patternString: Joi.string().pattern(/someregex/),
                 boundedNumber: Joi.number().min(3).max(5),
