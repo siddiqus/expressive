@@ -42,7 +42,9 @@ function _setMinMaxInSwaggerSchema(schemaProperty, type, schema) {
     schema[maxKey] = max;
 }
 
-function _setSwaggerPropsForObject(schemaProperty, schema) {
+function _setSwaggerPropsForObject(type, schemaProperty, schema) {
+    if (!(type === "object" && schemaProperty.$_terms.keys.length > 0)) return;
+
     const requiredProperties = [];
     const objectSchemaPropertyMap = {};
 
@@ -58,7 +60,9 @@ function _setSwaggerPropsForObject(schemaProperty, schema) {
     schema.properties = objectSchemaPropertyMap;
 }
 
-function _setSwaggerPropsForArray(schemaProperty, schema) {
+function _setSwaggerPropsForArray(type, schemaProperty, schema) {
+    if (type !== "array") return;
+
     const itemSchema = schemaProperty.$_terms.items[0];
     const hasItemSchema = schemaProperty.$_terms.items.length > 0;
     schema.items = hasItemSchema ? _getSchemaDefinitionForSwagger(itemSchema) : {};
@@ -83,13 +87,8 @@ function _getSchemaDefinitionForSwagger(schemaProperty) {
 
     schema.default = defaultValue ? JSON.stringify(defaultValue) : null;
 
-    if (type === "object" && schemaProperty.$_terms.keys.length > 0) {
-        _setSwaggerPropsForObject(schemaProperty, schema);
-    }
-
-    if (type === "array") {
-        _setSwaggerPropsForArray(schemaProperty, schema);
-    }
+    _setSwaggerPropsForObject(type, schemaProperty, schema);
+    _setSwaggerPropsForArray(type, schemaProperty, schema);
 
     Object.keys(schema).forEach((key) => schema[key] === null && delete schema[key]);
 
