@@ -5,7 +5,7 @@ function _getTypeFromSchemaProperty(schemaProperty) {
     }
 
     if (type === "number") {
-        return schemaProperty._rules.some((e) => e.name === "integer") ? "integer" : "number";
+        return schemaProperty._rules.some((e) => e.name === "integer") && "integer" || "number";
     }
 
     return "string";
@@ -13,10 +13,10 @@ function _getTypeFromSchemaProperty(schemaProperty) {
 
 function _getMinMaxFromSchemaDefition(schemaProperty) {
     let min = schemaProperty._rules.find((r) => r.name === "min");
-    min = min ? min.args.limit : null;
+    min = min && min.args.limit || null;
 
     let max = schemaProperty._rules.find((r) => r.name === "max");
-    max = max ? max.args.limit : null;
+    max = max && max.args.limit || null;
 
     return {
         min,
@@ -56,7 +56,7 @@ function _setSwaggerPropsForObject(type, schemaProperty, schema) {
             objectSchema.schema
         );
     });
-    schema.required = requiredProperties.length > 0 ? requiredProperties : null;
+    schema.required = requiredProperties.length > 0 && requiredProperties || null;
     schema.properties = objectSchemaPropertyMap;
 }
 
@@ -65,7 +65,7 @@ function _setSwaggerPropsForArray(type, schemaProperty, schema) {
 
     const itemSchema = schemaProperty.$_terms.items[0];
     const hasItemSchema = schemaProperty.$_terms.items.length > 0;
-    schema.items = hasItemSchema ? _getSchemaDefinitionForSwagger(itemSchema) : {};
+    schema.items = hasItemSchema && _getSchemaDefinitionForSwagger(itemSchema) || {};
 }
 
 function _getSchemaDefinitionForSwagger(schemaProperty) {
@@ -78,14 +78,14 @@ function _getSchemaDefinitionForSwagger(schemaProperty) {
     };
 
     const multipleOf = schemaProperty._rules.find((r) => r.name === "multiple");
-    schema.multipleOf = multipleOf ? multipleOf.args.base : null;
+    schema.multipleOf = multipleOf && multipleOf.args.base || null;
 
     const pattern = schemaProperty._rules.find((r) => r.name === "pattern");
-    schema.pattern = pattern ? String(pattern.args.regex) : null;
+    schema.pattern = pattern && String(pattern.args.regex) || null;
 
     _setMinMaxInSwaggerSchema(schemaProperty, type, schema);
 
-    schema.default = defaultValue ? JSON.stringify(defaultValue) : null;
+    schema.default = defaultValue && JSON.stringify(defaultValue) || null;
 
     _setSwaggerPropsForObject(type, schemaProperty, schema);
     _setSwaggerPropsForArray(type, schemaProperty, schema);
