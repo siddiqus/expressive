@@ -103,6 +103,12 @@ function _setSwaggerPropsEnums(schemaProperty, schema) {
     schema.enum = validValues;
 }
 
+function _setSwaggerPropsNullable(schemaProperty, schema) {
+    if (schema.enum && schema.enum.includes(null)) {
+        schema.nullable = true;
+    }
+}
+
 function _getSchemaDefinitionForSwagger(schemaProperty) {
     const type = _getTypeFromSchemaProperty(schemaProperty);
 
@@ -114,6 +120,7 @@ function _getSchemaDefinitionForSwagger(schemaProperty) {
     _setMultipleOfSwaggerSchema(schemaProperty, schema);
     _setPatternSwaggerSchema(schemaProperty, schema);
     _setSwaggerPropsEnums(schemaProperty, schema);
+    _setSwaggerPropsNullable(schemaProperty, schema);
     _setMinMaxInSwaggerSchema(type, schemaProperty, schema);
     _setSwaggerPropsForObject(type, schemaProperty, schema);
     _setSwaggerPropsForArray(type, schemaProperty, schema);

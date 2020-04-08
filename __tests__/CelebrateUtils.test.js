@@ -70,12 +70,14 @@ describe("CelebrateUtils", () => {
             });
         });
 
-        it("Should convert validationSchema to swagger for property with valid options", () => {
+        it("Should convert validationSchema to swagger for property with options - valid, empty, and nullable", () => {
             const validationSchema = {
                 body: Joi.object({
                     name: Joi.string()
                         .valid("hey", "you")
-                        .required()
+                        .required(),
+                    someAllow: Joi.string().allow("huh"),
+                    nullable: Joi.string().valid("hey").allow(null)
                 })
             };
 
@@ -90,6 +92,15 @@ describe("CelebrateUtils", () => {
                         name: {
                             type: "string",
                             enum: ["hey", "you"]
+                        },
+                        someAllow: {
+                            type: "string",
+                            enum: ["huh"]
+                        },
+                        nullable: {
+                            type: "string",
+                            nullable: true,
+                            enum: ["hey", null]
                         }
                     },
                     required: ["name"]
