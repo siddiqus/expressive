@@ -97,6 +97,12 @@ function _clearNullValuesInObject(obj) {
     Object.keys(obj).forEach((key) => (obj[key] === undefined || obj[key] === null) && delete obj[key]);
 }
 
+function _setSwaggerPropsEnums(schemaProperty, schema) {
+    if (!schemaProperty._valids) return;
+    const validValues = [...schemaProperty._valids._values.values()];
+    schema.enum = validValues;
+}
+
 function _getSchemaDefinitionForSwagger(schemaProperty) {
     const type = _getTypeFromSchemaProperty(schemaProperty);
 
@@ -107,6 +113,7 @@ function _getSchemaDefinitionForSwagger(schemaProperty) {
     _setDefaultValueForSwaggerSchema(schemaProperty, schema);
     _setMultipleOfSwaggerSchema(schemaProperty, schema);
     _setPatternSwaggerSchema(schemaProperty, schema);
+    _setSwaggerPropsEnums(schemaProperty, schema);
     _setMinMaxInSwaggerSchema(type, schemaProperty, schema);
     _setSwaggerPropsForObject(type, schemaProperty, schema);
     _setSwaggerPropsForArray(type, schemaProperty, schema);

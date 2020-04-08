@@ -70,6 +70,33 @@ describe("CelebrateUtils", () => {
             });
         });
 
+        it("Should convert validationSchema to swagger for property with valid options", () => {
+            const validationSchema = {
+                body: Joi.object({
+                    name: Joi.string()
+                        .valid("hey", "you")
+                        .required()
+                })
+            };
+
+            const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(validationSchema);
+
+            expect(json).toContainEqual({
+                in: "body",
+                name: "body",
+                schema: {
+                    type: "object",
+                    properties: {
+                        name: {
+                            type: "string",
+                            enum: ["hey", "you"]
+                        }
+                    },
+                    required: ["name"]
+                }
+            });
+        });
+
         it("Should convert validationSchema to swagger parameter json for complex body", () => {
             const validationSchema = {
                 body: {
