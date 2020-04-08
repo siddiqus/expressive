@@ -1,7 +1,7 @@
 const fs = require("fs");
 const SwaggerUi = require("swagger-ui-express");
 const RouteUtil = require("./RouteUtil.js");
-const { schemaToSwaggerRequestParameters } = require("./JoiUtils");
+const { joiSchemaToSwaggerRequestParameters } = require("./CelebrateUtils");
 
 function registerExpress(app, swaggerJson, url) {
     app.use(url, SwaggerUi.serve, SwaggerUi.setup(swaggerJson, {
@@ -34,7 +34,7 @@ function _addPathDoc(paths, route, tags) {
     if (!doc.summary) doc.summary = path;
 
     if (!doc.parameters) {
-        doc.parameters = schemaToSwaggerRequestParameters(validationSchema);
+        doc.parameters = joiSchemaToSwaggerRequestParameters(validationSchema);
     }
 
     if (!paths[path]) paths[path] = {};

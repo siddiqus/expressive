@@ -1,7 +1,8 @@
 /* eslint-disable no-invalid-this */
 const { Router } = require("express");
-const RouteUtil = require("./RouteUtil");
 const { celebrate: celebrateMiddleware } = require("celebrate");
+const RouteUtil = require("./RouteUtil");
+const CelebrateUtils = require("./CelebrateUtils");
 
 async function _handleRequestBase(req, res, next) {
     this.req = req;
@@ -15,6 +16,7 @@ module.exports = class RouterFactory {
     constructor() {
         this.routeUtil = RouteUtil;
         this.celebrateMiddleware = celebrateMiddleware;
+        this.CelebrateUtils = CelebrateUtils;
     }
 
     async _executeController(controller, { req, res, next }) {
@@ -40,6 +42,15 @@ module.exports = class RouterFactory {
         };
     }
 
+    _registerCelebrateMiddleware(validationSchema, routerArgs) {
+        if (validationSchema) {
+            this.CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
+            routerArgs.push(this.celebrateMiddleware(validationSchema, {
+                abortEarly: false
+            }));
+        }
+    }
+
     _registerRoute(router, {
         method, path, controller, validationSchema = null, authorizer = null, middleware = null
     }) {
@@ -47,11 +58,7 @@ module.exports = class RouterFactory {
             path
         ];
 
-        if (validationSchema) {
-            routerArgs.push(this.celebrateMiddleware(validationSchema, {
-                abortEarly: false
-            }));
-        }
+        this._registerCelebrateMiddleware(validationSchema, routerArgs);
 
         if (authorizer) {
             routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));

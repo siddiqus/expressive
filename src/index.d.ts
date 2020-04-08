@@ -69,6 +69,11 @@ export declare interface ValidationSchema {
     signedCookies?: object
 }
 
+export declare interface SwaggerDoc {
+    description?: string
+    summary?: string
+}
+
 export declare interface IRouteParams {
     controller: string | Handler | typeof BaseController
     validationSchema?: ValidationSchema

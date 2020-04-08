@@ -1,3 +1,13 @@
+const { Joi } = require("celebrate");
+
+function _isJoiObject(obj) {
+    return Boolean(obj.type === "object" && obj.$_terms && obj.$_terms.keys);
+}
+
+function _getJoiObjectKeys(obj) {
+    return obj.$_terms.keys;
+}
+
 function _getTypeFromSchemaProperty(schemaProperty) {
     const { type } = schemaProperty;
     if (["string", "array", "object", "boolean"].includes(type)) {
@@ -43,12 +53,11 @@ function _setMinMaxInSwaggerSchema(type, schemaProperty, schema) {
 }
 
 function _setSwaggerPropsForObject(type, schemaProperty, schema) {
-    if (!(type === "object" && schemaProperty.$_terms.keys.length > 0)) return;
-
+    if (!(type === "object" && _getJoiObjectKeys(schemaProperty).length > 0)) return;
     const requiredProperties = [];
     const objectSchemaPropertyMap = {};
 
-    schemaProperty.$_terms.keys.forEach((objectSchema) => {
+    _getJoiObjectKeys(schemaProperty).forEach((objectSchema) => {
         if (objectSchema.schema._flags.presence === "required") {
             requiredProperties.push(objectSchema.key);
         }
@@ -63,9 +72,10 @@ function _setSwaggerPropsForObject(type, schemaProperty, schema) {
 function _setSwaggerPropsForArray(type, schemaProperty, schema) {
     if (type !== "array") return;
 
-    const itemSchema = schemaProperty.$_terms.items[0];
     const hasItemSchema = schemaProperty.$_terms.items.length > 0;
-    schema.items = hasItemSchema && _getSchemaDefinitionForSwagger(itemSchema) || {};
+    schema.items = hasItemSchema && _getSchemaDefinitionForSwagger(
+        schemaProperty.$_terms.items[0]
+    ) || {};
 }
 
 function _setMultipleOfSwaggerSchema(schemaProperty, schema) {
@@ -84,7 +94,7 @@ function _setDefaultValueForSwaggerSchema(schemaProperty, schema) {
 }
 
 function _clearNullValuesInObject(obj) {
-    Object.keys(obj).forEach((key) => obj[key] === null && delete obj[key]);
+    Object.keys(obj).forEach((key) => (obj[key] === undefined || obj[key] === null) && delete obj[key]);
 }
 
 function _getSchemaDefinitionForSwagger(schemaProperty) {
@@ -120,29 +130,99 @@ function _getAllSwaggerParamsFromValidationSchema(schema, paramIn) {
     });
 }
 
-function schemaToSwaggerRequestParameters(validationSchema) {
+function _getSwaggerParamsForBody(bodySchema) {
+    const joiSchema = _isJoiObject(bodySchema) ? bodySchema : Joi.object(bodySchema);
+
+    const schema = {
+        type: "object"
+    };
+
+    _setSwaggerPropsForObject("object", joiSchema, schema);
+    _clearNullValuesInObject(schema);
+
+    return {
+        name: "body",
+        in: "body",
+        schema
+    };
+}
+
+function _getObjectNormalizedSchema(schema) {
+    if (_isJoiObject(schema)) {
+        return _getJoiObjectKeys(schema).reduce((map, schemaObj) => {
+            map[schemaObj.key] = schemaObj.schema;
+            return map;
+        }, {});
+    }
+    return schema;
+}
+
+function _lowercaseHeaderSchemaKeys(headerSchema, paramLocation = "header") {
+    if (paramLocation === "header") {
+        Object.keys(headerSchema).forEach((key) => {
+            headerSchema[key.toLowerCase()] = headerSchema[key];
+            delete headerSchema[key];
+        });
+    }
+}
+
+function joiSchemaToSwaggerRequestParameters(validationSchema) {
     const parameters = [];
     if (!validationSchema) return parameters;
 
     const {
         query,
-        body,
         params: path,
-        headers: header
+        headers: header,
+        body
     } = validationSchema;
-    const parameterKeyMap = { query, body, path, header };
+
+    const parameterKeyMap = { query, path, header };
+
+    _clearNullValuesInObject(parameterKeyMap);
 
     Object.keys(parameterKeyMap).forEach((paramLocation) => {
-        const schema = parameterKeyMap[paramLocation];
-        if (schema) {
-            const swaggerParams = _getAllSwaggerParamsFromValidationSchema(schema, paramLocation);
-            parameters.push(...swaggerParams);
-        }
+        const normalizedSchema = _getObjectNormalizedSchema(parameterKeyMap[paramLocation]);
+        _lowercaseHeaderSchemaKeys(normalizedSchema, paramLocation);
+        const swaggerParams = _getAllSwaggerParamsFromValidationSchema(
+            normalizedSchema,
+            paramLocation
+        );
+
+        parameters.push(...swaggerParams);
     });
+
+    if (body && Object.keys(body).length > 0) {
+        parameters.push(_getSwaggerParamsForBody(body));
+    }
 
     return parameters;
 }
 
+function lowercaseHeaderSchemaProperties(validationSchema) {
+    if (!validationSchema.headers) return;
+
+    const { headers } = validationSchema;
+
+    if (_isJoiObject(headers)) {
+        _getJoiObjectKeys(validationSchema.headers).forEach((obj) => {
+            obj.key = obj.key.toLowerCase();
+        });
+
+        const keysForById = [...validationSchema.headers._ids._byKey.keys()];
+        keysForById.forEach((key) => {
+            const lowercaseKey = key.toLowerCase();
+            const mapValue = validationSchema.headers._ids._byKey.get(key);
+            mapValue.id = mapValue.id.toLowerCase();
+            validationSchema.headers._ids._byKey.set(lowercaseKey, mapValue);
+            validationSchema.headers._ids._byKey.delete(key);
+        });
+    } else {
+        _lowercaseHeaderSchemaKeys(validationSchema.headers);
+    }
+}
+
 module.exports = {
-    schemaToSwaggerRequestParameters
+    joiSchemaToSwaggerRequestParameters,
+    lowercaseHeaderSchemaProperties
 };
