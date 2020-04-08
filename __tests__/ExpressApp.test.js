@@ -1,16 +1,9 @@
 const ExpressApp = require("../src/ExpressApp");
 const Route = require("../src/Route");
 
-jest.mock("celebrate");
-const celebrate = require("celebrate");
-
 describe("ExpressApp", () => {
     it("should be defined", () => {
         expect(ExpressApp).toBeDefined();
-    });
-
-    beforeEach(() => {
-        celebrate.__clearMocks();
     });
 
     describe("_registerSwagger", () => {
@@ -116,10 +109,6 @@ describe("ExpressApp", () => {
     });
 
     describe("_registerCelebrateMiddleware", () => {
-        it("Should register celebrate error middleware if custom is not provided", () => {
-            new ExpressApp({});
-            expect(celebrate.errors).toHaveBeenCalled();
-        });
         it("Should register celebrate error middleware if custom is provided", () => {
             const customCelebrateHandler = jest.fn();
 

@@ -88,6 +88,8 @@ module.exports = class ExpressApp {
             swaggerJson,
             "/docs/swagger"
         );
+        console.log("Swagger doc up and running on /docs");
+
         this.registerRedoc(this.express, swaggerJson, "/docs/redoc");
     }
 

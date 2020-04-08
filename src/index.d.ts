@@ -69,11 +69,20 @@ export declare interface ValidationSchema {
     signedCookies?: object
 }
 
+interface ResponseMap { [key: number]: object; }
+
+export declare interface SwaggerDoc {
+    description?: string
+    summary?: string
+    responses?: ResponseMap
+    tags?: string[]
+}
+
 export declare interface IRouteParams {
     controller: string | Handler | typeof BaseController
     validationSchema?: ValidationSchema
     authorizer?: Handler
-    doc?: any
+    doc?: SwaggerDoc
     middleware?: Handler[]
 }
 
