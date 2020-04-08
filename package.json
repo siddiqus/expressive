@@ -16,7 +16,8 @@
     "lintFix": "eslint --fix src || echo Linting done!",
     "dev": "cross-env NODE_ENV=development nodemon -w example -w src --exec node example/index.js",
     "dev:ts": "cd ts-example && npm start",
-    "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare"
+    "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare",
+    "prettier": "prettier --write src"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
   "license": "MIT",
@@ -55,6 +56,7 @@
     "jest": "25.1.0",
     "jest-stage": "1.0.0",
     "nodemon": "1.19.0",
+    "prettier": "2.0.4",
     "rimraf": "2.6.2"
   },
   "homepage": "https://github.com/siddiqus/expressive#readme",
@@ -79,7 +81,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test && eslint src --fix",
+      "pre-commit": "npm test && eslint src --fix && npm run prettier",
       "pre-push": "npm test"
     }
   },

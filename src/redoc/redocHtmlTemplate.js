@@ -1,5 +1,3 @@
-
-
 const html = `<!DOCTYPE html>
   <html>
     <head>
@@ -23,13 +21,13 @@ const html = `<!DOCTYPE html>
   </html>`;
 
 function redocHtml(
-    options = {
-        title: "ReDoc",
-        specUrl: "http://petstore.swagger.io/v2/swagger.json"
-    }
+  options = {
+    title: 'ReDoc',
+    specUrl: 'http://petstore.swagger.io/v2/swagger.json'
+  }
 ) {
-    const { title, specUrl } = options;
-    return html.replace("[[title]]", title).replace("[[spec-url]]", specUrl);
+  const { title, specUrl } = options;
+  return html.replace('[[title]]', title).replace('[[spec-url]]', specUrl);
 }
 
 module.exports = redocHtml;

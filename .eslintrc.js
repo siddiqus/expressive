@@ -30,10 +30,10 @@ module.exports = {
     "global-require": "warn",
     // "import/no-dynamic-require": "warn",
     "no-plusplus": "warn",
-    "indent": ["error", 4],
+    "indent": ["error", 2],
     "comma-dangle": 0,
     "prefer-rest-params": 0,
-    "quotes": ["error", "double"],
+    "quotes": ["error", "single"],
     "class-methods-use-this": 0,
     "require-jsdoc": 0,
     "object-curly-spacing": 0
