@@ -45,17 +45,14 @@ function _addPathDoc(paths, route, tags) {
     const { method } = route;
     path = _sanitizeSwaggerPath(path);
 
-    if (!doc) doc = {};
+    doc = doc || {};
+    doc.summary = doc.summary || path;
 
-    if (!doc.summary) doc.summary = path;
-
-    if (!doc.parameters) {
-        doc.parameters = joiSchemaToSwaggerRequestParameters(validationSchema);
-    }
+    doc.parameters = doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
 
     _addDocResponses(doc);
 
-    if (!paths[path]) paths[path] = {};
+    paths[path] = paths[path] || {};
     paths[path][method] = doc;
 
     if (doc.tags) tags.push(...doc.tags);
