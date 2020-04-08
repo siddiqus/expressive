@@ -1,14 +1,14 @@
-import { ExpressApp } from "../../src";
-import { router } from "./router";
+import { ExpressApp } from '../../src';
+import { router } from './router';
 
 const app = new ExpressApp(router, {
-    errorHandler(err, req, res, next) {
-        console.log(err);
-        res.status(500)
-        res.json({
-            message: err.message
-        })
-    }
+  errorHandler(err, req, res, next) {
+    console.log(err);
+    res.status(500);
+    res.json({
+      message: err.message
+    });
+  }
 });
 
-app.listen(3001, () => console.log("Running on port 3001"))
+app.listen(3001, () => console.log('Running on port 3001'));

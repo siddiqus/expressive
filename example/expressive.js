@@ -1,2 +1,2 @@
-const expressive = require("../src");
+const expressive = require('../src');
 module.exports = expressive;
