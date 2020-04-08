@@ -180,6 +180,18 @@ function _lowercaseHeaderSchemaKeys(headerSchema, paramLocation = "header") {
     }
 }
 
+function _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters) {
+    Object.keys(parameterKeyMap).forEach((paramLocation) => {
+        const normalizedSchema = _getObjectNormalizedSchema(parameterKeyMap[paramLocation]);
+        _lowercaseHeaderSchemaKeys(normalizedSchema, paramLocation);
+        const swaggerParams = _getAllSwaggerParamsFromValidationSchema(
+            normalizedSchema,
+            paramLocation
+        );
+        parameters.push(...swaggerParams);
+    });
+}
+
 function joiSchemaToSwaggerRequestParameters(validationSchema) {
     const parameters = [];
     if (!validationSchema) return parameters;
@@ -195,16 +207,7 @@ function joiSchemaToSwaggerRequestParameters(validationSchema) {
 
     _clearNullValuesInObject(parameterKeyMap);
 
-    Object.keys(parameterKeyMap).forEach((paramLocation) => {
-        const normalizedSchema = _getObjectNormalizedSchema(parameterKeyMap[paramLocation]);
-        _lowercaseHeaderSchemaKeys(normalizedSchema, paramLocation);
-        const swaggerParams = _getAllSwaggerParamsFromValidationSchema(
-            normalizedSchema,
-            paramLocation
-        );
-
-        parameters.push(...swaggerParams);
-    });
+    _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters);
 
     if (body && Object.keys(body).length > 0) {
         parameters.push(_getSwaggerParamsForBody(body));
