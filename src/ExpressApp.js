@@ -22,7 +22,8 @@ module.exports = class ExpressApp {
       errorHandler = null,
       bodyLimit = '100kb',
       helmetOptions = null,
-      celebrateErrorHandler = null
+      celebrateErrorHandler = null,
+      notFoundHandler = null
     } = {}
   ) {
     this.config = {
@@ -37,7 +38,8 @@ module.exports = class ExpressApp {
       bodyLimit,
       helmetOptions,
       authorizer,
-      celebrateErrorHandler
+      celebrateErrorHandler,
+      notFoundHandler
     };
     this.router = router;
 
@@ -155,6 +157,11 @@ module.exports = class ExpressApp {
     );
 
     this._registerRoutes();
+
+    this.middlewareManager.registerNotFoundHandler(
+      this.express,
+      this.config.notFoundHandler
+    );
 
     this._registerCelebrateMiddleware();
 

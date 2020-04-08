@@ -217,7 +217,8 @@ The ExpressApp class constructor's second parameter is a configuration object th
     basePath = "/", // Root path of the api, default "/"
     bodyLimit = "100kb",
     helmetOptions = null, // options for the 'helmet' middleware
-    celebrateErrorHandler = null // optional, handler to replace default celebrate 'errors' middleware
+    celebrateErrorHandler = null, // optional, handler to replace default celebrate 'errors' middleware
+    notFoundHandler = null // optional, handler that runs after all routes. By default it returns 404 status with a message.
 }
 ```
 

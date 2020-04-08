@@ -27,13 +27,13 @@ function _getSubroutes(paths, parentPath, subroute) {
 class RouteUtil {
   static getRoutesInfo(router, paths = [], parentPath = '') {
     if (router.routes) {
-      router.routes.forEach(route =>
+      router.routes.forEach((route) =>
         _addRouteToPaths(paths, parentPath, route)
       );
     }
 
     if (router.subroutes) {
-      router.subroutes.forEach(subroute =>
+      router.subroutes.forEach((subroute) =>
         _getSubroutes(paths, parentPath, subroute)
       );
     }

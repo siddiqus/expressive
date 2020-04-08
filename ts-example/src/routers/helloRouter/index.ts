@@ -1,5 +1,5 @@
-import { Joi } from "../../../../src"
-import { IExpressiveRouter, Route } from "../../../../src"
+import { Joi, Route } from "../../../../src"
+import type { ExpressiveRouter } from "../../../../src"
 import { GetHello } from "./getHello"
 import { PostHello } from "./postHello"
 
@@ -31,7 +31,7 @@ const postHello = Route.post("/hello", {
     }
 })
 
-export const helloRouter: IExpressiveRouter = {
+export const helloRouter: ExpressiveRouter = {
     routes: [
         getHello,
         getHey,

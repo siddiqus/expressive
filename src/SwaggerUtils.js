@@ -93,10 +93,10 @@ function convertDocsToSwaggerDoc(
   const paths = {};
   let tags = [];
 
-  infoList.forEach(route => _addPathDoc(paths, route, tags));
-  infoList.forEach(route => _handleRedirects(paths, route));
+  infoList.forEach((route) => _addPathDoc(paths, route, tags));
+  infoList.forEach((route) => _handleRedirects(paths, route));
 
-  tags = Array.from(new Set(tags)).map(t => ({ name: t }));
+  tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
 
   const swaggerDoc = Object.assign({}, swaggerHeader);
   swaggerDoc.definitions = swaggerDefinitions;

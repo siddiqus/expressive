@@ -72,6 +72,40 @@ describe("Middleware Manager", () => {
         });
     });
 
+    describe("registerNotFoundHandler", () => {
+        it("Should register given handler", () => {
+            const mockExpress = {
+                use: jest.fn()
+            };
+
+            const manager = new MiddlewareManager();
+
+            const someMockHandler = "hehe";
+            manager.registerNotFoundHandler(mockExpress, someMockHandler);
+
+            expect(mockExpress.use).toHaveBeenCalledWith(someMockHandler);
+        });
+
+        it("Should run default handler properly", () => {
+            const manager = new MiddlewareManager();
+            const mockReq = {
+                path: "/some/path"
+            };
+
+            const mockRes = {
+                status: jest.fn(),
+                json: jest.fn()
+            };
+
+            manager.defaultNotFoundHandler(mockReq, mockRes);
+
+            expect(mockRes.status).toHaveBeenCalledWith(404);
+            expect(mockRes.json).toHaveBeenCalledWith({
+                message: `Route '/some/path' not found`
+            });
+        });
+    });
+
     describe("_registerHelmet", () => {
         it("Should register helmet with defaults if no config is given", () => {
             const middlewareManager = new MiddlewareManager();

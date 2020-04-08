@@ -74,7 +74,7 @@ module.exports = class RouterFactory {
 
     const nextAdjustedMiddleware = !middleware
       ? []
-      : middleware.map(m => this.routeUtil.getHandlerWithManagedNextCall(m));
+      : middleware.map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
 
     routerArgs.push(
       ...nextAdjustedMiddleware,
@@ -88,7 +88,7 @@ module.exports = class RouterFactory {
     router,
     { path, router: subrouter, middleware = [], authorizer }
   ) {
-    const nextAdjustedMiddleware = middleware.map(m =>
+    const nextAdjustedMiddleware = middleware.map((m) =>
       this.routeUtil.getHandlerWithManagedNextCall(m)
     );
 
@@ -116,13 +116,13 @@ module.exports = class RouterFactory {
     const router = this._getRouter();
 
     if (routeConfigs.routes) {
-      routeConfigs.routes.forEach(routeConf => {
+      routeConfigs.routes.forEach((routeConf) => {
         this._registerRoute(router, routeConf);
       });
     }
 
     if (routeConfigs.subroutes) {
-      routeConfigs.subroutes.forEach(subroute => {
+      routeConfigs.subroutes.forEach((subroute) => {
         this._registerSubroute(router, subroute);
       });
     }

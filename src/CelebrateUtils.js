@@ -16,7 +16,7 @@ function _getTypeFromjoiSchema(joiSchema) {
 
   if (type === 'number') {
     return (
-      (joiSchema._rules.some(e => e.name === 'integer') && 'integer') ||
+      (joiSchema._rules.some((e) => e.name === 'integer') && 'integer') ||
       'number'
     );
   }
@@ -25,10 +25,10 @@ function _getTypeFromjoiSchema(joiSchema) {
 }
 
 function _getMinMaxFromSchemaDefition(joiSchema) {
-  let min = joiSchema._rules.find(r => r.name === 'min');
+  let min = joiSchema._rules.find((r) => r.name === 'min');
   min = (min && min.args.limit) || null;
 
-  let max = joiSchema._rules.find(r => r.name === 'max');
+  let max = joiSchema._rules.find((r) => r.name === 'max');
   max = (max && max.args.limit) || null;
 
   return {
@@ -60,7 +60,7 @@ function _setSwaggerPropsForObject(type, joiSchema, swaggerSchema) {
   const requiredProperties = [];
   const objectjoiSchemaMap = {};
 
-  _getJoiObjectKeys(joiSchema).forEach(objectSchema => {
+  _getJoiObjectKeys(joiSchema).forEach((objectSchema) => {
     if (objectSchema.schema._flags.presence === 'required') {
       requiredProperties.push(objectSchema.key);
     }
@@ -84,12 +84,12 @@ function _setSwaggerPropsForArray(type, joiSchema, swaggerSchema) {
 }
 
 function _setMultipleOfSwaggerSchema(joiSchema, swaggerSchema) {
-  const multipleOf = joiSchema._rules.find(r => r.name === 'multiple');
+  const multipleOf = joiSchema._rules.find((r) => r.name === 'multiple');
   swaggerSchema.multipleOf = (multipleOf && multipleOf.args.base) || null;
 }
 
 function _setPatternSwaggerSchema(joiSchema, swaggerSchema) {
-  const pattern = joiSchema._rules.find(r => r.name === 'pattern');
+  const pattern = joiSchema._rules.find((r) => r.name === 'pattern');
   swaggerSchema.pattern = (pattern && String(pattern.args.regex)) || null;
 }
 
@@ -101,7 +101,7 @@ function _setDefaultValueForSwaggerSchema(joiSchema, swaggerSchema) {
 
 function _clearNullValuesInObject(obj) {
   Object.keys(obj).forEach(
-    key => (obj[key] === undefined || obj[key] === null) && delete obj[key]
+    (key) => (obj[key] === undefined || obj[key] === null) && delete obj[key]
   );
 }
 
@@ -139,7 +139,7 @@ function _getSchemaDefinitionForSwagger(joiSchema) {
 }
 
 function _getAllSwaggerParamsFromValidationSchema(schema, paramIn) {
-  return Object.keys(schema).map(key => {
+  return Object.keys(schema).map((key) => {
     const joiSchema = schema[key];
     const schemaDefinition = _getSchemaDefinitionForSwagger(joiSchema);
     const isRequired = joiSchema._flags.presence === 'required';
@@ -183,7 +183,7 @@ function _getObjectNormalizedSchema(schema) {
 
 function _lowercaseHeaderSchemaKeys(headerSchema, paramLocation = 'header') {
   if (paramLocation === 'header') {
-    Object.keys(headerSchema).forEach(key => {
+    Object.keys(headerSchema).forEach((key) => {
       headerSchema[key.toLowerCase()] = headerSchema[key];
       delete headerSchema[key];
     });
@@ -191,7 +191,7 @@ function _lowercaseHeaderSchemaKeys(headerSchema, paramLocation = 'header') {
 }
 
 function _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters) {
-  Object.keys(parameterKeyMap).forEach(paramLocation => {
+  Object.keys(parameterKeyMap).forEach((paramLocation) => {
     const normalizedSchema = _getObjectNormalizedSchema(
       parameterKeyMap[paramLocation]
     );
@@ -227,13 +227,13 @@ function lowercaseHeaderSchemaProperties(validationSchema) {
   const { headers } = validationSchema;
 
   if (_isJoiObject(headers)) {
-    _getJoiObjectKeys(validationSchema.headers).forEach(obj => {
+    _getJoiObjectKeys(validationSchema.headers).forEach((obj) => {
       obj.key = obj.key.toLowerCase();
     });
 
     const byKey = validationSchema.headers._ids._byKey;
     const keysForById = [...byKey.keys()];
-    keysForById.forEach(key => {
+    keysForById.forEach((key) => {
       const lowercaseKey = key.toLowerCase();
       const mapValue = byKey.get(key);
       mapValue.id = mapValue.id.toLowerCase();

@@ -1,39 +1,39 @@
-import { CorsOptions as ICorsOptions } from 'cors';
+import { CorsOptions as CorsLibOptions } from 'cors';
 import {
-  ErrorRequestHandler as IErrorRequestHandler,
-  Express as IExpress,
-  Handler as IHandler,
-  NextFunction as INextFunction,
-  Request as IRequest,
-  Response as IResponse
+  ErrorRequestHandler as ExpressErrorRequestHandler,
+  Express as ExpressType,
+  Handler as ExpressHandler,
+  NextFunction as ExpressNextFunction,
+  Request as ExpressRequest,
+  Response as ExpressResponse
 } from 'express';
-import { IHelmetConfiguration as IHelmetConfigFromHelment } from 'helmet';
+
+import { IHelmetConfiguration as HelmetConfig } from 'helmet';
 
 export declare type express = typeof import('express');
-export declare interface Request extends IRequest {}
-export declare interface Response extends IResponse {}
-export declare interface NextFunction extends INextFunction {}
-export declare interface Handler extends IHandler {}
-export declare interface Express extends IExpress {}
-export declare interface ErrorRequestHandler extends IErrorRequestHandler {}
+export type Request = ExpressRequest;
+export type Response = ExpressResponse;
+export type NextFunction = ExpressNextFunction;
+export type Handler = ExpressHandler;
+export type Express = ExpressType;
+export type ErrorRequestHandler = ExpressErrorRequestHandler;
 
-export declare interface IHelmetConfiguration
-  extends IHelmetConfigFromHelment {}
-export declare interface CorsOptions extends ICorsOptions {}
+export type HelmetConfiguration = HelmetConfig;
+export type CorsOptions = CorsLibOptions;
 
 export declare const Joi: typeof import('celebrate').Joi;
 export declare const isValidationError: typeof import('celebrate').isCelebrate;
 export declare const celebrate: typeof import('celebrate');
 
-export declare interface ISwaggerInfoContact {
+export declare interface SwaggerInfoContact {
   name?: string;
   email?: string;
 }
 
-export declare interface ISwaggerInfo {
+export declare interface SwaggerInfo {
   version?: string;
   title?: string;
-  contact?: ISwaggerInfoContact;
+  contact?: SwaggerInfoContact;
 }
 
 export declare class BaseController {
@@ -81,18 +81,20 @@ interface ResponseMap {
   [key: number]: object;
 }
 
-export declare interface SwaggerDoc {
+export declare interface SwaggerEndpointDoc {
   description?: string;
   summary?: string;
   responses?: ResponseMap;
   tags?: string[];
 }
 
+type AuthorizerType = Handler | Handler[];
+
 export declare interface IRouteParams {
   controller: string | Handler | typeof BaseController;
   validationSchema?: ValidationSchema;
-  authorizer?: Handler;
-  doc?: SwaggerDoc;
+  authorizer?: AuthorizerType;
+  doc?: SwaggerEndpointDoc;
   middleware?: Handler[];
 }
 
@@ -165,38 +167,34 @@ export declare class Route {
 
 export declare interface ISubroute {
   path: string;
-  router: IExpressiveRouter;
-  authorizer?: Handler;
+  router: ExpressiveRouter;
+  authorizer?: AuthorizerType;
   middleware?: Handler[];
 }
 
-export declare interface ISubrouteOptions {
-  authorizer?: Handler;
-  middleware?: Handler[];
-}
-
-export declare interface IExpressiveRouter {
+export declare interface ExpressiveRouter {
   routes?: IEndpoint[];
   subroutes?: ISubroute[];
 }
 
-export interface IExpressiveOptions {
+export interface ExpressiveOptions {
   basePath?: string;
   showSwaggerOnlyInDev?: boolean;
-  swaggerInfo?: ISwaggerInfo;
+  swaggerInfo?: SwaggerInfo;
   swaggerDefinitions?: any;
   allowCors?: boolean;
-  corsConfig?: ICorsOptions;
+  corsConfig?: CorsOptions;
   middleware?: Handler[];
-  authorizer?: Handler;
+  authorizer?: AuthorizerType;
   errorHandler?: ErrorRequestHandler | ErrorRequestHandler[];
   bodyLimit?: string;
-  helmetOptions?: IHelmetConfiguration;
+  helmetOptions?: HelmetConfiguration;
   celebrateErrorHandler?: ErrorRequestHandler;
+  notFoundHandler?: Handler;
 }
 
 export declare class ExpressApp {
-  constructor(router: IExpressiveRouter, options?: IExpressiveOptions);
+  constructor(router: ExpressiveRouter, options?: ExpressiveOptions);
   express: Express;
   listen(port: number, cb: Function): void;
 }

@@ -13,7 +13,7 @@ describe("ExpressApp", () => {
                 some: "routes"
             };
             const mockSwaggerDefinitions = {
-                some: " Definition"
+                some: "Definition"
             };
             const app = new ExpressApp(mockRouter, {
                 swaggerInfo,
