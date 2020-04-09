@@ -56,7 +56,7 @@ module.exports = class ExpressApp {
     this.authUtil = new AuthUtil();
     this.SwaggerUtils = SwaggerUtils;
     this.registerRedoc = registerRedoc;
-    this.routerFactory = new RouterFactory();
+    this.routerFactory = new RouterFactory(this.config);
 
     this.middlewareManager = new MiddlewareManager({
       bodyLimit: this.config.bodyLimit,
@@ -144,16 +144,23 @@ module.exports = class ExpressApp {
     }
   }
 
+  _registerAuth() {
+    const authMiddleware = this.authUtil.getAuthorizerMiddleware(
+      this.config.authorizer,
+      this.config.authObjectHandler
+    );
+
+    if (authMiddleware) {
+      this.express.use(authMiddleware);
+    }
+  }
+
   registerHandlers() {
     this._registerSwagger();
 
     this._configureCors();
 
-    this.authUtil.registerAuthorizerForExpress(
-      this.express,
-      this.config.authorizer,
-      this.config.authObjectHandler
-    );
+    this._registerAuth();
 
     this.middlewareManager.registerMiddleware(
       this.express,

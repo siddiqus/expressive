@@ -19,8 +19,8 @@ module.exports = class AuthUtil {
     };
   }
 
-  registerAuthorizerForExpress(expressInstance, authorizer, authObjectHandler) {
-    if (!authorizer) return;
+  getAuthorizerMiddleware(authorizer, authObjectHandler) {
+    if (!authorizer) return null;
 
     const isObject = typeof authorizer === 'object';
 
@@ -30,14 +30,15 @@ module.exports = class AuthUtil {
       );
     }
 
+    const handlers = [];
     let authMiddleware = authorizer;
     if (isObject) {
-      expressInstance.use(this.injectAuthMiddleware(authorizer));
+      handlers.push(this.injectAuthMiddleware(authorizer));
       authMiddleware = authObjectHandler;
     }
 
-    expressInstance.use(
-      this.routeUtil.getHandlerWithManagedNextCall(authMiddleware)
-    );
+    handlers.push(this.routeUtil.getHandlerWithManagedNextCall(authMiddleware));
+
+    return handlers;
   }
 };

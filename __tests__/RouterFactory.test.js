@@ -1,7 +1,7 @@
 const RouterFactory = require('../src/RouterFactory');
 const BaseController = require('../src/BaseController');
 
-class MockControllerThrowsError extends BaseController {}
+class MockControllerThrowsError extends BaseController { }
 const mockErrorJestFn = jest.fn().mockImplementation(() => {
   throw new Error('mockErrorJestFn');
 });
@@ -68,7 +68,7 @@ describe('RouterFactory', () => {
         subroutes: mockSubroutes
       };
 
-      const routerFactory = new RouterFactory();
+      const routerFactory = new RouterFactory({});
       const mockExpressRouter = {
         get: jest.fn(),
         use: jest.fn(),
@@ -96,7 +96,7 @@ describe('RouterFactory', () => {
         subroutes: mockSubroutes
       };
 
-      const routerFactory = new RouterFactory();
+      const routerFactory = new RouterFactory({});
       const mockExpressRouter = {
         get: jest.fn(),
         use: jest.fn(),
@@ -121,7 +121,7 @@ describe('RouterFactory', () => {
 
   describe('_registerRoute', () => {
     it('Should register route with middleware properly', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       const mockExpressRouter = {
         get: jest.fn(),
@@ -138,17 +138,17 @@ describe('RouterFactory', () => {
         path: '/',
         controller: BaseController,
         middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => {}
+        authorizer: (req, res) => { }
       });
 
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(3);
+      ).toHaveBeenCalledTimes(2);
       expect(mockExpressRouter.get).toHaveBeenCalled();
     });
 
     it('Should use celebrate validation schema', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       factory.celebrateMiddleware = jest.fn().mockReturnValue(1);
 
@@ -173,7 +173,7 @@ describe('RouterFactory', () => {
         path: '/',
         controller: BaseController,
         middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => {},
+        authorizer: (req, res) => { },
         validationSchema: schema
       });
 
@@ -182,14 +182,14 @@ describe('RouterFactory', () => {
       });
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(3);
+      ).toHaveBeenCalledTimes(2);
       expect(mockExpressRouter.get).toHaveBeenCalled();
     });
   });
 
   describe('_registerSubroute', () => {
     it('Should register subroute with middleware properly', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       const mockExpressRouter = {
         use: jest.fn()
@@ -203,13 +203,13 @@ describe('RouterFactory', () => {
         path: '/',
         router: 'somerouter',
         middleware: [(req, res) => 1, (req, res) => 2, (req, res) => 3],
-        authorizer: (req, res) => {}
+        authorizer: (req, res) => { }
       });
 
       expect(factory.getExpressRouter).toHaveBeenCalled();
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(4);
+      ).toHaveBeenCalledTimes(3);
       expect(mockExpressRouter.use).toHaveBeenCalled();
     });
   });
