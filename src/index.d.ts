@@ -11,7 +11,9 @@ import {
 import { IHelmetConfiguration as HelmetConfig } from 'helmet';
 
 export declare type express = typeof import('express');
-export type Request = ExpressRequest;
+export declare interface Request extends ExpressRequest {
+  authorizer?: object[];
+}
 export type Response = ExpressResponse;
 export type NextFunction = ExpressNextFunction;
 export type Handler = ExpressHandler;
@@ -88,7 +90,7 @@ export declare interface SwaggerEndpointDoc {
   tags?: string[];
 }
 
-type AuthorizerType = Handler | Handler[];
+type AuthorizerType = Handler | Handler[] | object;
 
 export declare interface IRouteParams {
   controller: string | Handler | typeof BaseController;
@@ -191,6 +193,7 @@ export interface ExpressiveOptions {
   helmetOptions?: HelmetConfiguration;
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
+  authObjectHandler?: Handler;
 }
 
 export declare class ExpressApp {

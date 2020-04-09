@@ -3,6 +3,7 @@ const cors = require('cors');
 const { errors: celebrateErrors } = require('celebrate');
 const RouterFactory = require('./RouterFactory');
 const RouteUtil = require('./RouteUtil');
+const AuthUtil = require('./AuthUtil');
 const SwaggerUtils = require('./SwaggerUtils');
 const registerRedoc = require('./redoc/registerRedoc');
 const MiddlewareManager = require('./middleware/MiddlewareManager');
@@ -23,7 +24,8 @@ module.exports = class ExpressApp {
       bodyLimit = '100kb',
       helmetOptions = null,
       celebrateErrorHandler = null,
-      notFoundHandler = null
+      notFoundHandler = null,
+      authObjectHandler = null
     } = {}
   ) {
     this.config = {
@@ -39,7 +41,8 @@ module.exports = class ExpressApp {
       helmetOptions,
       authorizer,
       celebrateErrorHandler,
-      notFoundHandler
+      notFoundHandler,
+      authObjectHandler
     };
     this.router = router;
 
@@ -50,6 +53,7 @@ module.exports = class ExpressApp {
 
   _init() {
     this.routeUtil = RouteUtil;
+    this.authUtil = new AuthUtil();
     this.SwaggerUtils = SwaggerUtils;
     this.registerRedoc = registerRedoc;
     this.routerFactory = new RouterFactory();
@@ -145,11 +149,11 @@ module.exports = class ExpressApp {
 
     this._configureCors();
 
-    if (this.config.authorizer) {
-      this.express.use(
-        this.routeUtil.getHandlerWithManagedNextCall(this.config.authorizer)
-      );
-    }
+    this.authUtil.registerAuthorizerForExpress(
+      this.express,
+      this.config.authorizer,
+      this.config.authObjectHandler
+    );
 
     this.middlewareManager.registerMiddleware(
       this.express,

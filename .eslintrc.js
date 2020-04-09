@@ -33,7 +33,7 @@ module.exports = {
     "indent": ["error", 2],
     "comma-dangle": 0,
     "prefer-rest-params": 0,
-    "quotes": ["error", "single"],
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "class-methods-use-this": 0,
     "require-jsdoc": 0,
     "object-curly-spacing": 0
