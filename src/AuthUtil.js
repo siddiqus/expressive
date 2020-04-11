@@ -1,5 +1,19 @@
-const Ramda = require('ramda');
 const RouteUtil = require('./RouteUtil');
+
+function _isFunctionEmpty(fn) {
+  const fnStr = fn.toString();
+  const body = fnStr.substring(fnStr.indexOf('{') + 1, fnStr.lastIndexOf('}'));
+  return Boolean(body.trim().length === 0);
+}
+
+function _getUniqueArray(arr) {
+  const strArray = arr.map((a) => a.toString());
+  const uniqueStrArray = strArray.filter((value, index, self) => {
+    return self.indexOf(value) === index;
+  });
+  const indicesArray = uniqueStrArray.map((u) => strArray.indexOf(u));
+  return indicesArray.map((i) => arr[i]);
+}
 
 module.exports = class AuthUtil {
   constructor() {
@@ -7,7 +21,7 @@ module.exports = class AuthUtil {
   }
 
   getAuthInjectorMiddleware(authObject) {
-    return (req, res, next) => {
+    return (req) => {
       let { authorizer } = req;
       if (!authorizer) authorizer = [];
 
@@ -15,9 +29,8 @@ module.exports = class AuthUtil {
       // eslint-disable-next-line prefer-spread
       authorizer = [].concat.apply([], authorizer);
 
-      authorizer = Ramda.uniqWith(Ramda.eqProps, authorizer);
+      authorizer = _getUniqueArray(authorizer); // Ramda.uniqWith(Ramda.eqProps, authorizer);
       req.authorizer = authorizer;
-      next();
     };
   }
 
@@ -26,10 +39,13 @@ module.exports = class AuthUtil {
 
     const isObject = typeof authorizer === 'object';
 
-    if (isObject && !authObjectHandler) {
+    if (
+      isObject &&
+      (!authObjectHandler || _isFunctionEmpty(authObjectHandler))
+    ) {
       throw new Error(
         `'authorizer' object declared, but 'authObjectHandler' ` +
-          `not defined in ExpressApp constructor params`
+          `is not defined in ExpressApp constructor params, or is an empty function`
       );
     }
 

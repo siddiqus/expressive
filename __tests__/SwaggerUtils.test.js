@@ -7,7 +7,7 @@ const mockRouterWithTopRoutes = {
     {
       path: '/',
       method: 'get',
-      controller: () => { },
+      controller: () => {},
       doc: {
         tags: ['SomeTag']
       }
@@ -21,7 +21,7 @@ const mockRouterWithTopRoutes = {
           {
             path: '/',
             method: 'get',
-            controller: () => { },
+            controller: () => {},
             doc: {
               tags: ['SomeTag']
             }
@@ -29,7 +29,7 @@ const mockRouterWithTopRoutes = {
           {
             path: '/',
             method: 'post',
-            controller: () => { },
+            controller: () => {},
             doc: {}
           }
         ],
@@ -41,12 +41,12 @@ const mockRouterWithTopRoutes = {
                 {
                   path: '/',
                   method: 'get',
-                  controller: () => { }
+                  controller: () => {}
                 },
                 {
                   path: '/',
                   method: 'post',
-                  controller: () => { }
+                  controller: () => {}
                 }
               ]
             }
@@ -128,11 +128,46 @@ describe('SwaggerUtils', () => {
         method: 'get',
         doc: {
           responses: {}
+        },
+        authorizer: (req, res) => {}
+      });
+      swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+      expect(swaggerDoc).toBeDefined();
+    });
+
+    it('Should write json for swagger with authorizer object', () => {
+      const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {},
+            400: {}
+          }
+        },
+        authorizer: ['hello']
+      });
+
+      let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+      mockRoutes1.routes.push({
+        path: '/hello',
+        controller: '/hey/',
+        method: 'get',
+        doc: {
+          responses: {}
         }
       });
       swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
 
       expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(swaggerstr.substring(`Authorized: ["hello"]`)).toBeDefined();
     });
   });
 

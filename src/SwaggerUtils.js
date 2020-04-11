@@ -45,7 +45,7 @@ function _addDocResponses(doc) {
 }
 
 function _setAuthorizerDocInDescription(doc, authorizer) {
-  if (!authorizer) return;
+  if (!authorizer || !(typeof authorizer === 'object')) return;
   const authStr = `Authorized: ${JSON.stringify(authorizer)}`;
   if (doc.description) {
     doc.description = `${authStr}\n\n${doc.description}`;

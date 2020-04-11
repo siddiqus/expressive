@@ -24,6 +24,8 @@ interface Request<
   ReqQuery = CoreQuery
 > extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
   authorizer?: AuthorizerType;
+  user?: any;
+  permissions?: any;
 }
 
 export type Response = ExpressResponse;
