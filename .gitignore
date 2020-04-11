@@ -5,3 +5,4 @@ coverage
 .coverage
 reports
 build
+.eslintcache
