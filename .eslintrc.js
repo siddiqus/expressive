@@ -3,7 +3,10 @@ module.exports = {
     "browser": true,
     "es6": true,
   },
-  "extends": "google",
+  "extends": [
+    "google",
+    "plugin:prettier/recommended"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
@@ -16,7 +19,7 @@ module.exports = {
     "sourceType": "module",
   },
   "plugins": [
-    "react",
+    "react"
   ],
   "rules": {
     "linebreak-style": [
@@ -36,6 +39,7 @@ module.exports = {
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "class-methods-use-this": 0,
     "require-jsdoc": 0,
-    "object-curly-spacing": 0
+    "object-curly-spacing": 0,
+    "prettier/prettier": "error"
   }
 };

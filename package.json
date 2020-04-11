@@ -16,8 +16,7 @@
     "lintFix": "eslint --fix src || echo Linting done!",
     "dev": "cross-env NODE_ENV=development nodemon -w example -w src --exec node example/index.js",
     "dev:ts": "cd ts-example && npm start",
-    "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare",
-    "prettier": "prettier --write src"
+    "test:report": "npm test -- --reporters default jest-stare --testResultsProcessor=jest-stare"
   },
   "author": "Sabbir Siddiqui <siddiqus@live.com>",
   "license": "MIT",
@@ -52,11 +51,14 @@
     "cross-env": "5.2.0",
     "eslint": "5.16.0",
     "eslint-config-google": "0.12.0",
+    "eslint-config-prettier": "6.10.1",
     "eslint-detailed-reporter": "0.8.0",
+    "eslint-plugin-prettier": "3.1.2",
     "eslint-plugin-react": "7.12.4",
     "husky": "4.2.1",
     "jest": "25.1.0",
     "jest-stage": "1.0.0",
+    "lint-staged": "10.1.3",
     "nodemon": "1.19.0",
     "prettier": "2.0.4",
     "rimraf": "2.6.2"
@@ -83,9 +85,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test && eslint src --fix && npm run prettier",
+      "pre-commit": "npm test && lint-staged",
       "pre-push": "npm test"
     }
   },
-  "types": "./src/index.d.ts"
+  "types": "./src/index.d.ts",
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
+  }
 }
