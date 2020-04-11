@@ -6,16 +6,18 @@ module.exports = class AuthUtil {
     this.routeUtil = RouteUtil;
   }
 
-  injectAuthMiddleware(authObject) {
-    return (req) => {
+  getAuthInjectorMiddleware(authObject) {
+    return (req, res, next) => {
       let { authorizer } = req;
       if (!authorizer) authorizer = [];
 
       authorizer.push(authObject);
-      authorizer = authorizer.flat();
+      // eslint-disable-next-line prefer-spread
+      authorizer = [].concat.apply([], authorizer);
 
       authorizer = Ramda.uniqWith(Ramda.eqProps, authorizer);
       req.authorizer = authorizer;
+      next();
     };
   }
 
@@ -26,19 +28,21 @@ module.exports = class AuthUtil {
 
     if (isObject && !authObjectHandler) {
       throw new Error(
-        `Authorizer declared as object but 'authObjectHandler' not defined in ExpressiveOptions`
+        `'authorizer' object declared, but 'authObjectHandler' ` +
+          `not defined in ExpressApp constructor params`
       );
     }
 
-    const handlers = [];
-    let authMiddleware = authorizer;
+    let handlers = [];
     if (isObject) {
-      handlers.push(this.injectAuthMiddleware(authorizer));
-      authMiddleware = authObjectHandler;
+      handlers = [
+        this.getAuthInjectorMiddleware(authorizer),
+        authObjectHandler
+      ];
+    } else {
+      handlers = [authorizer];
     }
 
-    handlers.push(this.routeUtil.getHandlerWithManagedNextCall(authMiddleware));
-
-    return handlers;
+    return handlers.map((h) => this.routeUtil.getHandlerWithManagedNextCall(h));
   }
 };

@@ -2,7 +2,7 @@ import { ExpressApp } from '../../src';
 import { router } from './router';
 
 const app = new ExpressApp(router, {
-  errorHandler(err, req, res, next) {
+  errorHandler(err, req, res) {
     console.log(err);
     res.status(500);
     res.json({

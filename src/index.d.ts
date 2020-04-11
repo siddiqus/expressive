@@ -1,22 +1,48 @@
 import { CorsOptions as CorsLibOptions } from 'cors';
-import {
+import type {
   ErrorRequestHandler as ExpressErrorRequestHandler,
   Express as ExpressType,
-  Handler as ExpressHandler,
   NextFunction as ExpressNextFunction,
-  Request as ExpressRequest,
   Response as ExpressResponse
 } from 'express';
+
+import type {
+  ParamsDictionary as CoreParamsDictionary,
+  Params as CoreParams,
+  Query as CoreQuery,
+  Request as CoreRequest
+} from 'express-serve-static-core';
 
 import { IHelmetConfiguration as HelmetConfig } from 'helmet';
 
 export declare type express = typeof import('express');
-export declare interface Request extends ExpressRequest {
-  authorizer?: object[];
+
+interface Request<
+  P extends CoreParams = CoreParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = CoreQuery
+> extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
+  authorizer?: AuthorizerType;
 }
+
 export type Response = ExpressResponse;
 export type NextFunction = ExpressNextFunction;
-export type Handler = ExpressHandler;
+
+export interface Handler<
+  T extends CoreParams = CoreParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = CoreQuery
+> {
+  // tslint:disable-next-line callable-types (This is extended from and can't extend from a type alias in ts<2.2
+  (
+    req: Request<T, ResBody, ReqBody, ReqQuery>,
+    res: ExpressResponse<ResBody>,
+    next: NextFunction
+  ): any;
+}
+
 export type Express = ExpressType;
 export type ErrorRequestHandler = ExpressErrorRequestHandler;
 

@@ -44,13 +44,25 @@ function _addDocResponses(doc) {
   }
 }
 
+function _setAuthorizerDocInDescription(doc, authorizer) {
+  if (!authorizer) return;
+  const authStr = `Authorized: ${JSON.stringify(authorizer)}`;
+  if (doc.description) {
+    doc.description = `${authStr}\n\n${doc.description}`;
+  } else {
+    doc.description = authStr;
+  }
+}
+
 function _addPathDoc(paths, route, tags) {
-  let { doc, path, validationSchema } = route;
+  let { doc, path, validationSchema, authorizer } = route;
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
 
   doc = doc || {};
   doc.summary = doc.summary || path;
+
+  _setAuthorizerDocInDescription(doc, authorizer);
 
   doc.parameters =
     doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);

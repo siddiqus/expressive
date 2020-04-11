@@ -6,7 +6,8 @@ function _addRouteToPaths(paths, parentPath, route) {
   const routeData = {
     method: route.method,
     path: `${parentPath}${route.path}`,
-    validationSchema: route.validationSchema
+    validationSchema: route.validationSchema,
+    authorizer: route.authorizer
   };
 
   if (RouteUtil.isUrlPath(route.controller)) {
