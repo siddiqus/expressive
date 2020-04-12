@@ -122,17 +122,28 @@ module.exports = class RouterFactory {
     });
   }
 
-  getExpressRouter(routeConfigs) {
+  _handleDuplicateUrls(expressiveRouter) {
+    const duplicateUrls = this.routeUtil.getDuplicateUrls(expressiveRouter);
+    if (duplicateUrls.length > 0) {
+      throw new Error(
+        `Duplicate endpoints detected! -> ${duplicateUrls.join(', ')}`
+      );
+    }
+  }
+
+  getExpressRouter(expressiveRouter) {
+    this._handleDuplicateUrls(expressiveRouter);
+
     const router = this._getRouter();
 
-    if (routeConfigs.routes) {
-      routeConfigs.routes.forEach((routeConf) => {
+    if (expressiveRouter.routes) {
+      expressiveRouter.routes.forEach((routeConf) => {
         this._registerRoute(router, routeConf);
       });
     }
 
-    if (routeConfigs.subroutes) {
-      routeConfigs.subroutes.forEach((subroute) => {
+    if (expressiveRouter.subroutes) {
+      expressiveRouter.subroutes.forEach((subroute) => {
         this._registerSubroute(router, subroute);
       });
     }

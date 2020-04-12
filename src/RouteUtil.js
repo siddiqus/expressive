@@ -70,6 +70,22 @@ class RouteUtil {
     const regex = /^(\/[a-zA-Z0-9\-:]+)*\/?$/g;
     return regex.test(string);
   }
+
+  static getDuplicateUrls(expressiveRouter) {
+    const routeList = RouteUtil.getRoutesInfo(expressiveRouter);
+    const urlStrings = routeList.map(({ path, method }) => {
+      const sanitizedPath =
+        path.charAt(path.length - 1) === '/'
+          ? path.substring(0, path.length - 1)
+          : path;
+      return `${method} ${sanitizedPath}`;
+    });
+
+    const duplicates = urlStrings.filter(
+      (item, index) => urlStrings.indexOf(item) !== index
+    );
+    return duplicates;
+  }
 }
 
 module.exports = RouteUtil;

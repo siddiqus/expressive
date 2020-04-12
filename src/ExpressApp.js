@@ -1,16 +1,12 @@
 const express = require('express');
-const cors = require('cors');
-const { errors: celebrateErrors } = require('celebrate');
 const RouterFactory = require('./RouterFactory');
 const RouteUtil = require('./RouteUtil');
 const AuthUtil = require('./AuthUtil');
-const SwaggerUtils = require('./SwaggerUtils');
-const registerRedoc = require('./redoc/registerRedoc');
 const MiddlewareManager = require('./middleware/MiddlewareManager');
 
 module.exports = class ExpressApp {
   constructor(
-    router,
+    expressiveRouter,
     {
       basePath = '/',
       showSwaggerOnlyInDev = true,
@@ -44,7 +40,7 @@ module.exports = class ExpressApp {
       notFoundHandler,
       authObjectHandler
     };
-    this.router = router;
+    this.expressiveRouter = expressiveRouter;
 
     this._init();
 
@@ -54,127 +50,34 @@ module.exports = class ExpressApp {
   _init() {
     this.routeUtil = RouteUtil;
     this.authUtil = new AuthUtil();
-    this.SwaggerUtils = SwaggerUtils;
-    this.registerRedoc = registerRedoc;
     this.routerFactory = new RouterFactory(this.config);
 
-    this.middlewareManager = new MiddlewareManager({
-      bodyLimit: this.config.bodyLimit,
-      helmetOptions: this.config.helmetOptions
-    });
-
-    this._setExpress();
-  }
-
-  _setExpress() {
     this.express = express();
     this.listen = this.express.listen.bind(this.express);
-  }
-
-  _registerSwagger() {
-    const shouldRegister =
-      (this.config.showSwaggerOnlyInDev &&
-        process.env.NODE_ENV === 'development') ||
-      !this.config.showSwaggerOnlyInDev;
-
-    if (!shouldRegister) return;
-
-    const swaggerHeader = this.SwaggerUtils.getSwaggerHeader(
-      this.config.basePath,
-      this.config.swaggerInfo
-    );
-    const swaggerJson = this.SwaggerUtils.convertDocsToSwaggerDoc(
-      this.router,
-      swaggerHeader,
-      this.config.swaggerDefinitions
-    );
-
-    this.SwaggerUtils.registerExpress(
-      this.express,
-      swaggerJson,
-      '/docs/swagger'
-    );
-    console.log('Swagger doc up and running on /docs');
-
-    this.registerRedoc(this.express, swaggerJson, '/docs/redoc');
-  }
-
-  _configureCors() {
-    if (!this.config.allowCors) return;
-
-    const corsMiddleware = this.config.corsConfig
-      ? cors(this.config.corsConfig)
-      : cors();
-    this.express.use(corsMiddleware);
-  }
-
-  _getDuplicateUrls() {
-    const routeList = this.routeUtil.getRoutesInfo(this.router);
-    const urlStrings = routeList.map(({ path, method }) => {
-      const sanitizedPath =
-        path.charAt(path.length - 1) === '/'
-          ? path.substring(0, path.length - 1)
-          : path;
-      return `${method} ${sanitizedPath}`;
-    });
-
-    const duplicates = urlStrings.filter(
-      (item, index) => urlStrings.indexOf(item) !== index
-    );
-    return duplicates;
+    this.middlewareManager = new MiddlewareManager(this.config, this.express);
   }
 
   _registerRoutes() {
-    const duplicateUrls = this._getDuplicateUrls();
-    if (duplicateUrls.length > 0) {
-      throw new Error(
-        `Duplicate endpoints detected! -> ${duplicateUrls.join(', ')}`
-      );
-    }
-
-    const expressRouter = this.routerFactory.getExpressRouter(this.router);
+    const expressRouter = this.routerFactory.getExpressRouter(
+      this.expressiveRouter
+    );
     this.express.use(this.config.basePath, expressRouter);
   }
 
-  _registerCelebrateMiddleware() {
-    if (this.config.celebrateErrorHandler) {
-      this.express.use(this.config.celebrateErrorHandler);
-    } else {
-      this.express.use(celebrateErrors());
-    }
-  }
-
-  _registerAuth() {
-    const authMiddleware = this.authUtil.getAuthorizerMiddleware(
-      this.config.authorizer,
-      this.config.authObjectHandler
-    );
-
-    if (authMiddleware) {
-      this.express.use(authMiddleware);
-    }
-  }
-
   registerHandlers() {
-    this._registerSwagger();
+    this.middlewareManager.registerDocs(this.expressiveRouter);
 
-    this._configureCors();
+    this.middlewareManager.configureCors();
 
-    this._registerAuth();
+    this.middlewareManager.registerAuth();
 
-    this.middlewareManager.registerMiddleware(
-      this.express,
-      this.config.middleware
-    );
+    this.middlewareManager.registerBasicMiddleware();
 
     this._registerRoutes();
 
-    this.middlewareManager.registerNotFoundHandler(
-      this.express,
-      this.config.notFoundHandler
-    );
+    this.middlewareManager.registerNotFoundHandler();
 
-    this._registerCelebrateMiddleware();
+    this.middlewareManager.registerCelebrateMiddleware();
 
     if (this.config.errorHandler) {
       this.express.use(this.config.errorHandler);

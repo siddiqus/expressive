@@ -126,21 +126,19 @@ const sampleSwaggerInfo = {
   }
 };
 
-function writeSwaggerJson(
-  router,
-  output,
-  basePath = '/',
-  swaggerInfo = sampleSwaggerInfo
-) {
-  const swaggerHeader = getSwaggerHeader(basePath, swaggerInfo);
+function writeSwaggerJson(router, output, basePath = '/', swaggerInfo = null) {
+  const swaggerHeader = getSwaggerHeader(
+    basePath,
+    swaggerInfo || sampleSwaggerInfo
+  );
   const swaggerJson = convertDocsToSwaggerDoc(router, swaggerHeader);
   fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));
 }
 
-function getSwaggerHeader(basePath = '/', swaggerInfo = sampleSwaggerInfo) {
+function getSwaggerHeader(basePath = '/', swaggerInfo = null) {
   return {
     swagger: '2.0',
-    info: swaggerInfo,
+    info: swaggerInfo || sampleSwaggerInfo,
     basePath: basePath,
     schemes: ['http', 'https'],
     consumes: ['application/json'],
