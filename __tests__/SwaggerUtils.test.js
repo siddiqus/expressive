@@ -145,8 +145,7 @@ describe('SwaggerUtils', () => {
         doc: {
           summary: 'hey route',
           responses: {
-            200: {},
-            400: {}
+            200: {}
           }
         },
         authorizer: ['hello']
@@ -168,6 +167,60 @@ describe('SwaggerUtils', () => {
 
       const swaggerstr = JSON.stringify(swaggerDoc);
       expect(swaggerstr.substring(`Authorized: ["hello"]`)).toBeDefined();
+    });
+
+    it('Should write json for swagger with responses defined', () => {
+      const mockRoutes1 = { routes: [] };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {}
+          }
+        },
+        authorizer: ['hello'],
+        validationSchema: {
+          some: 'schema'
+        }
+      });
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(
+        swaggerstr.includes(`Schema validation error response`)
+      ).toBeTruthy();
+    });
+
+    it('Should write json for swagger with responses defined for validation', () => {
+      const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {},
+            400: {
+              response: 'hehe'
+            }
+          }
+        },
+        authorizer: ['hello']
+      });
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(
+        swaggerstr.includes(`Schema validation error response`)
+      ).toBeFalsy();
     });
   });
 

@@ -28,20 +28,22 @@ function _sanitizeSwaggerPath(path) {
   return split.join('/');
 }
 
-function _addDocResponses(doc) {
-  if (!doc.responses) {
-    doc.responses = {
-      200: {
-        description: 'Success response'
-      },
-      400: {
-        description: 'Schema validation error response'
-      }
+function _addDocResponses(doc, validationSchema) {
+  const docResponses = doc.responses || {};
+
+  if (!docResponses[400] && validationSchema) {
+    docResponses[400] = {
+      description: 'Schema validation error response'
     };
-  } else {
-    doc.responses[200] = doc.responses[200] || {};
-    doc.responses[400] = doc.responses[400] || {};
   }
+
+  if (!docResponses[200]) {
+    docResponses[200] = {
+      description: 'Success response'
+    };
+  }
+
+  doc.responses = docResponses;
 }
 
 function _setAuthorizerDocInDescription(doc, authorizer) {
@@ -66,7 +68,7 @@ function _addPathDoc(paths, route, tags) {
   doc.parameters =
     doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
 
-  _addDocResponses(doc);
+  _addDocResponses(doc, validationSchema);
 
   paths[path] = paths[path] || {};
   paths[path][method] = doc;
