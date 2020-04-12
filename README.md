@@ -32,7 +32,8 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - [Handling requests](#handling-requests)
   - [Middleware](#middleware)
 - [Request validation using Celebrate](#request-validation-using-celebrate)
-- [Documentation with Swagger syntax](#documentation-with-swagger-syntax)
+- [Auto-generated documentation with Swagger syntax](#documentation-with-swagger-syntax)
+- [Centralized and flexible authorization](#centralized-authorization)
 - [Example applications (Both TypeScript and ES5)](#example)
 
 \*Table of contents generated with [markdown-toc](http://ecotrust-canada.github.io/markdown-toc/)
@@ -422,6 +423,13 @@ const getUserById = Route.get(
 
 # Documentation with Swagger syntax
 
+##### Auto-generated documentation
+Firstly, Expressive auto generates Swagger documentation from the declared routes, even if you do not provide any documentation of your own. Currently:
+* For any project, if you declare basic routes, then the swagger will at least show you the routes that are available on the server.
+* If you declare a request validation schema with [celebrate](https://www.npmjs.com/package/celebrate) syntax, then Swagger parameter definitions will also be auto-generated.
+
+##### Declaring docs manually
+
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
 
@@ -486,7 +494,7 @@ const app = new ExpressApp(router, {
 
 ---
 
-To create a swagger.json file, the function _writeSwaggerJson_ can be used from the _SwaggerUtils_ export. Example:
+To create a swagger.json file, the function `writeSwaggerJson` can be used from the `SwaggerUtils` export. Example:
 
 ```javascript
 const { SwaggerUtils } = require("expressive");
