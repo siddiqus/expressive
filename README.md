@@ -48,6 +48,9 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - Built in middleware e.g. body-parser, cors, etc.
   - Security middleware i.e. helmet
 - Built in support for asynchronous request handlers and middleware
+  - No need to wrap every controller with a try/catch block. Any error thrown will be sent to a central error handler
+- Implicit `next` function calls
+  - If you do not declare the `next` variable in your handler function, then it will be called for you automatically after your handler executes. If you declare it as a function parameter, you can use it as you like.
 - API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas (Using Joi schemas also yields generated Swagger documentation!)
 - Centralized error handling
   - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
@@ -124,6 +127,10 @@ Here you'll notice that the request object is available with `this.req` and you 
 - notFound (404)
 - tooMany (429)
 - internalServerError (500)
+
+##### Wrapping response data
+Sometimes you will want to always wrap your response data in an object e.g. `{ data: someData }`
+The BaseController class has a static method `bodyWrapper` which has the response data as a parameter. This is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it.
 
 * Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }`
 
