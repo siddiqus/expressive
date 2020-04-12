@@ -244,4 +244,68 @@ describe('Middleware Manager', () => {
       );
     });
   });
+
+  describe('registerAuth', () => {
+    it('Should throw error if authorizer is declared without authObjectHandler', () => {
+      let response;
+      try {
+        const manager = new MiddlewareManager({
+          authorizer: ['hehe']
+        });
+
+        manager.registerAuth();
+      } catch (error) {
+        response = error;
+      }
+
+      expect(response.message).toEqual(
+        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params, or is an empty function`
+      );
+    });
+
+    it('Should not throw error if authorizer and authObjectHandler both declared', () => {
+      let response;
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const manager = new MiddlewareManager(
+        {
+          authorizer: ['hehe'],
+          authObjectHandler: (req, res) => {
+            return null;
+          }
+        },
+        mockExpress
+      );
+      manager.authUtil = {
+        getAuthorizerMiddleware: jest.fn().mockReturnValue(1234)
+      };
+
+      try {
+        manager.registerAuth();
+      } catch (error) {
+        response = error;
+      }
+
+      expect(response).not.toBeInstanceOf(Error);
+      expect(mockExpress.use).toHaveBeenCalledWith(1234);
+    });
+
+    it('Should throw error if authObjectHandler body is empty', () => {
+      let response;
+      try {
+        response = new ExpressApp(
+          {},
+          {
+            authorizer: ['hehe'],
+            authObjectHandler: (req, res) => {}
+          }
+        );
+      } catch (error) {
+        response = error;
+      }
+
+      expect(response).toBeInstanceOf(Error);
+    });
+  });
 });

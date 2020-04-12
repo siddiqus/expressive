@@ -1,7 +1,8 @@
 const RouterFactory = require('../src/RouterFactory');
 const BaseController = require('../src/BaseController');
+const Route = require('../src/Route');
 
-class MockControllerThrowsError extends BaseController { }
+class MockControllerThrowsError extends BaseController {}
 const mockErrorJestFn = jest.fn().mockImplementation(() => {
   throw new Error('mockErrorJestFn');
 });
@@ -138,7 +139,7 @@ describe('RouterFactory', () => {
         path: '/',
         controller: BaseController,
         middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => { }
+        authorizer: (req, res) => {}
       });
 
       expect(
@@ -173,7 +174,7 @@ describe('RouterFactory', () => {
         path: '/',
         controller: BaseController,
         middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => { },
+        authorizer: (req, res) => {},
         validationSchema: schema
       });
 
@@ -203,7 +204,7 @@ describe('RouterFactory', () => {
         path: '/',
         router: 'somerouter',
         middleware: [(req, res) => 1, (req, res) => 2, (req, res) => 3],
-        authorizer: (req, res) => { }
+        authorizer: (req, res) => {}
       });
 
       expect(factory.getExpressRouter).toHaveBeenCalled();
@@ -314,5 +315,33 @@ describe('RouterFactory', () => {
     const result = factory._getRouter();
 
     expect(result).toBeDefined();
+  });
+
+  it('Should throw error if duplicate urls', () => {
+    let response;
+    const mockRoutes = {
+      routes: [
+        Route.get('/hello', () => {}),
+        Route.get('/hello/', () => {}),
+        Route.get('/v1/hey', () => {})
+      ],
+      subroutes: [
+        {
+          path: '/v1',
+          router: {
+            routes: [Route.get('/hey', () => {})]
+          }
+        }
+      ]
+    };
+    try {
+      new RouterFactory({})._handleDuplicateUrls(mockRoutes);
+    } catch (error) {
+      response = error;
+    }
+
+    expect(response.message).toEqual(
+      'Duplicate endpoints detected! -> get /hello, get /v1/hey'
+    );
   });
 });
