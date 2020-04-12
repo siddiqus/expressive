@@ -20,7 +20,7 @@ module.exports = class AuthUtil {
     this.routeUtil = RouteUtil;
   }
 
-  getAuthInjectorMiddleware(authObject) {
+  getMiddlewareForInjectingAuthPropoerties(authObject) {
     return (req) => {
       let { authorizer } = req;
       if (!authorizer) authorizer = [];
@@ -52,7 +52,7 @@ module.exports = class AuthUtil {
     let handlers = [];
     if (isObject) {
       handlers = [
-        this.getAuthInjectorMiddleware(authorizer),
+        this.getMiddlewareForInjectingAuthPropoerties(authorizer),
         authObjectHandler
       ];
     } else {

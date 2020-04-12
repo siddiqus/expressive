@@ -55,11 +55,10 @@ function _setAuthorizerDocInDescription(doc, authorizer) {
 }
 
 function _addPathDoc(paths, route, tags) {
-  let { doc, path, validationSchema, authorizer } = route;
+  let { doc = {}, path, validationSchema, authorizer } = route;
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
 
-  doc = doc || {};
   doc.summary = doc.summary || path;
 
   _setAuthorizerDocInDescription(doc, authorizer);
