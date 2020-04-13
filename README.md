@@ -26,14 +26,14 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
   - [Configuring your own middleware](#configuring-your-own-middleware)
     - [At the application level](#at-the-application-level)
     - [At the sub route level](#at-the-sub-route-level)
-    - [At the sub route level](#at-the-sub-route-level-1)
+    - [At the route level](#at-the-route-level)
 - [Centralized error handling](#centralized-error-handling)
 - [Asynchronous request handlers and middleware](#asynchronous-request-handlers-and-middleware)
   - [Handling requests](#handling-requests)
   - [Middleware](#middleware)
 - [Request validation using Celebrate](#request-validation-using-celebrate)
-- [Auto-generated documentation with Swagger syntax](#documentation-with-swagger-syntax)
-- [Centralized and flexible authorization](#centralized-authorization)
+- [Centralized authorization](#centralized-authorization)
+- [Auto-generated documentation with Swagger](#documentation-with-swagger)
 - [Example applications (Both TypeScript and ES5)](#example)
 
 \*Table of contents generated with [markdown-toc](http://ecotrust-canada.github.io/markdown-toc/)
@@ -55,6 +55,9 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 - API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas (Using Joi schemas also yields generated Swagger documentation!)
 - Centralized error handling
   - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
+- Centralized authorization
+  - By defining authorizer function at any level - app, subroute, or route
+  - Objective Authorization: By defining an authorizer object for each level, and centrally managing request authorization with one handler
 - Doc generation through Swagger https://swagger.io/
   - Request parameter docs are generated if `validationSchema` property is provided with Joi schemas!
   - Each endpoint can have an associated doc using Swagger syntax (JSON/JS), making doc writing easier and distributed.
@@ -68,23 +71,23 @@ Here is a basic example:
 **\*It is required for controllers to extend BaseController. This also allows for dependencies to be instantiated inside the constructor, which can be useful for testing.**
 
 ```javascript
-const { Route, ExpressApp, BaseController } = require("@siddiqus/expressive");
+const { Route, ExpressApp, BaseController } = require('@siddiqus/expressive');
 
 class HelloGetController extends BaseController {
   handleRequest(req, res) {
     this.ok({
-      hello: "world"
+      hello: 'world'
     });
   }
 }
 
 const router = {
-  routes: [Route.get("/hello", HelloGetController)]
+  routes: [Route.get('/hello', HelloGetController)]
 };
 
 const app = new ExpressApp(router);
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log("Listening on port " + port));
+app.listen(port, () => console.log('Listening on port ' + port));
 ```
 
 Run this node script will start an Express app on port 8080. A GET request on [http://localhost:8080/hello] will return the following JSON response
@@ -106,7 +109,7 @@ It is easy to create routes and nested routes using Expressive, with the focus b
 Each separate endpoint e.g. 'GET /users' is handled using a _controller_ class, that extends the `BaseController` class provided by Expressive. There is an 'abstract' method called `handleRequest` that requires an implementation for your own controller. The Express `request`, `response` and `next` objects are available in this method using `this`. This `handleRequest` method can be used as an `async` function also. For example:
 
 ```javascript
-const { BaseController } = require("@siddiqus/expressive");
+const { BaseController } = require('@siddiqus/expressive');
 
 class GetUsersController extends BaseController {
   async handleRequest() {
@@ -130,10 +133,11 @@ Here you'll notice that the request object is available with `this.req` and you 
 - internalServerError (500)
 
 ##### Wrapping response data
+
 Sometimes you will want to always wrap your response data in an object e.g. `{ data: someData }`
 The BaseController class has a static method `bodyWrapper` which has the response data as a parameter. This is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it.
 
-* Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }`
+- Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }`
 
 ## Routes and subroutes
 
@@ -147,17 +151,17 @@ The BaseController class has a static method `bodyWrapper` which has the respons
 - Each object in the _routes_ array is an instance of the Route class. For example, we can use the Route class's GET method to create a GET endpoint like so:
 
   ```javascript
-  const { Route } = require("@siddiqus/expressive");
+  const { Route } = require('@siddiqus/expressive');
 
   const helloGetRoute = Route.get(
-    "/some/path", // required - relative end path of endpoint
+    '/some/path', // required - relative end path of endpoint
     SomeController, // required - a controller function or class
     {
       doc: someDocJs, // optional - Swagger json format for a given endpoint
       validationSchema: {
         query: someJoiSchemaForQueryParams
       }, // validationSchema optional - object with Joi schemas for body, query, params, etc.
-      errorHandler: function(err, req, res, next) {} // optional - middleware to handle errors for this specific endpoint
+      errorHandler: function (err, req, res, next) {} // optional - middleware to handle errors for this specific endpoint
     }
   );
   ```
@@ -167,11 +171,11 @@ The BaseController class has a static method `bodyWrapper` which has the respons
 - Each object in the _subroutes_ array can be constructed using the `subroute` function, like so:
 
   ```javascript
-  const { subroute } = require("@siddiqus/expressive");
+  const { subroute } = require('@siddiqus/expressive');
 
   const router = {
     subroutes: [
-      subroute("/some/sub/path", someRouter) // 'someRouter' is another router object
+      subroute('/some/sub/path', someRouter) // 'someRouter' is another router object
     ]
   };
   ```
@@ -188,15 +192,15 @@ Let's say we want to create an API with the following routes:
 We need to define a router object as follows:
 
 ```javascript
-const { Route, subroute } = require("@siddiqus/expressive");
+const { Route, subroute } = require('@siddiqus/expressive');
 
 const helloRouter = {
   routes: [
     [
       // with some predefined controller functions
-      Route.get("/", GetHelloController),
-      Route.get("/users", GetUsersController),
-      Route.post("/users", PostUsersController)
+      Route.get('/', GetHelloController),
+      Route.get('/users', GetUsersController),
+      Route.post('/users', PostUsersController)
       // get /users and post /users can also be refactored into a separate subroute for "/users"
     ]
   ]
@@ -204,9 +208,9 @@ const helloRouter = {
 
 const apiRouter = {
   routes: [
-    Route.get("/", ApiRootController) // some predefined controller
+    Route.get('/', ApiRootController) // some predefined controller
   ],
-  subroutes: [subroute("/hello", helloRouter)]
+  subroutes: [subroute('/hello', helloRouter)]
 };
 ```
 
@@ -216,17 +220,18 @@ The ExpressApp class constructor's second parameter is a configuration object th
 
 ```javascript
 {
-    swaggerInfo = null, // this is an optional JSON with the basic swagger info detailed later
+  (swaggerInfo = null), // this is an optional JSON with the basic swagger info detailed later
     swaggerDefinitions, // this is an optional JSON for the swagger model definitions
-    allowCors = false, // this uses the 'cors' npm module to allow CORS in the express app, default false
-    corsConfig = null, // config for cors based on the 'cors' npm module, allows all origin by default
-    middleware = null, // Array of express middlewares can be provided (optional)
-    errorHandler = null, // express middleware function to handle errors e.g. function(err, req, res, next){}
-    basePath = "/", // Root path of the api, default "/"
-    bodyLimit = "100kb",
-    helmetOptions = null, // options for the 'helmet' middleware
-    celebrateErrorHandler = null, // optional, handler to replace default celebrate 'errors' middleware
-    notFoundHandler = null // optional, handler that runs after all routes. By default it returns 404 status with a message.
+    (allowCors = false), // this uses the 'cors' npm module to allow CORS in the express app, default false
+    (corsConfig = null), // config for cors based on the 'cors' npm module, allows all origin by default
+    (middleware = null), // Array of express middlewares can be provided (optional)
+    (errorHandler = null), // express middleware function to handle errors e.g. function(err, req, res, next){}
+    (basePath = '/'), // Root path of the api, default "/"
+    (bodyLimit = '100kb'),
+    (helmetOptions = null), // options for the 'helmet' middleware
+    (celebrateErrorHandler = null), // optional, handler to replace default celebrate 'errors' middleware
+    (notFoundHandler = null), // optional, handler that runs after all routes. By default it returns 404 status with a message.
+    (authObjectHandler = null); // optional handler to manage authorization via authorizer objects. See 'Centralized authorization' below.
 }
 ```
 
@@ -265,7 +270,7 @@ This will allow CORS for all origins. If you want to configure CORS as per the m
 const app = new ExpressApp(router, {
   allowCors: true,
   corsConfig: {
-    origin: "http://example.com",
+    origin: 'http://example.com',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
   }
 });
@@ -287,7 +292,7 @@ const app = new ExpressApp(router, {
 
 These are examples on how to declare middleware accross the Expressive application.
 
-### At the application level
+#### At the application level
 
 ```javascript
 const expressApp = new ExpressApp(router, {
@@ -295,29 +300,29 @@ const expressApp = new ExpressApp(router, {
 });
 ```
 
-### At the sub route level
+#### At the sub route level
 
 ```javascript
-const { subroute } = require("@siddiqus/expressive");
+const { subroute } = require('@siddiqus/expressive');
 
 const router = {
   subroutes: [
-    subroute("/hello", someHelloRouter, {
+    subroute('/hello', someHelloRouter, {
       middleware: [] // some array of middleware to execute for all routes under /hello
     })
   ]
 };
 ```
 
-### At the sub route level
+#### At the route level
 
 ```javascript
-const { subroute } = require("@siddiqus/expressive");
+const { subroute } = require('@siddiqus/expressive');
 
 const router = {
-  subroutes: [
-    subroute("/hello", someHelloRouter, {
-      middleware: [] // some array of middleware to execute for all routes under /hello
+  routes: [
+    Route.get('/hello', someHelloController, {
+      middleware: [] // some array of middleware to execute for this particular endpoint
     })
   ]
 };
@@ -338,7 +343,7 @@ function centralizedErrorHandling (err, req, res, next) {
 }
 
 const app = new ExpressApp(router, {
-  errorMiddleware: centralizedErrorHandling // all errors go here
+  errorMiddleware: centralizedErrorHandling // all errors go here, can also be an array
 }
 ```
 
@@ -377,17 +382,17 @@ This example shows both async and non-async middleware being passed to multiple 
 
 ```javascript
 Route.get(
-  "/hello",
+  '/hello',
   (req, res) => {
     res.json({
-      hello: "world"
+      hello: 'world'
     });
   },
   {
     middleware: [
-      async (req, res, next) => console.log("from mid 1") || next(), // this works
-      (req, res, next) => console.log("from mid 2") || next(), // this works too
-      (req, res) => console.log("from mid 2") // this works too
+      async (req, res, next) => console.log('from mid 1') || next(), // this works
+      (req, res, next) => console.log('from mid 2') || next(), // this works too
+      (req, res) => console.log('from mid 2') // this works too
     ]
   }
 );
@@ -403,10 +408,10 @@ Notice how the three middleware functions are different:
 Expressive uses [celebrate](https://www.npmjs.com/package/celebrate) for API endpoint validations. A schema can be added to any endpoint using the 'validationSchema' property of a route.
 
 ```javascript
-const { Route, Joi } = require("@siddiqus/expressive");
+const { Route, Joi } = require('@siddiqus/expressive');
 
 const getUserById = Route.get(
-  "/users/:userId",
+  '/users/:userId',
   GetSpecificUser, // some predefined controller
   {
     validationSchema: {
@@ -414,28 +419,106 @@ const getUserById = Route.get(
         userId: Joi.number().required()
       },
       body: {}, // keys with Joi schema
-      query: {}, 
+      query: {},
       headers: {} // and others based on celebrate's documentation
-    } 
+    }
   }
 );
 ```
 
-# Documentation with Swagger syntax
+# Centralized authorization
 
-##### Auto-generated documentation
+You can define an `authorizer` property at the app, subroute or route level (in case of multiple definitions, they will be executed in that order respectively). Here are the examples:
+
+```javascript
+const expressiveRouter = {
+  routes: [
+    Route.get("/users", {
+      controller: someControllerFn, // required controller for the endpoint
+      authorizer: (req, res) => {} // authorizer function for this particular route
+    })
+  ],
+  subroutes: [
+    {
+      path: '/products',
+      router: productRouter, // some other defined Expressive router
+      authorizer: (req, res) => {} // authorizer function for all routes under /products/*
+    }
+  ]
+}
+const app = new ExpressApp(expressiveRouter, {
+  authorizer: (req, res, next) => { // authorizer function for the whole app
+})
+```
+
+While defining a function at every level gives you granular control over your endpoint authorization, Expressive gives you another way: authorizer objects
+
+#### Objective authorization (with authorizer objects)
+
+This implementation can be summarized as:
+
+`For an endpoint [x], there is a criteria [y] that describes who is authorized to access the endpoint.`
+
+You can use this authorization mechanism by defining an `authObjectHandler` function as a parameter in ExpressApp, with any `authorizer` property at any level being defined as an object, a string, or an array of those. Defining an `authorizer` property without declaring the `authObjectHandler` will throw an error while initializing the app. Here is an example.
+
+1. Let's say we define an endpoint with an authorizer
+
+```javascript
+const expressiveRouter = {
+  routes: [
+    Route.get('/hello', {
+      controller: (req, res) => {}, // some controller
+      authorizer: {
+        permissions: 'some-permission-criteria'
+      }
+    })
+  ]
+};
+```
+
+2. And we have declared our `authObjectHandler` in `ExpressApp` params
+
+```javascript
+const app = new ExpressApp(expressiveRouter, {
+  authObjectHandler: async (req, res) => {
+    const user = req.user; // this object is allowed for any user data
+    const authorizer = req.authorizer; // req.authorizer is a flattened array of all authorizer objects
+    // in our case, req.authorizer = [{ some: 'permission-criteria' }]
+    // some logic to authorize the user
+    const hasPermissions = authorizer.filter(
+      a => a.permissions === user.permissions
+    )
+
+    if(!hasPermissions.length) {
+      res.status(401).json({
+        message: "Unauthorized"
+      })
+    }
+  }
+});
+```
+
+If the authorizer object is declared at any level (app, subroute, or route), the authorizer object (or string) will be appended to a flattened array in `req.authorizer`.
+
+So by declaring the `authObjectHandler` in a generic way, we can centrally manage authorization for the whole application at any level by simply defining the authorization criteria in the `authorizer` object.
+
+# Documentation with Swagger
+
+#### Auto-generated documentation
+
 Firstly, Expressive auto generates Swagger documentation from the declared routes, even if you do not provide any documentation of your own. Currently:
-* For any project, if you declare basic routes, then the swagger will at least show you the routes that are available on the server.
-* If you declare a request validation schema with [celebrate](https://www.npmjs.com/package/celebrate) syntax, then Swagger parameter definitions will also be auto-generated.
 
-##### Declaring docs manually
+- For any project, if you declare basic routes, then the swagger will at least show you the routes that are available on the server.
+- If you declare a request validation schema with [celebrate](https://www.npmjs.com/package/celebrate) syntax, then Swagger parameter definitions will also be auto-generated.
+
+#### Declaring docs manually
 
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
 Example:
 
 ```javascript
 const getUserById = Route.get(
-  "/hello",
+  '/hello',
   GetHelloController, // some predefined controller
   {
     doc: GetHelloDocJs // Swagger doc format for an endpoint
@@ -475,14 +558,14 @@ In Development, Swagger docs can be seen at the url http://localhost:8080/docs (
 You can initialize your app with the basic swagger 'info' property as shown below:
 
 ```javascript
-const { ExpressApp } = require("@siddiqus/expressive");
+const { ExpressApp } = require('@siddiqus/expressive');
 
 const swaggerInfo = {
-  version: "1.0.0",
-  title: "Example Expressive App",
+  version: '1.0.0',
+  title: 'Example Expressive App',
   contact: {
-    name: "Sabbir Siddiqui",
-    email: "sabbir.m.siddiqui@gmail.com"
+    name: 'Sabbir Siddiqui',
+    email: 'sabbir.m.siddiqui@gmail.com'
   }
 };
 
@@ -497,9 +580,9 @@ const app = new ExpressApp(router, {
 To create a swagger.json file, the function `writeSwaggerJson` can be used from the `SwaggerUtils` export. Example:
 
 ```javascript
-const { SwaggerUtils } = require("expressive");
+const { SwaggerUtils } = require('expressive');
 const appConfig = {
-  basePath: "/",
+  basePath: '/',
   swaggerInfo: {} // swagger info property as shown above
 };
 SwaggerUtils.writeSwaggerJson(
