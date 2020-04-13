@@ -132,6 +132,29 @@ describe('AuthUtil', () => {
       ).toHaveBeenCalledWith(mockAuthObjectHandler);
     });
 
+    it('Should return proper middleware if authorizer is string', () => {
+      // setup
+      const authUtil = new AuthUtil();
+      authUtil.routeUtil = {
+        getHandlerWithManagedNextCall: jest.fn().mockReturnValue(1)
+      };
+      const mockAuthorizer = 'hello';
+      const mockAuthObjectHandler = jest.fn();
+      // execute
+      const result = authUtil.getAuthorizerMiddleware(
+        mockAuthorizer,
+        mockAuthObjectHandler
+      );
+      // assert
+      expect(result).not.toBeNull();
+      expect(
+        authUtil.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledTimes(2);
+      expect(
+        authUtil.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledWith(mockAuthObjectHandler);
+    });
+
     it('Should return proper middleware if authorizer is a function', () => {
       // setup
       const authUtil = new AuthUtil();

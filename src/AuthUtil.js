@@ -37,7 +37,7 @@ module.exports = class AuthUtil {
   getAuthorizerMiddleware(authorizer, authObjectHandler) {
     if (!authorizer) return null;
 
-    const isObject = typeof authorizer === 'object';
+    const isObject = ['object', 'string'].includes(typeof authorizer);
 
     if (
       isObject &&

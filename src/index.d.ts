@@ -22,7 +22,7 @@ interface Request<
   ResBody = any,
   ReqBody = any,
   ReqQuery = CoreQuery
-> extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
+  > extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
   authorizer?: AuthorizerType;
   user?: any;
   permissions?: any;
@@ -36,7 +36,7 @@ export interface Handler<
   ResBody = any,
   ReqBody = any,
   ReqQuery = CoreQuery
-> {
+  > {
   // tslint:disable-next-line callable-types (This is extended from and can't extend from a type alias in ts<2.2
   (
     req: Request<T, ResBody, ReqBody, ReqQuery>,
@@ -118,7 +118,7 @@ export declare interface SwaggerEndpointDoc {
   tags?: string[];
 }
 
-type AuthorizerType = Handler | Handler[] | object;
+type AuthorizerType = Handler | Handler[] | string | string[] | object | object[];
 
 export declare interface IRouteParams {
   controller: string | Handler | typeof BaseController;
