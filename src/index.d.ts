@@ -26,6 +26,7 @@ interface Request<
   authorizer?: AuthorizerType;
   user?: any;
   permissions?: any;
+  id: string
 }
 
 export type Response = ExpressResponse;
