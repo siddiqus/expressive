@@ -14,6 +14,10 @@ module.exports = class MiddlewareManager {
     this.options = expressiveConfig;
     this.express = expressApp;
 
+    this._initDependencies();
+  }
+
+  _initDependencies() {
     this.expressModule = expressModule;
     this.addRequestId = addRequestId;
     this.helmet = helmet;
