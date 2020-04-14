@@ -18,9 +18,10 @@ function registerExpress(app, swaggerJson, url) {
 }
 
 function _sanitizeSwaggerPath(path) {
-  if (!path.includes(':')) return path;
+  const normalizedPath = Utils.normalizePathSlashes(path);
+  if (!normalizedPath.includes(':')) return normalizedPath;
 
-  const split = path.split('/');
+  const split = normalizedPath.split('/');
 
   split.forEach((p, index) => {
     if (p.includes(':')) {
@@ -30,7 +31,7 @@ function _sanitizeSwaggerPath(path) {
   return split.join('/');
 }
 
-function _addDocResponses(doc, validationSchema) {
+function _setDocResponses(doc, validationSchema) {
   const docResponses = doc.responses || {};
 
   if (!docResponses[400] && validationSchema) {
@@ -58,19 +59,20 @@ function _setAuthorizerDocInDescription(doc, authorizer) {
   }
 }
 
+function _setDocParameters(doc, validationSchema) {
+  doc.parameters =
+    doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
+}
+
 function _addPathDoc(paths, route, tags) {
   let { doc = {}, path, validationSchema, authorizer } = route;
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
-  path = Utils.normalizePathSlashes(path);
   doc.summary = doc.summary || path;
 
   _setAuthorizerDocInDescription(doc, authorizer);
-
-  doc.parameters =
-    doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
-
-  _addDocResponses(doc, validationSchema);
+  _setDocParameters(doc, validationSchema);
+  _setDocResponses(doc, validationSchema);
 
   paths[path] = paths[path] || {};
   paths[path][method] = doc;

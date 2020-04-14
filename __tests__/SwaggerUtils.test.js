@@ -83,7 +83,7 @@ describe('SwaggerUtils', () => {
   describe('_sanitizeSwaggerPath', () => {
     it('Should sanitize path parameter at the end of the url', () => {
       const result = SwaggerUtils._sanitizeSwaggerPath('some/:path');
-      expect(result).toEqual('some/{path}');
+      expect(result).toEqual('some/{path}/');
     });
 
     it('Should sanitize path parameter at the end of the url with extra slash', () => {
@@ -93,7 +93,7 @@ describe('SwaggerUtils', () => {
 
     it('Should sanitize path parameter in the middle of url', () => {
       const result = SwaggerUtils._sanitizeSwaggerPath('/some/:path/other');
-      expect(result).toEqual('/some/{path}/other');
+      expect(result).toEqual('/some/{path}/other/');
     });
 
     it('Should sanitize multiple path parameters', () => {

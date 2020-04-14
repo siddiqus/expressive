@@ -38,7 +38,6 @@ export interface Handler<
   ReqBody = any,
   ReqQuery = CoreQuery
   > {
-  // tslint:disable-next-line callable-types (This is extended from and can't extend from a type alias in ts<2.2
   (
     req: Request<T, ResBody, ReqBody, ReqQuery>,
     res: ExpressResponse<ResBody>,
