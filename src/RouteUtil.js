@@ -1,3 +1,4 @@
+const Utils = require('./Utils');
 const FUNCTION_STRING = 'function';
 const CLASS_STRING = 'class';
 const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
@@ -5,18 +6,22 @@ const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
 function _addRouteToPaths(paths, parentPath, route) {
   const routeData = {
     method: route.method,
-    path: `${parentPath}${route.path}`,
+    path: Utils.normalizePathSlashes(`${parentPath}${route.path}`),
     validationSchema: route.validationSchema,
     authorizer: route.authorizer
   };
 
   if (RouteUtil.isUrlPath(route.controller)) {
-    routeData.redirectUrl = `${parentPath}${route.controller}`;
+    routeData.redirectUrl = Utils.normalizePathSlashes(
+      `${parentPath}${route.controller}`
+    );
   }
 
   if (route.doc) {
     routeData.doc = route.doc;
   }
+
+  Utils.clearNullValuesInObject(routeData);
 
   paths.push(routeData);
 }
@@ -74,10 +79,10 @@ class RouteUtil {
   static getDuplicateUrls(expressiveRouter) {
     const routeList = RouteUtil.getRoutesInfo(expressiveRouter);
     const urlStrings = routeList.map(({ path, method }) => {
-      const sanitizedPath =
-        path.charAt(path.length - 1) === '/'
-          ? path.substring(0, path.length - 1)
-          : path;
+      const sanitizedPath = Utils.normalizePathSlashes(path);
+      // path.charAt(path.length - 1) === '/'
+      //   ? path.substring(0, path.length - 1)
+      //   : path;
       return `${method} ${sanitizedPath}`;
     });
 

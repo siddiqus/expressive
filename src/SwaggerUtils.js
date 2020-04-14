@@ -1,6 +1,8 @@
 const fs = require('fs');
 const SwaggerUi = require('swagger-ui-express');
 const RouteUtil = require('./RouteUtil.js');
+const Utils = require('./Utils');
+
 const { joiSchemaToSwaggerRequestParameters } = require('./CelebrateUtils');
 
 function registerExpress(app, swaggerJson, url) {
@@ -60,7 +62,7 @@ function _addPathDoc(paths, route, tags) {
   let { doc = {}, path, validationSchema, authorizer } = route;
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
-
+  path = Utils.normalizePathSlashes(path);
   doc.summary = doc.summary || path;
 
   _setAuthorizerDocInDescription(doc, authorizer);
@@ -76,15 +78,11 @@ function _addPathDoc(paths, route, tags) {
   if (doc.tags) tags.push(...doc.tags);
 }
 
-function _normalizeEndSlash(path) {
-  if (path && path.charAt(path.length - 1) !== '/') return `${path}/`;
-  return path;
-}
-
 function _handleRedirects(paths, route) {
   const { method, path } = route;
-  const redirectUrl = _normalizeEndSlash(route.redirectUrl);
-  if (!redirectUrl) return;
+  if (!route.redirectUrl) return;
+
+  const redirectUrl = Utils.normalizePathSlashes(route.redirectUrl);
 
   const doc =
     paths[redirectUrl] && paths[redirectUrl][method]

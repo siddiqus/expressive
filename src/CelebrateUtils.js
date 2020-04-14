@@ -1,4 +1,5 @@
 const { Joi } = require('celebrate');
+const Utils = require('./Utils');
 
 function _isJoiObject(obj) {
   return Boolean(obj.type === 'object' && obj.$_terms && obj.$_terms.keys);
@@ -99,12 +100,6 @@ function _setDefaultValueForSwaggerSchema(joiSchema, swaggerSchema) {
     (defaultValue && JSON.stringify(defaultValue)) || null;
 }
 
-function _clearNullValuesInObject(obj) {
-  Object.keys(obj).forEach(
-    (key) => (obj[key] === undefined || obj[key] === null) && delete obj[key]
-  );
-}
-
 function _setSwaggerPropsEnums(joiSchema, swaggerSchema) {
   if (!joiSchema._valids) return;
   const validValues = [...joiSchema._valids._values.values()];
@@ -133,7 +128,7 @@ function _getSchemaDefinitionForSwagger(joiSchema) {
   _setSwaggerPropsForObject(type, joiSchema, swaggerSchema);
   _setSwaggerPropsForArray(type, joiSchema, swaggerSchema);
 
-  _clearNullValuesInObject(swaggerSchema);
+  Utils.clearNullValuesInObject(swaggerSchema);
 
   return swaggerSchema;
 }
@@ -162,7 +157,7 @@ function _getSwaggerParamsForBody(bodySchema) {
   };
 
   _setSwaggerPropsForObject('object', joiSchema, swaggerSchema);
-  _clearNullValuesInObject(swaggerSchema);
+  Utils.clearNullValuesInObject(swaggerSchema);
 
   return {
     name: 'body',
@@ -215,7 +210,7 @@ function joiSchemaToSwaggerRequestParameters(validationSchema) {
   }
 
   const parameterKeyMap = { query, path, header };
-  _clearNullValuesInObject(parameterKeyMap);
+  Utils.clearNullValuesInObject(parameterKeyMap);
   _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters);
 
   return parameters;

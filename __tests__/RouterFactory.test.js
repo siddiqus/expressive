@@ -341,7 +341,7 @@ describe('RouterFactory', () => {
     }
 
     expect(response.message).toEqual(
-      'Duplicate endpoints detected! -> get /hello, get /v1/hey'
+      'Duplicate endpoints detected! -> get /hello/, get /v1/hey/'
     );
   });
 });

@@ -51,7 +51,7 @@ describe('RouteUtil', () => {
         { path: '/', method: 'get', doc: 'hello' },
         { path: '/users/', method: 'get' },
         { path: '/users/', method: 'post' },
-        { path: '/users/hey', method: 'get', redirectUrl: '/users/' },
+        { path: '/users/hey/', method: 'get', redirectUrl: '/users/' },
         { path: '/users/:userId/posts/', method: 'get' },
         { path: '/users/:userId/posts/', method: 'post' }
       ];
@@ -75,7 +75,7 @@ describe('RouteUtil', () => {
     it('Should register all routes and subroutes without redirects', () => {
       const expectedRoutes = [
         { path: '/', method: 'get', doc: 'hello' },
-        { path: '/hey', method: 'get', redirectUrl: '/' },
+        { path: '/hey/', method: 'get', redirectUrl: '/' },
         { path: '/users/', method: 'get' },
         { path: '/users/', method: 'post' },
         { path: '/users/:userId/posts/', method: 'get' },
@@ -96,7 +96,7 @@ describe('RouteUtil', () => {
             doc: 'hello'
           },
           {
-            path: '/hey',
+            path: '/hey/',
             method: 'get',
             controller: '/'
           }
