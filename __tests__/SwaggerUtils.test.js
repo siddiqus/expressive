@@ -107,18 +107,31 @@ describe('SwaggerUtils', () => {
   describe('convertDocsToSwaggerDoc', () => {
     it('Should write json for swagger with redirects', () => {
       const mockRoutes1 = { ...mockRouterWithTopRoutes };
-      mockRoutes1.routes.push({
-        path: '/hey',
-        controller: '/users',
-        method: 'get',
-        doc: {
-          summary: 'hey route',
-          responses: {
-            200: {},
-            400: {}
+      mockRoutes1.routes.push(
+        {
+          path: '/hey',
+          controller: '/users',
+          method: 'get',
+          doc: {
+            summary: 'hey route',
+            responses: {
+              200: {},
+              400: {}
+            }
+          }
+        },
+        {
+          path: '/hello',
+          controller: '/products',
+          method: 'get',
+          doc: {
+            responses: {
+              200: {},
+              400: {}
+            }
           }
         }
-      });
+      );
 
       let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
 
