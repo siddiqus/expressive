@@ -1,11 +1,11 @@
 const AuthUtil = require('../src/AuthUtil');
 
 describe('AuthUtil', () => {
-  describe('getMiddlewareForInjectingAuthPropoerties', () => {
+  describe('getMiddlewareForInjectingAuthProperties', () => {
     it('should inject auth if none previously', () => {
       const authUtil = new AuthUtil();
 
-      const handler = authUtil.getMiddlewareForInjectingAuthPropoerties(1);
+      const handler = authUtil.getMiddlewareForInjectingAuthProperties(1);
 
       const mockReq = {};
 
@@ -17,7 +17,7 @@ describe('AuthUtil', () => {
     it('should inject auth with previous auth', () => {
       const authUtil = new AuthUtil();
 
-      const handler = authUtil.getMiddlewareForInjectingAuthPropoerties(1);
+      const handler = authUtil.getMiddlewareForInjectingAuthProperties(1);
 
       const mockReq = {
         authorizer: ['hehe']
@@ -34,7 +34,7 @@ describe('AuthUtil', () => {
       const someAuthorizer = {
         someAuthPrivileges: ['hello', 'hey']
       };
-      const handler = authUtil.getMiddlewareForInjectingAuthPropoerties(
+      const handler = authUtil.getMiddlewareForInjectingAuthProperties(
         someAuthorizer
       );
 
@@ -51,7 +51,7 @@ describe('AuthUtil', () => {
       const authUtil = new AuthUtil();
 
       const someAuthorizer = ['hehe'];
-      const handler = authUtil.getMiddlewareForInjectingAuthPropoerties(
+      const handler = authUtil.getMiddlewareForInjectingAuthProperties(
         someAuthorizer
       );
 
