@@ -7,7 +7,7 @@ const mockRouterWithTopRoutes = {
     {
       path: '/',
       method: 'get',
-      controller: () => { },
+      controller: () => {},
       doc: {
         tags: ['SomeTag']
       }
@@ -21,7 +21,7 @@ const mockRouterWithTopRoutes = {
           {
             path: '/',
             method: 'get',
-            controller: () => { },
+            controller: () => {},
             doc: {
               tags: ['SomeTag']
             }
@@ -29,7 +29,7 @@ const mockRouterWithTopRoutes = {
           {
             path: '/',
             method: 'post',
-            controller: () => { },
+            controller: () => {},
             doc: {}
           }
         ],
@@ -41,12 +41,12 @@ const mockRouterWithTopRoutes = {
                 {
                   path: '/',
                   method: 'get',
-                  controller: () => { }
+                  controller: () => {}
                 },
                 {
                   path: '/',
                   method: 'post',
-                  controller: () => { }
+                  controller: () => {}
                 }
               ]
             }
@@ -83,7 +83,7 @@ describe('SwaggerUtils', () => {
   describe('_sanitizeSwaggerPath', () => {
     it('Should sanitize path parameter at the end of the url', () => {
       const result = SwaggerUtils._sanitizeSwaggerPath('some/:path');
-      expect(result).toEqual('some/{path}');
+      expect(result).toEqual('some/{path}/');
     });
 
     it('Should sanitize path parameter at the end of the url with extra slash', () => {
@@ -93,7 +93,7 @@ describe('SwaggerUtils', () => {
 
     it('Should sanitize path parameter in the middle of url', () => {
       const result = SwaggerUtils._sanitizeSwaggerPath('/some/:path/other');
-      expect(result).toEqual('/some/{path}/other');
+      expect(result).toEqual('/some/{path}/other/');
     });
 
     it('Should sanitize multiple path parameters', () => {
@@ -107,17 +107,61 @@ describe('SwaggerUtils', () => {
   describe('convertDocsToSwaggerDoc', () => {
     it('Should write json for swagger with redirects', () => {
       const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      mockRoutes1.routes.push(
+        {
+          path: '/hey',
+          controller: '/users',
+          method: 'get',
+          doc: {
+            summary: 'hey route',
+            responses: {
+              200: {},
+              400: {}
+            }
+          }
+        },
+        {
+          path: '/hello',
+          controller: '/products',
+          method: 'get',
+          doc: {
+            responses: {
+              200: {},
+              400: {}
+            }
+          }
+        }
+      );
+
+      let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+      mockRoutes1.routes.push({
+        path: '/hello',
+        controller: '/hey/',
+        method: 'get',
+        doc: {
+          responses: {}
+        },
+        authorizer: (req, res) => {}
+      });
+      swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+
+      expect(swaggerDoc).toBeDefined();
+    });
+
+    it('Should write json for swagger with authorizer object', () => {
+      const mockRoutes1 = { ...mockRouterWithTopRoutes };
       mockRoutes1.routes.push({
         path: '/hey',
-        controller: '/users',
+        controller: () => {},
         method: 'get',
         doc: {
           summary: 'hey route',
           responses: {
-            200: {},
-            400: {}
+            200: {}
           }
-        }
+        },
+        authorizer: ['hello']
       });
 
       let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
@@ -133,6 +177,63 @@ describe('SwaggerUtils', () => {
       swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
 
       expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(swaggerstr.substring(`Authorized: ["hello"]`)).toBeDefined();
+    });
+
+    it('Should write json for swagger with responses defined', () => {
+      const mockRoutes1 = { routes: [] };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {}
+          }
+        },
+        authorizer: ['hello'],
+        validationSchema: {
+          some: 'schema'
+        }
+      });
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(
+        swaggerstr.includes(`Schema validation error response`)
+      ).toBeTruthy();
+    });
+
+    it('Should write json for swagger with responses defined for validation', () => {
+      const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {},
+            400: {
+              response: 'hehe'
+            }
+          }
+        },
+        authorizer: ['hello']
+      });
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(
+        swaggerstr.includes(`Schema validation error response`)
+      ).toBeFalsy();
     });
   });
 

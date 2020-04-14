@@ -2,6 +2,7 @@
 const { Router } = require('express');
 const { celebrate: celebrateMiddleware } = require('celebrate');
 const RouteUtil = require('./RouteUtil');
+const AuthUtil = require('./AuthUtil');
 const CelebrateUtils = require('./CelebrateUtils');
 
 async function _handleRequestBase(req, res, next) {
@@ -13,8 +14,10 @@ async function _handleRequestBase(req, res, next) {
 }
 
 module.exports = class RouterFactory {
-  constructor() {
+  constructor(expressiveOptions) {
+    this.expressiveOptions = expressiveOptions;
     this.routeUtil = RouteUtil;
+    this.authUtil = new AuthUtil();
     this.celebrateMiddleware = celebrateMiddleware;
     this.CelebrateUtils = CelebrateUtils;
   }
@@ -53,6 +56,17 @@ module.exports = class RouterFactory {
     }
   }
 
+  _setAuthorizerMiddleware(authorizer, routerArgs) {
+    const authMiddleware = this.authUtil.getAuthorizerMiddleware(
+      authorizer,
+      this.expressiveOptions.authObjectHandler
+    );
+
+    if (authMiddleware) {
+      routerArgs.push(authMiddleware);
+    }
+  }
+
   _registerRoute(
     router,
     {
@@ -68,9 +82,7 @@ module.exports = class RouterFactory {
 
     this._registerCelebrateMiddleware(validationSchema, routerArgs);
 
-    if (authorizer) {
-      routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
-    }
+    this._setAuthorizerMiddleware(authorizer, routerArgs);
 
     const nextAdjustedMiddleware = !middleware
       ? []
@@ -88,15 +100,13 @@ module.exports = class RouterFactory {
     router,
     { path, router: subrouter, middleware = [], authorizer }
   ) {
+    const routerArgs = [path];
+
+    this._setAuthorizerMiddleware(authorizer, routerArgs);
+
     const nextAdjustedMiddleware = middleware.map((m) =>
       this.routeUtil.getHandlerWithManagedNextCall(m)
     );
-
-    const routerArgs = [path];
-
-    if (authorizer) {
-      routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(authorizer));
-    }
 
     routerArgs.push(
       ...nextAdjustedMiddleware,
@@ -112,17 +122,28 @@ module.exports = class RouterFactory {
     });
   }
 
-  getExpressRouter(routeConfigs) {
+  _handleDuplicateUrls(expressiveRouter) {
+    const duplicateUrls = this.routeUtil.getDuplicateUrls(expressiveRouter);
+    if (duplicateUrls.length > 0) {
+      throw new Error(
+        `Duplicate endpoints detected! -> ${duplicateUrls.join(', ')}`
+      );
+    }
+  }
+
+  getExpressRouter(expressiveRouter) {
+    this._handleDuplicateUrls(expressiveRouter);
+
     const router = this._getRouter();
 
-    if (routeConfigs.routes) {
-      routeConfigs.routes.forEach((routeConf) => {
+    if (expressiveRouter.routes) {
+      expressiveRouter.routes.forEach((routeConf) => {
         this._registerRoute(router, routeConf);
       });
     }
 
-    if (routeConfigs.subroutes) {
-      routeConfigs.subroutes.forEach((subroute) => {
+    if (expressiveRouter.subroutes) {
+      expressiveRouter.subroutes.forEach((subroute) => {
         this._registerSubroute(router, subroute);
       });
     }

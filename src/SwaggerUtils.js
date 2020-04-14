@@ -1,6 +1,8 @@
 const fs = require('fs');
 const SwaggerUi = require('swagger-ui-express');
 const RouteUtil = require('./RouteUtil.js');
+const Utils = require('./Utils');
+
 const { joiSchemaToSwaggerRequestParameters } = require('./CelebrateUtils');
 
 function registerExpress(app, swaggerJson, url) {
@@ -16,9 +18,10 @@ function registerExpress(app, swaggerJson, url) {
 }
 
 function _sanitizeSwaggerPath(path) {
-  if (!path.includes(':')) return path;
+  const normalizedPath = Utils.normalizePathSlashes(path);
+  if (!normalizedPath.includes(':')) return normalizedPath;
 
-  const split = path.split('/');
+  const split = normalizedPath.split('/');
 
   split.forEach((p, index) => {
     if (p.includes(':')) {
@@ -28,34 +31,48 @@ function _sanitizeSwaggerPath(path) {
   return split.join('/');
 }
 
-function _addDocResponses(doc) {
-  if (!doc.responses) {
-    doc.responses = {
-      200: {
-        description: 'Success response'
-      },
-      400: {
-        description: 'Schema validation error response'
-      }
+function _setDocResponses(doc, validationSchema) {
+  const docResponses = doc.responses || {};
+
+  if (!docResponses[400] && validationSchema) {
+    docResponses[400] = {
+      description: 'Schema validation error response'
     };
+  }
+
+  if (!docResponses[200]) {
+    docResponses[200] = {
+      description: 'Success response'
+    };
+  }
+
+  doc.responses = docResponses;
+}
+
+function _setAuthorizerDocInDescription(doc, authorizer) {
+  if (!authorizer || !(typeof authorizer === 'object')) return;
+  const authStr = `Authorized: ${JSON.stringify(authorizer)}`;
+  if (doc.description) {
+    doc.description = `${authStr}\n\n${doc.description}`;
   } else {
-    doc.responses[200] = doc.responses[200] || {};
-    doc.responses[400] = doc.responses[400] || {};
+    doc.description = authStr;
   }
 }
 
-function _addPathDoc(paths, route, tags) {
-  let { doc, path, validationSchema } = route;
-  const { method } = route;
-  path = _sanitizeSwaggerPath(path);
-
-  doc = doc || {};
-  doc.summary = doc.summary || path;
-
+function _setDocParameters(doc, validationSchema) {
   doc.parameters =
     doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
+}
 
-  _addDocResponses(doc);
+function _addPathDoc(paths, route, tags) {
+  let { doc = {}, path, validationSchema, authorizer } = route;
+  const { method } = route;
+  path = _sanitizeSwaggerPath(path);
+  doc.summary = doc.summary || path;
+
+  _setAuthorizerDocInDescription(doc, authorizer);
+  _setDocParameters(doc, validationSchema);
+  _setDocResponses(doc, validationSchema);
 
   paths[path] = paths[path] || {};
   paths[path][method] = doc;
@@ -63,15 +80,11 @@ function _addPathDoc(paths, route, tags) {
   if (doc.tags) tags.push(...doc.tags);
 }
 
-function _normalizeEndSlash(path) {
-  if (path && path.charAt(path.length - 1) !== '/') return `${path}/`;
-  return path;
-}
-
 function _handleRedirects(paths, route) {
   const { method, path } = route;
-  const redirectUrl = _normalizeEndSlash(route.redirectUrl);
-  if (!redirectUrl) return;
+  if (!route.redirectUrl) return;
+
+  const redirectUrl = Utils.normalizePathSlashes(route.redirectUrl);
 
   const doc =
     paths[redirectUrl] && paths[redirectUrl][method]
@@ -115,21 +128,19 @@ const sampleSwaggerInfo = {
   }
 };
 
-function writeSwaggerJson(
-  router,
-  output,
-  basePath = '/',
-  swaggerInfo = sampleSwaggerInfo
-) {
-  const swaggerHeader = getSwaggerHeader(basePath, swaggerInfo);
+function writeSwaggerJson(router, output, basePath = '/', swaggerInfo = null) {
+  const swaggerHeader = getSwaggerHeader(
+    basePath,
+    swaggerInfo || sampleSwaggerInfo
+  );
   const swaggerJson = convertDocsToSwaggerDoc(router, swaggerHeader);
   fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));
 }
 
-function getSwaggerHeader(basePath = '/', swaggerInfo = sampleSwaggerInfo) {
+function getSwaggerHeader(basePath = '/', swaggerInfo = null) {
   return {
     swagger: '2.0',
-    info: swaggerInfo,
+    info: swaggerInfo || sampleSwaggerInfo,
     basePath: basePath,
     schemes: ['http', 'https'],
     consumes: ['application/json'],

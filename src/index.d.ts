@@ -1,20 +1,50 @@
 import { CorsOptions as CorsLibOptions } from 'cors';
-import {
+import type {
   ErrorRequestHandler as ExpressErrorRequestHandler,
   Express as ExpressType,
-  Handler as ExpressHandler,
   NextFunction as ExpressNextFunction,
-  Request as ExpressRequest,
   Response as ExpressResponse
 } from 'express';
+
+import type {
+  ParamsDictionary as CoreParamsDictionary,
+  Params as CoreParams,
+  Query as CoreQuery,
+  Request as CoreRequest
+} from 'express-serve-static-core';
 
 import { IHelmetConfiguration as HelmetConfig } from 'helmet';
 
 export declare type express = typeof import('express');
-export type Request = ExpressRequest;
+
+interface Request<
+  P extends CoreParams = CoreParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = CoreQuery
+  > extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
+  authorizer?: AuthorizerType;
+  user?: any;
+  permissions?: any;
+  id: string
+}
+
 export type Response = ExpressResponse;
 export type NextFunction = ExpressNextFunction;
-export type Handler = ExpressHandler;
+
+export interface Handler<
+  T extends CoreParams = CoreParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = CoreQuery
+  > {
+  (
+    req: Request<T, ResBody, ReqBody, ReqQuery>,
+    res: ExpressResponse<ResBody>,
+    next: NextFunction
+  ): any;
+}
+
 export type Express = ExpressType;
 export type ErrorRequestHandler = ExpressErrorRequestHandler;
 
@@ -88,7 +118,7 @@ export declare interface SwaggerEndpointDoc {
   tags?: string[];
 }
 
-type AuthorizerType = Handler | Handler[];
+type AuthorizerType = Handler | Handler[] | string | string[] | object | object[];
 
 export declare interface IRouteParams {
   controller: string | Handler | typeof BaseController;
@@ -191,6 +221,7 @@ export interface ExpressiveOptions {
   helmetOptions?: HelmetConfiguration;
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
+  authObjectHandler?: Handler;
 }
 
 export declare class ExpressApp {

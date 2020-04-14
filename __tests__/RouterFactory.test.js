@@ -1,5 +1,6 @@
 const RouterFactory = require('../src/RouterFactory');
 const BaseController = require('../src/BaseController');
+const Route = require('../src/Route');
 
 class MockControllerThrowsError extends BaseController {}
 const mockErrorJestFn = jest.fn().mockImplementation(() => {
@@ -68,7 +69,7 @@ describe('RouterFactory', () => {
         subroutes: mockSubroutes
       };
 
-      const routerFactory = new RouterFactory();
+      const routerFactory = new RouterFactory({});
       const mockExpressRouter = {
         get: jest.fn(),
         use: jest.fn(),
@@ -96,7 +97,7 @@ describe('RouterFactory', () => {
         subroutes: mockSubroutes
       };
 
-      const routerFactory = new RouterFactory();
+      const routerFactory = new RouterFactory({});
       const mockExpressRouter = {
         get: jest.fn(),
         use: jest.fn(),
@@ -121,7 +122,7 @@ describe('RouterFactory', () => {
 
   describe('_registerRoute', () => {
     it('Should register route with middleware properly', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       const mockExpressRouter = {
         get: jest.fn(),
@@ -143,12 +144,12 @@ describe('RouterFactory', () => {
 
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(3);
+      ).toHaveBeenCalledTimes(2);
       expect(mockExpressRouter.get).toHaveBeenCalled();
     });
 
     it('Should use celebrate validation schema', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       factory.celebrateMiddleware = jest.fn().mockReturnValue(1);
 
@@ -182,14 +183,14 @@ describe('RouterFactory', () => {
       });
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(3);
+      ).toHaveBeenCalledTimes(2);
       expect(mockExpressRouter.get).toHaveBeenCalled();
     });
   });
 
   describe('_registerSubroute', () => {
     it('Should register subroute with middleware properly', () => {
-      const factory = new RouterFactory();
+      const factory = new RouterFactory({});
 
       const mockExpressRouter = {
         use: jest.fn()
@@ -209,7 +210,7 @@ describe('RouterFactory', () => {
       expect(factory.getExpressRouter).toHaveBeenCalled();
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(4);
+      ).toHaveBeenCalledTimes(3);
       expect(mockExpressRouter.use).toHaveBeenCalled();
     });
   });
@@ -314,5 +315,33 @@ describe('RouterFactory', () => {
     const result = factory._getRouter();
 
     expect(result).toBeDefined();
+  });
+
+  it('Should throw error if duplicate urls', () => {
+    let response;
+    const mockRoutes = {
+      routes: [
+        Route.get('/hello', () => {}),
+        Route.get('/hello/', () => {}),
+        Route.get('/v1/hey', () => {})
+      ],
+      subroutes: [
+        {
+          path: '/v1',
+          router: {
+            routes: [Route.get('/hey', () => {})]
+          }
+        }
+      ]
+    };
+    try {
+      new RouterFactory({})._handleDuplicateUrls(mockRoutes);
+    } catch (error) {
+      response = error;
+    }
+
+    expect(response.message).toEqual(
+      'Duplicate endpoints detected! -> get /hello/, get /v1/hey/'
+    );
   });
 });
