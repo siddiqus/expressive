@@ -6,6 +6,7 @@ const { errors: celebrateErrors } = require('celebrate');
 const responseMiddleware = require('./response');
 const RouteUtil = require('../RouteUtil');
 const AuthUtil = require('../AuthUtil');
+const CelebrateUtils = require('../CelebrateUtils');
 const SwaggerUtils = require('../SwaggerUtils');
 const registerRedoc = require('../redoc/registerRedoc');
 
@@ -24,6 +25,7 @@ module.exports = class MiddlewareManager {
 
     this.routeUtil = RouteUtil;
     this.authUtil = new AuthUtil();
+    this.celebrateUtils = new CelebrateUtils();
     this.SwaggerUtils = SwaggerUtils;
     this.registerRedoc = registerRedoc;
     this.celebrateErrors = celebrateErrors;
@@ -84,7 +86,7 @@ module.exports = class MiddlewareManager {
     }
   }
 
-  registerCelebrateMiddleware() {
+  registerCelebrateErrorHandler() {
     const { celebrateErrorHandler } = this.options;
     if (celebrateErrorHandler) {
       this.express.use(celebrateErrorHandler);
@@ -128,5 +130,14 @@ module.exports = class MiddlewareManager {
     console.log('Swagger doc up and running on /docs');
 
     this.registerRedoc(this.express, swaggerJson, '/docs/redoc');
+  }
+
+  registerAppLevelValidation() {
+    const { validationSchema } = this.options;
+    if (!validationSchema) return;
+
+    this.express.use(
+      this.celebrateUtils.getCelebrateMiddleware(validationSchema)
+    );
   }
 };

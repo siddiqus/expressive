@@ -151,7 +151,9 @@ describe('RouterFactory', () => {
     it('Should use celebrate validation schema', () => {
       const factory = new RouterFactory({});
 
-      factory.celebrateMiddleware = jest.fn().mockReturnValue(1);
+      factory.celebrateUtils = {
+        getCelebrateMiddleware: jest.fn().mockReturnValue(1)
+      };
 
       const mockExpressRouter = {
         get: jest.fn(),
@@ -178,9 +180,9 @@ describe('RouterFactory', () => {
         validationSchema: schema
       });
 
-      expect(factory.celebrateMiddleware).toHaveBeenCalledWith(schema, {
-        abortEarly: false
-      });
+      expect(
+        factory.celebrateUtils.getCelebrateMiddleware
+      ).toHaveBeenCalledWith(schema);
       expect(
         factory.routeUtil.getHandlerWithManagedNextCall
       ).toHaveBeenCalledTimes(2);

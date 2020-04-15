@@ -152,7 +152,7 @@ describe('Middleware Manager', () => {
     });
   });
 
-  describe('registerCelebrateMiddleware', () => {
+  describe('registerCelebrateErrorHandler', () => {
     it('Should register custom celebrate error middleware is provided', () => {
       const customCelebrateHandler = jest.fn();
 
@@ -168,7 +168,7 @@ describe('Middleware Manager', () => {
         },
         mockExpress
       );
-      manager.registerCelebrateMiddleware();
+      manager.registerCelebrateErrorHandler();
 
       expect(mockUse).toHaveBeenCalledWith(customCelebrateHandler);
     });
@@ -183,7 +183,7 @@ describe('Middleware Manager', () => {
 
       const mockCelebrateErrors = jest.fn().mockReturnValue(1);
       manager.celebrateErrors = mockCelebrateErrors;
-      manager.registerCelebrateMiddleware();
+      manager.registerCelebrateErrorHandler();
 
       expect(mockCelebrateErrors).toHaveBeenCalled();
       expect(mockUse).toHaveBeenCalledWith(1);
@@ -306,6 +306,44 @@ describe('Middleware Manager', () => {
       }
 
       expect(response).toBeInstanceOf(Error);
+    });
+  });
+
+  describe('registerAppLevelValidation', () => {
+    it('should not do anything if validationSchema is null', () => {
+      // setup
+      const options = {};
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const middlewareManager = new MiddlewareManager(options, mockExpress);
+      // execute
+      middlewareManager.registerAppLevelValidation();
+      // assert
+      expect(mockExpress.use).not.toHaveBeenCalled();
+    });
+
+    it('should register middleware if validationSchema is given at the app level', () => {
+      // setup
+      const options = {
+        validationSchema: {
+          some: 'validation'
+        }
+      };
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const middlewareManager = new MiddlewareManager(options, mockExpress);
+      middlewareManager.celebrateUtils = {
+        getCelebrateMiddleware: jest.fn().mockReturnValue(1)
+      };
+      // execute
+      middlewareManager.registerAppLevelValidation();
+      // assert
+      expect(mockExpress.use).toHaveBeenCalledWith(1);
+      expect(
+        middlewareManager.celebrateUtils.getCelebrateMiddleware
+      ).toHaveBeenCalledWith(options.validationSchema);
     });
   });
 });

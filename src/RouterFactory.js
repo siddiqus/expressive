@@ -1,6 +1,5 @@
 /* eslint-disable no-invalid-this */
 const { Router } = require('express');
-const { celebrate: celebrateMiddleware } = require('celebrate');
 const RouteUtil = require('./RouteUtil');
 const AuthUtil = require('./AuthUtil');
 const CelebrateUtils = require('./CelebrateUtils');
@@ -18,8 +17,7 @@ module.exports = class RouterFactory {
     this.expressiveOptions = expressiveOptions;
     this.routeUtil = RouteUtil;
     this.authUtil = new AuthUtil();
-    this.celebrateMiddleware = celebrateMiddleware;
-    this.CelebrateUtils = CelebrateUtils;
+    this.celebrateUtils = new CelebrateUtils();
   }
 
   async _executeController(controller, { req, res, next }) {
@@ -45,14 +43,12 @@ module.exports = class RouterFactory {
     };
   }
 
-  _registerCelebrateMiddleware(validationSchema, routerArgs) {
-    if (validationSchema) {
-      this.CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
-      routerArgs.push(
-        this.celebrateMiddleware(validationSchema, {
-          abortEarly: false
-        })
-      );
+  _registerCelebrateErrorHandler(validationSchema, routerArgs) {
+    const middleware = this.celebrateUtils.getCelebrateMiddleware(
+      validationSchema
+    );
+    if (middleware) {
+      routerArgs.push(middleware);
     }
   }
 
@@ -80,7 +76,7 @@ module.exports = class RouterFactory {
   ) {
     const routerArgs = [path];
 
-    this._registerCelebrateMiddleware(validationSchema, routerArgs);
+    this._registerCelebrateErrorHandler(validationSchema, routerArgs);
 
     this._setAuthorizerMiddleware(authorizer, routerArgs);
 
@@ -98,10 +94,11 @@ module.exports = class RouterFactory {
 
   _registerSubroute(
     router,
-    { path, router: subrouter, middleware = [], authorizer }
+    { path, router: subrouter, middleware = [], authorizer, validationSchema }
   ) {
     const routerArgs = [path];
 
+    this._registerCelebrateErrorHandler(validationSchema, routerArgs);
     this._setAuthorizerMiddleware(authorizer, routerArgs);
 
     const nextAdjustedMiddleware = middleware.map((m) =>

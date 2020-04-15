@@ -12,11 +12,7 @@ const postHello = Route.post('/hello', {
   validationSchema: {
     body: {
       name: Joi.string().empty().required()
-    },
-    headers: Joi.object({
-      Authorization: Joi.string().required(),
-      'X-Some-Header': Joi.string().valid('abc')
-    }).unknown(true)
+    }
   },
   authorizer: (req, res, next) => {
     if (req.headers.authorization !== '1234') {

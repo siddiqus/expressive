@@ -21,7 +21,8 @@ module.exports = class ExpressApp {
       helmetOptions = null,
       celebrateErrorHandler = null,
       notFoundHandler = null,
-      authObjectHandler = null
+      authObjectHandler = null,
+      validationSchema = null
     } = {}
   ) {
     this.config = {
@@ -38,7 +39,8 @@ module.exports = class ExpressApp {
       authorizer,
       celebrateErrorHandler,
       notFoundHandler,
-      authObjectHandler
+      authObjectHandler,
+      validationSchema
     };
     this.expressiveRouter = expressiveRouter;
 
@@ -69,6 +71,8 @@ module.exports = class ExpressApp {
 
     this.middlewareManager.configureCors();
 
+    this.middlewareManager.registerAppLevelValidation();
+
     this.middlewareManager.registerAuth();
 
     this.middlewareManager.registerBasicMiddleware();
@@ -77,7 +81,7 @@ module.exports = class ExpressApp {
 
     this.middlewareManager.registerNotFoundHandler();
 
-    this.middlewareManager.registerCelebrateMiddleware();
+    this.middlewareManager.registerCelebrateErrorHandler();
 
     if (this.config.errorHandler) {
       this.express.use(this.config.errorHandler);

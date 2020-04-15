@@ -1,4 +1,4 @@
-import { Route } from '../../src';
+import { Joi, Route } from '../../src';
 import type { ExpressiveRouter } from '../../src';
 import { helloRouter } from './routers/helloRouter';
 
@@ -11,7 +11,13 @@ export const router: ExpressiveRouter = {
   subroutes: [
     {
       path: '/v1',
-      router: helloRouter
+      router: helloRouter,
+      validationSchema: {
+        headers: Joi.object({
+          Authorization: Joi.string().required(),
+          'X-Some-Header': Joi.string().valid('abc')
+        }).unknown(true)
+      }
     }
   ]
 };

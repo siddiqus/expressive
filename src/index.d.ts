@@ -200,6 +200,7 @@ export declare interface ISubroute {
   router: ExpressiveRouter;
   authorizer?: AuthorizerType;
   middleware?: Handler[];
+  validationSchema?: ValidationSchema
 }
 
 export declare interface ExpressiveRouter {

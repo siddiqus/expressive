@@ -1,4 +1,5 @@
-const { Joi } = require('celebrate');
+const { celebrate: celebrateMiddleware, Joi } = require('celebrate');
+
 const Utils = require('./Utils');
 
 function _isJoiObject(obj) {
@@ -199,24 +200,7 @@ function _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters) {
   });
 }
 
-function joiSchemaToSwaggerRequestParameters(validationSchema) {
-  if (!validationSchema) return [];
-
-  const { query, params: path, headers: header, body } = validationSchema;
-
-  const parameters = [];
-  if (body && Object.keys(body).length > 0) {
-    parameters.push(_getSwaggerParamsForBody(body));
-  }
-
-  const parameterKeyMap = { query, path, header };
-  Utils.clearNullValuesInObject(parameterKeyMap);
-  _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters);
-
-  return parameters;
-}
-
-function lowercaseHeaderSchemaProperties(validationSchema) {
+function _lowercaseHeaderSchemaProperties(validationSchema) {
   if (!validationSchema.headers) return;
 
   const { headers } = validationSchema;
@@ -240,7 +224,33 @@ function lowercaseHeaderSchemaProperties(validationSchema) {
   }
 }
 
-module.exports = {
-  joiSchemaToSwaggerRequestParameters,
-  lowercaseHeaderSchemaProperties
+module.exports = class CelebrateUtils {
+  constructor() {
+    this.celebrateMiddleware = celebrateMiddleware;
+  }
+
+  joiSchemaToSwaggerRequestParameters(validationSchema) {
+    if (!validationSchema) return [];
+
+    const { query, params: path, headers: header, body } = validationSchema;
+
+    const parameters = [];
+    if (body && Object.keys(body).length > 0) {
+      parameters.push(_getSwaggerParamsForBody(body));
+    }
+
+    const parameterKeyMap = { query, path, header };
+    Utils.clearNullValuesInObject(parameterKeyMap);
+    _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters);
+
+    return parameters;
+  }
+
+  getCelebrateMiddleware(validationSchema) {
+    if (!validationSchema) return null;
+    _lowercaseHeaderSchemaProperties(validationSchema);
+    return this.celebrateMiddleware(validationSchema, {
+      abortEarly: false
+    });
+  }
 };

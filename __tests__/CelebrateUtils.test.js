@@ -16,7 +16,7 @@ describe('CelebrateUtils', () => {
         }
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -55,7 +55,7 @@ describe('CelebrateUtils', () => {
         })
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -83,7 +83,7 @@ describe('CelebrateUtils', () => {
         })
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -129,7 +129,7 @@ describe('CelebrateUtils', () => {
         }
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -199,7 +199,7 @@ describe('CelebrateUtils', () => {
         }
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -259,7 +259,7 @@ describe('CelebrateUtils', () => {
         }
       };
 
-      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+      const json = new CelebrateUtils().joiSchemaToSwaggerRequestParameters(
         validationSchema
       );
 
@@ -302,41 +302,48 @@ describe('CelebrateUtils', () => {
     });
   });
 
-  describe('lowercaseHeaderSchemaProperties', () => {
-    it('Should do nothing if no headers present', () => {
+  describe('getValidationMiddleware', () => {
+    it('Should return null if schema not provided', () => {
+      const middleware = new CelebrateUtils().getCelebrateMiddleware();
+      expect(middleware).toBeNull();
+    });
+
+    it('Should not lowercase if headers not object provided', () => {
       const validationSchema = {
         body: {
-          some: 'validation'
+          some: Joi.string()
         }
       };
 
-      CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
+      const util = new CelebrateUtils();
+      util.celebrateMiddleware = jest.fn().mockReturnValue(1);
 
-      expect(validationSchema).toEqual(validationSchema);
+      const middleware = util.getCelebrateMiddleware(validationSchema);
+
+      expect(middleware).toEqual(1);
+      expect(validationSchema.body.some).toBeDefined();
     });
 
     it('Should lowercase if headers object provided', () => {
       const validationSchema = {
         body: {
-          some: 'validation'
+          some: Joi.string()
         },
         headers: {
-          Authorization: 1234,
-          ContentType: 'json'
+          Authorization: Joi.string(),
+          ContentType: Joi.string()
         }
       };
 
-      CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
+      const util = new CelebrateUtils();
+      util.celebrateMiddleware = jest.fn().mockReturnValue(1);
 
-      expect(validationSchema).toEqual({
-        body: {
-          some: 'validation'
-        },
-        headers: {
-          authorization: 1234,
-          contenttype: 'json'
-        }
-      });
+      const middleware = util.getCelebrateMiddleware(validationSchema);
+
+      expect(middleware).toEqual(1);
+      expect(validationSchema.body.some).toBeDefined();
+      expect(validationSchema.headers.Authorization).not.toBeDefined();
+      expect(validationSchema.headers.authorization).toBeDefined();
     });
 
     it('Should lowercase if headers object provided as joi object', () => {
@@ -350,7 +357,9 @@ describe('CelebrateUtils', () => {
         })
       };
 
-      CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
+      const util = new CelebrateUtils();
+      util.celebrateMiddleware = jest.fn();
+      new CelebrateUtils().getCelebrateMiddleware(validationSchema);
 
       expect(JSON.stringify(validationSchema.headers)).toEqual(
         JSON.stringify(
