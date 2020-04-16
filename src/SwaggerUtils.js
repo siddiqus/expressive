@@ -64,6 +64,16 @@ function _setDocParameters(doc, validationSchema) {
     celebrateUtils.joiSchemaToSwaggerRequestParameters(validationSchema);
 }
 
+function _setDocTags(doc, path) {
+  doc.tags = doc.tags || [];
+  if (path === '/') return;
+
+  const basePath = path.split('/').filter(Boolean)[0];
+  if (basePath) {
+    doc.tags.push(basePath);
+  }
+}
+
 function _addPathDoc(paths, route, tags) {
   let { doc = {}, path, validationSchema, authorizer } = route;
   const { method } = route;
@@ -73,11 +83,12 @@ function _addPathDoc(paths, route, tags) {
   _setAuthorizerDocInDescription(doc, authorizer);
   _setDocParameters(doc, validationSchema);
   _setDocResponses(doc, validationSchema);
+  _setDocTags(doc, path);
 
   paths[path] = paths[path] || {};
   paths[path][method] = doc;
 
-  if (doc.tags) tags.push(...doc.tags);
+  tags.push(...doc.tags);
 }
 
 function _handleRedirects(paths, route) {
