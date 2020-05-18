@@ -259,7 +259,7 @@ describe('Middleware Manager', () => {
       }
 
       expect(response.message).toEqual(
-        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params, or is an empty function`
+        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params`
       );
     });
 

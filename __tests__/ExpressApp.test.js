@@ -20,7 +20,10 @@ describe('ExpressApp', () => {
           swaggerDefinitions: {},
           basePath: '/api',
           errorHandler: () => {},
-          authorizer: () => {},
+          authorizer: true,
+          authObjectHandler: (req, res) => {
+            console.log(req.authorizer);
+          },
           showSwaggerOnlyInDev: false,
           swaggerInfo: {}
         }

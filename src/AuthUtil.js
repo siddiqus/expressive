@@ -1,11 +1,5 @@
 const RouteUtil = require('./RouteUtil');
 
-function _isFunctionEmpty(fn) {
-  const fnStr = fn.toString();
-  const body = fnStr.substring(fnStr.indexOf('{') + 1, fnStr.lastIndexOf('}'));
-  return Boolean(body.trim().length === 0);
-}
-
 function _getUniqueArray(arr) {
   const strArray = arr.map((a) => a.toString());
   const uniqueStrArray = strArray.filter((value, index, self) => {
@@ -39,13 +33,10 @@ module.exports = class AuthUtil {
 
     const isObject = ['object', 'string'].includes(typeof authorizer);
 
-    if (
-      isObject &&
-      (!authObjectHandler || _isFunctionEmpty(authObjectHandler))
-    ) {
+    if (isObject && !authObjectHandler) {
       throw new Error(
         `'authorizer' object declared, but 'authObjectHandler' ` +
-          `is not defined in ExpressApp constructor params, or is an empty function`
+          `is not defined in ExpressApp constructor params`
       );
     }
 

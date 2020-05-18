@@ -118,7 +118,7 @@ export declare interface SwaggerEndpointDoc {
   tags?: string[];
 }
 
-type AuthorizerType = Handler | Handler[] | string | string[] | object | object[] | true;
+type AuthorizerType = Handler | Handler[] | string | string[] | object | object[];
 
 export declare interface IRouteParams {
   controller: string | Handler | typeof BaseController;

@@ -88,24 +88,7 @@ describe('AuthUtil', () => {
       // assert
 
       expect(result.message).toEqual(
-        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params, or is an empty function`
-      );
-    });
-
-    it('Should throw error if authorizer is defined but auth object handler is empty function', () => {
-      // setup
-      const authUtil = new AuthUtil();
-      // execute
-      let result;
-      try {
-        authUtil.getAuthorizerMiddleware([1, 2, 3], () => {});
-      } catch (error) {
-        result = error;
-      }
-      // assert
-
-      expect(result.message).toEqual(
-        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params, or is an empty function`
+        `'authorizer' object declared, but 'authObjectHandler' is not defined in ExpressApp constructor params`
       );
     });
 
