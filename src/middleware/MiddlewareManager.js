@@ -103,9 +103,9 @@ module.exports = class MiddlewareManager {
   }
 
   registerDocs(expressiveRouter) {
+    const env = process.env.NODE_ENV || 'development';
     const shouldRegister =
-      (this.options.showSwaggerOnlyInDev &&
-        process.env.NODE_ENV === 'development') ||
+      (this.options.showSwaggerOnlyInDev && env === 'development') ||
       !this.options.showSwaggerOnlyInDev;
 
     if (!shouldRegister) return;

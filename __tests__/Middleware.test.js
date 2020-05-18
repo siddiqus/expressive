@@ -1,6 +1,8 @@
 const response = require('../src/middleware/response');
 const MiddlewareManager = require('../src/middleware/MiddlewareManager');
 
+const OLD_ENV = process.env;
+
 describe('response middleware', () => {
   it('Should call fn properly', () => {
     const mockNext = jest.fn();
@@ -242,6 +244,57 @@ describe('Middleware Manager', () => {
         mockSwaggerJson,
         '/docs/swagger'
       );
+    });
+
+    describe('test without NODE_ENV', () => {
+      beforeEach(() => {
+        jest.resetModules(); // this is important - it clears the cache
+        process.env = { ...OLD_ENV };
+        delete process.env.NODE_ENV;
+      });
+
+      afterEach(() => {
+        process.env = OLD_ENV;
+      });
+
+      it('Should register with default NODE_ENV', () => {
+        const swaggerInfo = { name: 'John Smith' };
+        const mockRouter = {
+          some: 'routes'
+        };
+        const mockSwaggerDefinitions = {
+          some: 'Definition'
+        };
+
+        const options = {
+          basePath: '/',
+          swaggerInfo,
+          swaggerDefinitions: mockSwaggerDefinitions,
+          showSwaggerOnlyInDev: false
+        };
+
+        const mockExpress = {
+          get: jest.fn()
+        };
+        const manager = new MiddlewareManager(options, mockExpress);
+
+        const mockSwaggerHeader = { some: 'Header' };
+        const mockSwaggerJson = { hello: 'world' };
+        manager.SwaggerUtils = {
+          getSwaggerHeader: jest.fn().mockReturnValue(mockSwaggerHeader),
+          convertDocsToSwaggerDoc: jest.fn().mockReturnValue(mockSwaggerJson),
+          registerExpress: jest.fn()
+        };
+        manager.registerRedoc = jest.fn();
+
+        manager.registerDocs(mockRouter);
+
+        expect(manager.registerRedoc).toHaveBeenCalledWith(
+          mockExpress,
+          mockSwaggerJson,
+          '/docs/redoc'
+        );
+      });
     });
   });
 
