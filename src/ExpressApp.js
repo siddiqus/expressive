@@ -69,9 +69,9 @@ module.exports = class ExpressApp {
 
     this.middlewareManager.configureCors();
 
-    this.middlewareManager.registerAuth();
-
     this.middlewareManager.registerBasicMiddleware();
+
+    this.middlewareManager.registerAuth();
 
     this._registerRoutes();
 
