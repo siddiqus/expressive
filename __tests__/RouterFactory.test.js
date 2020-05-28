@@ -186,6 +186,43 @@ describe('RouterFactory', () => {
       ).toHaveBeenCalledTimes(2);
       expect(mockExpressRouter.get).toHaveBeenCalled();
     });
+
+    it('Should not use celebrate validation schema with file upload', () => {
+      const factory = new RouterFactory({});
+
+      factory.celebrateMiddleware = jest.fn().mockReturnValue(1);
+
+      const mockExpressRouter = {
+        get: jest.fn(),
+        use: jest.fn(),
+        post: jest.fn()
+      };
+
+      factory.routeUtil = {
+        getHandlerWithManagedNextCall: jest.fn()
+      };
+
+      const schema = {
+        fileUpload: {
+          someId: 1
+        }
+      };
+
+      factory._registerRoute(mockExpressRouter, {
+        method: 'get',
+        path: '/',
+        controller: BaseController,
+        middleware: [(req, res) => 1, (req, res) => 2],
+        authorizer: (req, res) => {},
+        validationSchema: schema
+      });
+
+      expect(factory.celebrateMiddleware).not.toHaveBeenCalledWith(schema);
+      expect(
+        factory.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledTimes(2);
+      expect(mockExpressRouter.get).toHaveBeenCalled();
+    });
   });
 
   describe('_registerSubroute', () => {

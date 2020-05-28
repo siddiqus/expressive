@@ -45,11 +45,32 @@ module.exports = class RouterFactory {
     };
   }
 
+  _getSanitizedValidationSchema(validationSchema) {
+    if (!validationSchema) return null;
+
+    if (
+      validationSchema.fileUpload &&
+      Object.keys(validationSchema).length === 1
+    ) {
+      return null;
+    }
+
+    const newValidationSchema = { ...validationSchema };
+    delete newValidationSchema.fileUpload;
+    return newValidationSchema;
+  }
+
   _registerCelebrateMiddleware(validationSchema, routerArgs) {
-    if (validationSchema) {
-      this.CelebrateUtils.lowercaseHeaderSchemaProperties(validationSchema);
+    const sanitizedValidationSchema = this._getSanitizedValidationSchema(
+      validationSchema
+    );
+
+    if (sanitizedValidationSchema) {
+      this.CelebrateUtils.lowercaseHeaderSchemaProperties(
+        sanitizedValidationSchema
+      );
       routerArgs.push(
-        this.celebrateMiddleware(validationSchema, {
+        this.celebrateMiddleware(sanitizedValidationSchema, {
           abortEarly: false
         })
       );
@@ -98,9 +119,17 @@ module.exports = class RouterFactory {
 
   _registerSubroute(
     router,
-    { path, router: subrouter, middleware = [], authorizer }
+    {
+      path,
+      router: subrouter,
+      authorizer,
+      validationSchema = null,
+      middleware = []
+    }
   ) {
     const routerArgs = [path];
+
+    this._registerCelebrateMiddleware(validationSchema, routerArgs);
 
     this._setAuthorizerMiddleware(authorizer, routerArgs);
 

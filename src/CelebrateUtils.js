@@ -138,12 +138,18 @@ function _getAllSwaggerParamsFromValidationSchema(schema, paramIn) {
     const joiSchema = schema[key];
     const schemaDefinition = _getSchemaDefinitionForSwagger(joiSchema);
     const isRequired = joiSchema._flags.presence === 'required';
-    return {
+    const swaggerParams = {
       name: key,
       in: paramIn,
       required: isRequired,
       schema: schemaDefinition
     };
+
+    if (paramIn === 'fileUpload') {
+      swaggerParams.type = 'file';
+      swaggerParams.in = 'formData';
+    }
+    return swaggerParams;
   });
 }
 
@@ -202,14 +208,20 @@ function _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters) {
 function joiSchemaToSwaggerRequestParameters(validationSchema) {
   if (!validationSchema) return [];
 
-  const { query, params: path, headers: header, body } = validationSchema;
+  const {
+    query,
+    params: path,
+    headers: header,
+    body,
+    fileUpload
+  } = validationSchema;
 
   const parameters = [];
   if (body && Object.keys(body).length > 0) {
     parameters.push(_getSwaggerParamsForBody(body));
   }
 
-  const parameterKeyMap = { query, path, header };
+  const parameterKeyMap = { query, path, header, fileUpload };
   Utils.clearNullValuesInObject(parameterKeyMap);
   _addSwaggerParamsForNonBodyProps(parameterKeyMap, parameters);
 

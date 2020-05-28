@@ -43,18 +43,23 @@ module.exports = class MiddlewareManager {
     this.express.use(helmet);
   }
 
-  registerBasicMiddleware() {
-    const { middleware: userMiddleware } = this.options;
+  _registerBodyParser() {
     this.express.use(
       this.expressModule.json({
         limit: this.options.bodyLimit
       })
     );
+    this.express.use(this.expressModule.urlencoded({ extended: true }));
+  }
+
+  registerBasicMiddleware() {
+    this._registerBodyParser();
     this.express.use(responseMiddleware);
     this.express.use(this.addRequestId());
 
     this._registerHelmet();
 
+    const { middleware: userMiddleware } = this.options;
     if (userMiddleware && userMiddleware.length > 0) {
       const nextManagedMiddlewares = userMiddleware.map((m) =>
         this.routeUtil.getHandlerWithManagedNextCall(m)

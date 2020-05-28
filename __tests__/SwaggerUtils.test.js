@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const SwaggerUtils = require('../src/SwaggerUtils');
+const { Joi } = require('celebrate');
 
 const mockRouterWithTopRoutes = {
   routes: [
@@ -207,6 +208,33 @@ describe('SwaggerUtils', () => {
       expect(
         swaggerstr.includes(`Schema validation error response`)
       ).toBeTruthy();
+    });
+
+    it('Should write json for swagger with file upload defined', () => {
+      const mockRoutes1 = { routes: [] };
+      mockRoutes1.routes.push({
+        path: '/hey',
+        controller: () => {},
+        method: 'get',
+        doc: {
+          summary: 'hey route',
+          responses: {
+            200: {}
+          }
+        },
+        authorizer: ['hello'],
+        validationSchema: {
+          fileUpload: {
+            file: Joi.any().required()
+          }
+        }
+      });
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      expect(swaggerDoc).toBeDefined();
+
+      const swaggerstr = JSON.stringify(swaggerDoc);
+      expect(swaggerstr.includes(`multipart/form-data`)).toBeTruthy();
     });
 
     it('Should write json for swagger with responses defined for validation', () => {
