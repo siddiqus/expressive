@@ -15,9 +15,6 @@ export const router: ExpressiveRouter = {
       validationSchema: {
         fileUpload: {
           file: Joi.any().required()
-        },
-        query: {
-          check: Joi.bool().required()
         }
       },
       middleware: [
