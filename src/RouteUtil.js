@@ -52,10 +52,24 @@ class RouteUtil {
         await handler(req, res, next);
 
         if (handler.length !== 3) {
-          next();
+          return next();
         }
       } catch (error) {
-        next(error);
+        return next(error);
+      }
+    };
+  }
+
+  static getErrorHandlerWithManagedNextCall(handler) {
+    return async (err, req, res, next) => {
+      try {
+        await handler(err, req, res, next);
+
+        if (handler.length !== 4) {
+          return next();
+        }
+      } catch (error) {
+        return next(error);
       }
     };
   }

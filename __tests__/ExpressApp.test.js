@@ -52,7 +52,7 @@ describe('ExpressApp', () => {
       expect(app.express).toBeDefined();
     });
 
-    it('Should register proper error handler for array', () => {
+    it('Should register proper error handler for array', async () => {
       const app = new ExpressApp(
         {},
         {
@@ -71,9 +71,12 @@ describe('ExpressApp', () => {
       app.express = {
         use: jest.fn()
       };
+
       app.config.errorHandler = [
         (err, req, res) => ({ err, req, res, next: 1 }),
-        (err, req, res, next) => ({ err, req, res, next })
+        (err, req, res, next) => {
+          return next();
+        }
       ];
 
       app._registerErrorHandlers();
@@ -82,22 +85,14 @@ describe('ExpressApp', () => {
       expect(app.express.use.mock.calls[0][0][0].length).toEqual(4);
       expect(app.express.use.mock.calls[0][0][1].length).toEqual(4);
 
-      expect(app.express.use.mock.calls[0][0][0](1, 2, 3)).toEqual({
-        err: 1,
-        req: 2,
-        res: 3,
-        next: 1
-      });
+      const mockNext = jest.fn().mockReturnValue(123);
+      await app.express.use.mock.calls[0][0][0](1, 2, 3, mockNext);
+      await app.express.use.mock.calls[0][0][1](1, 2, 3, mockNext);
 
-      expect(app.express.use.mock.calls[0][0][1](1, 2, 3, 4)).toEqual({
-        err: 1,
-        req: 2,
-        res: 3,
-        next: 4
-      });
+      expect(mockNext).toHaveBeenCalledTimes(2);
     });
 
-    it('Should register proper error handler for single function', () => {
+    it('Should register proper error handler for single function', async () => {
       const app = new ExpressApp(
         {},
         {
@@ -120,14 +115,17 @@ describe('ExpressApp', () => {
 
       app._registerErrorHandlers();
 
+      const mockNext = jest.fn().mockReturnValue(123);
+
       expect(app.express.use).toHaveBeenCalledTimes(1);
       expect(app.express.use.mock.calls[0][0].length).toEqual(4);
-      expect(app.express.use.mock.calls[0][0](1, 2, 3)).toEqual({
-        err: 1,
-        req: 2,
-        res: 3,
-        next: 1
-      });
+      const handlerResponse = await app.express.use.mock.calls[0][0](
+        1,
+        2,
+        3,
+        mockNext
+      );
+      expect(handlerResponse).toEqual(123);
     });
   });
 });

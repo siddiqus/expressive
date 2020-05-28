@@ -4,10 +4,6 @@ const RouteUtil = require('./RouteUtil');
 const AuthUtil = require('./AuthUtil');
 const MiddlewareManager = require('./middleware/MiddlewareManager');
 
-function getWrappedErrorHandler(e) {
-  return (err, req, res, next) => e(err, req, res, next);
-}
-
 module.exports = class ExpressApp {
   constructor(
     expressiveRouter,
@@ -74,10 +70,12 @@ module.exports = class ExpressApp {
     let errorHandler;
     if (Array.isArray(this.config.errorHandler)) {
       errorHandler = this.config.errorHandler.map((e) =>
-        getWrappedErrorHandler(e)
+        this.routeUtil.getErrorHandlerWithManagedNextCall(e)
       );
     } else {
-      errorHandler = getWrappedErrorHandler(this.config.errorHandler);
+      errorHandler = this.routeUtil.getErrorHandlerWithManagedNextCall(
+        this.config.errorHandler
+      );
     }
     this.express.use(errorHandler);
   }
