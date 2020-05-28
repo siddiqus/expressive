@@ -1,4 +1,5 @@
-const { Joi } = require('celebrate');
+/* eslint-disable new-cap */
+const { Joi, CelebrateError, Segments } = require('celebrate');
 const Utils = require('./Utils');
 
 function _isJoiObject(obj) {
@@ -252,7 +253,45 @@ function lowercaseHeaderSchemaProperties(validationSchema) {
   }
 }
 
+function getSanitizedValidationSchema(validationSchema) {
+  if (
+    validationSchema.fileUpload &&
+    Object.keys(validationSchema).length === 1
+  ) {
+    return null;
+  }
+
+  const newValidationSchema = { ...validationSchema };
+  delete newValidationSchema.fileUpload;
+  return newValidationSchema;
+}
+
+function getCelebrateValidationMiddlewareForFileUpload(fileUploadValidation) {
+  let schema = fileUploadValidation;
+  if (!_isJoiObject(schema)) {
+    schema = Joi.object(fileUploadValidation);
+  }
+
+  return async (req, _, next) => {
+    const { file, files } = req;
+    const testObj = {
+      ...(file && { file }),
+      ...(files && { files })
+    };
+
+    try {
+      await schema.validateAsync(testObj);
+      return next();
+    } catch (error) {
+      error.isJoi = true;
+      return next(CelebrateError(error, Segments.BODY, { celebrated: true }));
+    }
+  };
+}
+
 module.exports = {
   joiSchemaToSwaggerRequestParameters,
-  lowercaseHeaderSchemaProperties
+  lowercaseHeaderSchemaProperties,
+  getCelebrateValidationMiddlewareForFileUpload,
+  getSanitizedValidationSchema
 };

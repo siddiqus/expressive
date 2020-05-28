@@ -45,23 +45,10 @@ module.exports = class RouterFactory {
     };
   }
 
-  _getSanitizedValidationSchema(validationSchema) {
-    if (!validationSchema) return null;
-
-    if (
-      validationSchema.fileUpload &&
-      Object.keys(validationSchema).length === 1
-    ) {
-      return null;
-    }
-
-    const newValidationSchema = { ...validationSchema };
-    delete newValidationSchema.fileUpload;
-    return newValidationSchema;
-  }
-
   _registerCelebrateErrorMiddleware(validationSchema, routerArgs) {
-    const sanitizedValidationSchema = this._getSanitizedValidationSchema(
+    if (!validationSchema) return;
+
+    const sanitizedValidationSchema = this.CelebrateUtils.getSanitizedValidationSchema(
       validationSchema
     );
 
@@ -88,6 +75,33 @@ module.exports = class RouterFactory {
     }
   }
 
+  _setFileUploadValidationMiddleware(validationSchema, routerArgs) {
+    if (!validationSchema || !validationSchema.fileUpload) return;
+
+    routerArgs.push(
+      this.CelebrateUtils.getCelebrateValidationMiddlewareForFileUpload(
+        validationSchema.fileUpload
+      )
+    );
+  }
+
+  _registerMiddleware(
+    routerArgs,
+    { validationSchema, authorizer, middleware }
+  ) {
+    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
+
+    this._setAuthorizerMiddleware(authorizer, routerArgs);
+
+    const nextAdjustedMiddleware = !middleware
+      ? []
+      : middleware.map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
+
+    routerArgs.push(...nextAdjustedMiddleware);
+
+    this._setFileUploadValidationMiddleware(validationSchema, routerArgs);
+  }
+
   _registerRoute(
     router,
     {
@@ -101,18 +115,13 @@ module.exports = class RouterFactory {
   ) {
     const routerArgs = [path];
 
-    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
+    this._registerMiddleware(routerArgs, {
+      validationSchema,
+      authorizer,
+      middleware
+    });
 
-    this._setAuthorizerMiddleware(authorizer, routerArgs);
-
-    const nextAdjustedMiddleware = !middleware
-      ? []
-      : middleware.map((m) => this.routeUtil.getHandlerWithManagedNextCall(m));
-
-    routerArgs.push(
-      ...nextAdjustedMiddleware,
-      this._getWrappedController(controller)
-    );
+    routerArgs.push(this._getWrappedController(controller));
 
     router[method](...routerArgs);
   }
@@ -129,18 +138,13 @@ module.exports = class RouterFactory {
   ) {
     const routerArgs = [path];
 
-    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
+    this._registerMiddleware(routerArgs, {
+      validationSchema,
+      authorizer,
+      middleware
+    });
 
-    this._setAuthorizerMiddleware(authorizer, routerArgs);
-
-    const nextAdjustedMiddleware = middleware.map((m) =>
-      this.routeUtil.getHandlerWithManagedNextCall(m)
-    );
-
-    routerArgs.push(
-      ...nextAdjustedMiddleware,
-      this.getExpressRouter(subrouter)
-    );
+    routerArgs.push(this.getExpressRouter(subrouter));
 
     router.use(...routerArgs);
   }
