@@ -60,7 +60,7 @@ module.exports = class RouterFactory {
     return newValidationSchema;
   }
 
-  _registerCelebrateMiddleware(validationSchema, routerArgs) {
+  _registerCelebrateErrorMiddleware(validationSchema, routerArgs) {
     const sanitizedValidationSchema = this._getSanitizedValidationSchema(
       validationSchema
     );
@@ -101,7 +101,7 @@ module.exports = class RouterFactory {
   ) {
     const routerArgs = [path];
 
-    this._registerCelebrateMiddleware(validationSchema, routerArgs);
+    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
 
     this._setAuthorizerMiddleware(authorizer, routerArgs);
 
@@ -129,7 +129,7 @@ module.exports = class RouterFactory {
   ) {
     const routerArgs = [path];
 
-    this._registerCelebrateMiddleware(validationSchema, routerArgs);
+    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
 
     this._setAuthorizerMiddleware(authorizer, routerArgs);
 

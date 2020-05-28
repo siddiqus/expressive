@@ -89,7 +89,7 @@ module.exports = class MiddlewareManager {
     }
   }
 
-  registerCelebrateMiddleware() {
+  registerCelebrateErrorMiddleware() {
     const { celebrateErrorHandler } = this.options;
     if (celebrateErrorHandler) {
       this.express.use(celebrateErrorHandler);

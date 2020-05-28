@@ -64,6 +64,21 @@ module.exports = class ExpressApp {
     this.express.use(this.config.basePath, expressRouter);
   }
 
+  _registerErrorHandlers() {
+    if (!this.config.errorHandler) return;
+
+    let errorHandler;
+    if (Array.isArray(this.config.errorHandler)) {
+      errorHandler = this.config.errorHandler.map(
+        (e) => (err, req, res, next) => e(err, req, res, next)
+      );
+    } else {
+      errorHandler = (err, req, res, next) =>
+        this.config.errorHandler(err, req, res, next);
+    }
+    this.express.use(errorHandler);
+  }
+
   registerHandlers() {
     this.middlewareManager.registerDocs(this.expressiveRouter);
 
@@ -77,10 +92,8 @@ module.exports = class ExpressApp {
 
     this.middlewareManager.registerNotFoundHandler();
 
-    this.middlewareManager.registerCelebrateMiddleware();
+    this.middlewareManager.registerCelebrateErrorMiddleware();
 
-    if (this.config.errorHandler) {
-      this.express.use(this.config.errorHandler);
-    }
+    this._registerErrorHandlers();
   }
 };

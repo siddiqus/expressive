@@ -13,7 +13,7 @@ const swaggerInfo = {
   }
 };
 
-function centralizedErrorHandler(err, req, res, next) {
+function centralizedErrorHandler(err, req, res) {
   res.status(500).json({
     message: err.message
   });
