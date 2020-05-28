@@ -107,7 +107,10 @@ export declare interface ValidationSchema {
   headers?: object;
   cookies?: object;
   signedCookies?: object;
-  fileUpload?: object;
+  fileUpload?: {
+    file?: object,
+    files?: object
+  }
 }
 
 interface ResponseMap {

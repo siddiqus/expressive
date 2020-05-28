@@ -9,7 +9,7 @@ const uploadFile = multer();
 export const router: ExpressiveRouter = {
   routes: [
     Route.get('/health', {
-      controller: (req, res) => res.json({ hello: 'world' })
+      controller: (_, res) => res.json({ hello: 'world' })
     }),
     Route.put('/file-upload', {
       validationSchema: {

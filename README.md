@@ -34,6 +34,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 - [Request validation using Celebrate](#request-validation-using-celebrate)
 - [Centralized authorization](#centralized-authorization)
 - [Auto-generated documentation with Swagger](#documentation-with-swagger)
+- [File upload example with [multer](https://npmjs.org/package/multer)](#file-upload)
 - [Example applications (Both TypeScript and ES5)](#example)
 
 \*Table of contents generated with [markdown-toc](http://ecotrust-canada.github.io/markdown-toc/)
@@ -486,13 +487,13 @@ const app = new ExpressApp(expressiveRouter, {
     // in our case, req.authorizer = [{ some: 'permission-criteria' }]
     // some logic to authorize the user
     const hasPermissions = authorizer.filter(
-      a => a.permissions === user.permissions
-    )
+      (a) => a.permissions === user.permissions
+    );
 
-    if(!hasPermissions.length) {
+    if (!hasPermissions.length) {
       res.status(401).json({
-        message: "Unauthorized"
-      })
+        message: 'Unauthorized'
+      });
     }
   }
 });
@@ -591,6 +592,43 @@ SwaggerUtils.writeSwaggerJson(
   outputPath // absolute path of output file
 );
 ```
+
+# File upload
+
+The recommended middleware for file uploads is [multer](https://www.npmjs.com/package/multer). Currently Typescript support is available for `req.file` and `req.files` but you can declare your own `req` type if you need.
+
+Here's an example using `multer`, with schema validation:
+
+```javascript
+import { Route, Joi } from '@siddiqus/expressive';
+import multer from 'multer';
+
+const uploadFile = multer();
+
+const fileUploadRoute = Route.put('/file-upload', {
+  validationSchema: {
+    fileUpload: {
+      file: Joi.any().required() // use Joi.any() for any validations
+    }
+  },
+  middleware: [uploadFile.single('file')], // adding multer middleware
+  controller: (req, res) => {
+    const file = req.file;
+    const filename = file.originalname;
+    const content = file.buffer.toString();
+    res.json({
+      filename,
+      content
+    });
+  }
+});
+```
+
+This provides two benefits:
+1. Celebrate error handling with validate the form data according to the schema
+2. Generates swagger doc for file upload
+
+*** Current limitation is the `fileUpload` in `validationSchema` is limited to `file` and `files`, which means the `formData` property has to be either `file` or `files` for this to work. You can use `multer`'s other methods like `fields`, but in that case, you won't be able to name the field anything other than `file` or `files`.
 
 # Examples
 

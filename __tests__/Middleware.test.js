@@ -158,7 +158,7 @@ describe('Middleware Manager', () => {
     });
   });
 
-  describe('registerCelebrateMiddleware', () => {
+  describe('registerCelebrateErrorMiddleware', () => {
     it('Should register custom celebrate error middleware is provided', () => {
       const customCelebrateHandler = jest.fn();
 
@@ -174,7 +174,7 @@ describe('Middleware Manager', () => {
         },
         mockExpress
       );
-      manager.registerCelebrateMiddleware();
+      manager.registerCelebrateErrorMiddleware();
 
       expect(mockUse).toHaveBeenCalledWith(customCelebrateHandler);
     });
@@ -189,7 +189,7 @@ describe('Middleware Manager', () => {
 
       const mockCelebrateErrors = jest.fn().mockReturnValue(1);
       manager.celebrateErrors = mockCelebrateErrors;
-      manager.registerCelebrateMiddleware();
+      manager.registerCelebrateErrorMiddleware();
 
       expect(mockCelebrateErrors).toHaveBeenCalled();
       expect(mockUse).toHaveBeenCalledWith(1);

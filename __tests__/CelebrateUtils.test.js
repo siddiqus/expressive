@@ -362,4 +362,74 @@ describe('CelebrateUtils', () => {
       );
     });
   });
+
+  describe('getCelebrateValidationMiddlewareForFileUpload', () => {
+    it('should return proper handler with non joi object - no error', async () => {
+      const fileUpload = {
+        file: Joi.any().required()
+      };
+
+      const handler = CelebrateUtils.getCelebrateValidationMiddlewareForFileUpload(
+        fileUpload
+      );
+
+      const mockNext = jest.fn();
+      const mockReq = {
+        file: 'some file'
+      };
+      await handler(mockReq, null, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it('should return proper handler with non joi object - no error - multiple files', async () => {
+      const fileUpload = {
+        files: Joi.any().required()
+      };
+
+      const handler = CelebrateUtils.getCelebrateValidationMiddlewareForFileUpload(
+        fileUpload
+      );
+
+      const mockNext = jest.fn();
+      const mockReq = {
+        files: ['some files']
+      };
+      await handler(mockReq, null, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith();
+    });
+
+    it('should return proper handler with non joi object - with error', async () => {
+      const fileUpload = {
+        file: Joi.any().required()
+      };
+
+      const handler = CelebrateUtils.getCelebrateValidationMiddlewareForFileUpload(
+        fileUpload
+      );
+
+      const mockNext = jest.fn();
+      const mockReq = {};
+      await handler(mockReq, null, mockNext);
+
+      expect(mockNext.mock.calls[0][0].message).toEqual(`"file" is required`);
+    });
+
+    it('should return proper handler with joi object - with error', async () => {
+      const fileUpload = Joi.object({
+        file: Joi.any().required()
+      });
+
+      const handler = CelebrateUtils.getCelebrateValidationMiddlewareForFileUpload(
+        fileUpload
+      );
+
+      const mockNext = jest.fn();
+      const mockReq = {};
+      await handler(mockReq, null, mockNext);
+
+      expect(mockNext.mock.calls[0][0].message).toEqual(`"file" is required`);
+    });
+  });
 });
