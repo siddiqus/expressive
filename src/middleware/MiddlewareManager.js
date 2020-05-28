@@ -50,6 +50,7 @@ module.exports = class MiddlewareManager {
         limit: this.options.bodyLimit
       })
     );
+    this.express.use(this.expressModule.urlencoded({ extended: true }));
     this.express.use(responseMiddleware);
     this.express.use(this.addRequestId());
 

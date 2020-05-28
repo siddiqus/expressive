@@ -33,7 +33,8 @@ describe('Middleware Manager', () => {
         mockExpress
       );
       manager.expressModule = {
-        json: jest.fn().mockReturnValue(1)
+        json: jest.fn().mockReturnValue(1),
+        urlencoded: jest.fn().mockReturnValue(5)
       };
       manager.addRequestId = jest.fn().mockReturnValue(2);
       manager.helmet = jest.fn().mockReturnValue(3);
@@ -43,17 +44,18 @@ describe('Middleware Manager', () => {
 
       manager.registerBasicMiddleware();
 
-      expect(mockExpress.use).toHaveBeenCalledTimes(5);
+      expect(mockExpress.use).toHaveBeenCalledTimes(6);
 
       expect(manager.expressModule.json).toHaveBeenCalledWith({
         limit: manager.options.bodyLimit
       });
 
       expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
-      expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
-      expect(mockExpress.use.mock.calls[2][0]).toEqual(2);
-      expect(mockExpress.use.mock.calls[3][0]).toEqual(3);
-      expect(mockExpress.use.mock.calls[4][0]).toEqual(mockUserMiddleware);
+      expect(mockExpress.use.mock.calls[1][0]).toEqual(5);
+      expect(mockExpress.use.mock.calls[2][0]).toEqual(response);
+      expect(mockExpress.use.mock.calls[3][0]).toEqual(2);
+      expect(mockExpress.use.mock.calls[4][0]).toEqual(3);
+      expect(mockExpress.use.mock.calls[5][0]).toEqual(mockUserMiddleware);
     });
 
     it('Should register defaults without user middleware', () => {
@@ -62,21 +64,23 @@ describe('Middleware Manager', () => {
       };
       const manager = new MiddlewareManager({}, mockExpress);
       manager.expressModule = {
-        json: jest.fn().mockReturnValue(1)
+        json: jest.fn().mockReturnValue(1),
+        urlencoded: jest.fn().mockReturnValue(2)
       };
-      manager.addRequestId = jest.fn().mockReturnValue(2);
+      manager.addRequestId = jest.fn().mockReturnValue(3);
 
       manager.registerBasicMiddleware();
 
-      expect(mockExpress.use).toHaveBeenCalledTimes(4); // registering 4 middleware
+      expect(mockExpress.use).toHaveBeenCalledTimes(5); // registering 4 middleware
 
       expect(manager.expressModule.json).toHaveBeenCalledWith({
         limit: manager.options.bodyLimit
       });
 
       expect(mockExpress.use.mock.calls[0][0]).toEqual(1);
-      expect(mockExpress.use.mock.calls[1][0]).toEqual(response);
-      expect(mockExpress.use.mock.calls[2][0]).toEqual(2);
+      expect(mockExpress.use.mock.calls[1][0]).toEqual(2);
+      expect(mockExpress.use.mock.calls[2][0]).toEqual(response);
+      expect(mockExpress.use.mock.calls[3][0]).toEqual(3);
     });
   });
 

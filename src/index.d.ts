@@ -23,6 +23,8 @@ interface Request<
   ReqBody = any,
   ReqQuery = CoreQuery
   > extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
+  file: any;
+  files: any[];
   authorizer?: AuthorizerType;
   user?: any;
   permissions?: any;
@@ -105,6 +107,7 @@ export declare interface ValidationSchema {
   headers?: object;
   cookies?: object;
   signedCookies?: object;
+  fileUpload?: object;
 }
 
 interface ResponseMap {
@@ -200,7 +203,14 @@ export declare interface ISubroute {
   router: ExpressiveRouter;
   authorizer?: AuthorizerType;
   middleware?: Handler[];
+  validationSchema?: ValidationSchema;
 }
+
+export declare function subroute(
+  path: string,
+  router: ExpressiveRouter,
+  options: Pick<ISubroute, 'authorizer' | 'middleware' | 'validationSchema'>
+): ISubroute
 
 export declare interface ExpressiveRouter {
   routes?: IEndpoint[];

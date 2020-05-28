@@ -62,6 +62,10 @@ function _setAuthorizerDocInDescription(doc, authorizer) {
 function _setDocParameters(doc, validationSchema) {
   doc.parameters =
     doc.parameters || joiSchemaToSwaggerRequestParameters(validationSchema);
+
+  if (doc.parameters.find((p) => p.type === 'file')) {
+    doc.consumes = ['multipart/form-data'];
+  }
 }
 
 function _addPathDoc(paths, route, tags) {
