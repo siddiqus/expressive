@@ -516,7 +516,7 @@ Firstly, Expressive auto generates Swagger documentation from the declared route
 
 Swagger UI is accessible on the url `/docs`, and it requires basic authentication. The default value for both user and password is `admin`.
 
-To set your own username and password, you can use the environment variables `EXPRESS_SWAGGER_USER` and `EXPRESS_SWAGGER_PASSWORD`
+To set your own username and password, set the environment variables `EXPRESS_SWAGGER_USER` and `EXPRESS_SWAGGER_PASSWORD` respectively.
 
 #### Swagger options
 
