@@ -8,7 +8,7 @@ const app = new ExpressApp(router, {
     res.json({
       message: err.message
     });
-  }
+  },
 });
 
 app.listen(3001, () => console.log('Running on port 3001'));

@@ -512,6 +512,35 @@ Firstly, Expressive auto generates Swagger documentation from the declared route
 - For any project, if you declare basic routes, then the swagger will at least show you the routes that are available on the server.
 - If you declare a request validation schema with [celebrate](https://www.npmjs.com/package/celebrate) syntax, then Swagger parameter definitions will also be auto-generated.
 
+---
+
+Swagger UI is accessible on the url `/docs`, and it requires basic authentication. The default value for both user and password is `admin`.
+
+To set your own username and password, you can use the environment variables `EXPRESS_SWAGGER_USER` and `EXPRESS_SWAGGER_PASSWORD`
+
+#### Swagger options
+
+You can initialize your app with the basic swagger 'info' property as shown below:
+
+```javascript
+const { ExpressApp } = require('@siddiqus/expressive');
+
+const swaggerInfo = {
+  version: '1.0.0',
+  title: 'Example Expressive App',
+  contact: {
+    name: 'Sabbir Siddiqui',
+    email: 'sabbir.m.siddiqui@gmail.com'
+  }
+};
+
+const app = new ExpressApp(router, {
+  allowCors: true,
+  swaggerInfo: swaggerInfo,
+  showSwaggerOnlyInDev: true // default value is true, set to false to enable swagger for non-development environments
+});
+```
+
 #### Declaring docs manually
 
 Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
@@ -527,7 +556,7 @@ const getUserById = Route.get(
 );
 ```
 
-The 'GetUserByIdDocJs' JS or JSON could be something like this:
+The 'GetUserByIdDocJs' JS or JSON could be an Open API 2.x specification JSON, for example:
 
 ```javascript
 {
@@ -552,31 +581,7 @@ The 'GetUserByIdDocJs' JS or JSON could be something like this:
 }
 ```
 
-In Development, Swagger docs can be seen at the url http://localhost:8080/docs (basically /docs after your app URL in _Dev_).
-
----
-
-You can initialize your app with the basic swagger 'info' property as shown below:
-
-```javascript
-const { ExpressApp } = require('@siddiqus/expressive');
-
-const swaggerInfo = {
-  version: '1.0.0',
-  title: 'Example Expressive App',
-  contact: {
-    name: 'Sabbir Siddiqui',
-    email: 'sabbir.m.siddiqui@gmail.com'
-  }
-};
-
-const app = new ExpressApp(router, {
-  allowCors: true,
-  swaggerInfo: swaggerInfo
-});
-```
-
----
+#### Writing Swagger specs to a JSON file
 
 To create a swagger.json file, the function `writeSwaggerJson` can be used from the `SwaggerUtils` export. Example:
 
@@ -625,10 +630,11 @@ const fileUploadRoute = Route.put('/file-upload', {
 ```
 
 This provides two benefits:
+
 1. Celebrate error handling with validate the form data according to the schema
 2. Generates swagger doc for file upload
 
-*** Current limitation is the `fileUpload` in `validationSchema` is limited to `file` and `files`, which means the `formData` property has to be either `file` or `files` for this to work. You can use `multer`'s other methods like `fields`, but in that case, you won't be able to name the field anything other than `file` or `files`.
+\*\*\* Current limitation is the `fileUpload` in `validationSchema` is limited to `file` and `files`, which means the `formData` property has to be either `file` or `files` for this to work. You can use `multer`'s other methods like `fields`, but in that case, you won't be able to name the field anything other than `file` or `files`.
 
 # Examples
 

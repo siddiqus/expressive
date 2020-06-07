@@ -229,11 +229,15 @@ describe('Middleware Manager', () => {
 
       manager.registerDocs(mockRouter);
 
-      expect(manager.registerRedoc).toHaveBeenCalledWith(
-        mockExpress,
-        mockSwaggerJson,
-        '/docs/redoc'
-      );
+      expect(manager.registerRedoc).toHaveBeenCalledWith({
+        app: mockExpress,
+        swaggerJson: mockSwaggerJson,
+        url: '/docs/redoc',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
       expect(manager.SwaggerUtils.getSwaggerHeader).toHaveBeenCalledWith(
         '/',
         swaggerInfo
@@ -243,11 +247,83 @@ describe('Middleware Manager', () => {
         mockSwaggerHeader,
         mockSwaggerDefinitions
       );
-      expect(manager.SwaggerUtils.registerExpress).toHaveBeenCalledWith(
-        manager.express,
-        mockSwaggerJson,
-        '/docs/swagger'
-      );
+      expect(manager.SwaggerUtils.registerExpress).toHaveBeenCalledWith({
+        app: manager.express,
+        swaggerJson: mockSwaggerJson,
+        url: '/docs/swagger',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
+    });
+
+    describe('test with env set username and password for swagger', () => {
+      beforeEach(() => {
+        jest.resetModules(); // this is important - it clears the cache
+        process.env = {
+          ...OLD_ENV,
+          EXPRESS_SWAGGER_USER: 'expressive',
+          EXPRESS_SWAGGER_PASSWORD: 'expressive321'
+        };
+      });
+
+      afterEach(() => {
+        process.env = OLD_ENV;
+      });
+
+      it('description', () => {
+        const swaggerInfo = { name: 'John Smith' };
+        const mockRouter = {
+          some: 'routes'
+        };
+        const mockSwaggerDefinitions = {
+          some: 'Definition'
+        };
+
+        const options = {
+          basePath: '/',
+          swaggerInfo,
+          swaggerDefinitions: mockSwaggerDefinitions,
+          showSwaggerOnlyInDev: false
+        };
+
+        const mockExpress = {
+          get: jest.fn()
+        };
+        const manager = new MiddlewareManager(options, mockExpress);
+
+        const mockSwaggerHeader = { some: 'Header' };
+        const mockSwaggerJson = { hello: 'world' };
+        manager.SwaggerUtils = {
+          getSwaggerHeader: jest.fn().mockReturnValue(mockSwaggerHeader),
+          convertDocsToSwaggerDoc: jest.fn().mockReturnValue(mockSwaggerJson),
+          registerExpress: jest.fn()
+        };
+        manager.registerRedoc = jest.fn();
+
+        manager.registerDocs(mockRouter);
+
+        expect(manager.registerRedoc).toHaveBeenCalledWith({
+          app: mockExpress,
+          swaggerJson: mockSwaggerJson,
+          url: '/docs/redoc',
+          authUser: {
+            user: 'expressive',
+            password: 'expressive321'
+          }
+        });
+
+        expect(manager.SwaggerUtils.registerExpress).toHaveBeenCalledWith({
+          app: mockExpress,
+          swaggerJson: mockSwaggerJson,
+          url: '/docs/swagger',
+          authUser: {
+            user: 'expressive',
+            password: 'expressive321'
+          }
+        });
+      });
     });
 
     describe('test without NODE_ENV', () => {
@@ -293,11 +369,25 @@ describe('Middleware Manager', () => {
 
         manager.registerDocs(mockRouter);
 
-        expect(manager.registerRedoc).toHaveBeenCalledWith(
-          mockExpress,
-          mockSwaggerJson,
-          '/docs/redoc'
-        );
+        expect(manager.registerRedoc).toHaveBeenCalledWith({
+          app: mockExpress,
+          swaggerJson: mockSwaggerJson,
+          url: '/docs/redoc',
+          authUser: {
+            user: 'admin',
+            password: 'admin'
+          }
+        });
+
+        expect(manager.SwaggerUtils.registerExpress).toHaveBeenCalledWith({
+          app: mockExpress,
+          swaggerJson: mockSwaggerJson,
+          url: '/docs/swagger',
+          authUser: {
+            user: 'admin',
+            password: 'admin'
+          }
+        });
       });
     });
   });

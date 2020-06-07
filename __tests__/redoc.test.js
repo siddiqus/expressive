@@ -8,7 +8,15 @@ describe('Redoc', () => {
         get: jest.fn()
       };
 
-      registerRedoc(app, {}, '/docs');
+      registerRedoc({
+        app,
+        swaggerJson: {},
+        url: '/docs',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
 
       expect(app.get).toHaveBeenCalledTimes(2);
       expect(app.get.mock.calls[0][0]).toEqual('/docs/swagger.json');
@@ -24,7 +32,15 @@ describe('Redoc', () => {
         hello: 'world'
       };
 
-      registerRedoc(app, someSwagger, '/docs');
+      registerRedoc({
+        app: app,
+        swaggerJson: someSwagger,
+        url: '/docs',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
       expect(app.get).toHaveBeenCalledTimes(2);
 
       const mockSend = jest.fn();
@@ -35,7 +51,7 @@ describe('Redoc', () => {
         })
       };
 
-      const firstHandler = app.get.mock.calls[0][1];
+      const firstHandler = app.get.mock.calls[0][2];
       firstHandler(null, mockRes);
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockSend).toHaveBeenCalledWith(someSwagger);
@@ -50,7 +66,15 @@ describe('Redoc', () => {
         hello: 'world'
       };
 
-      registerRedoc(app, someSwagger, '/docs');
+      registerRedoc({
+        app: app,
+        swaggerJson: someSwagger,
+        url: '/docs',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
       expect(app.get).toHaveBeenCalledTimes(2);
 
       const mockSend = jest.fn();
@@ -61,7 +85,7 @@ describe('Redoc', () => {
         })
       };
 
-      const secondHandler = app.get.mock.calls[1][1];
+      const secondHandler = app.get.mock.calls[1][2];
       secondHandler(null, mockRes);
 
       const expectedRedoc = redocHtmlTemplate({

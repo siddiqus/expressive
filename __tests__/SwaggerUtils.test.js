@@ -66,15 +66,24 @@ describe('SwaggerUtils', () => {
         get: jest.fn()
       };
 
-      SwaggerUtils.registerExpress(mockApp, {}, '/someurl');
+      SwaggerUtils.registerExpress({
+        app: mockApp,
+        swaggerJson: {},
+        url: '/someurl',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
 
       expect(mockApp.use).toHaveBeenCalled();
       expect(mockApp.get).toHaveBeenCalled();
 
-      const [, mockRedirectHandler] = mockApp.get.mock.calls[0];
+      const [, , mockRedirectHandler] = mockApp.get.mock.calls[0];
       const mockRes = {
         redirect: jest.fn()
       };
+
       mockRedirectHandler(null, mockRes);
 
       expect(mockRes.redirect).toHaveBeenCalledWith('/someurl');
