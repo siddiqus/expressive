@@ -86,7 +86,7 @@ describe('SwaggerUtils', () => {
 
       mockRedirectHandler(null, mockRes);
 
-      expect(mockRes.redirect).toHaveBeenCalledWith('/someurl');
+      expect(mockRes.redirect).toHaveBeenCalledWith('someurl');
     });
   });
 

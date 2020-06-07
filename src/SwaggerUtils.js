@@ -22,7 +22,9 @@ function registerExpress({ app, swaggerJson, url, authUser }) {
     })
   );
 
-  app.get('/docs', basicAuthMiddleware, (_, res) => res.redirect(url));
+  const redirectUrl =
+    url.charAt(0) === '/' ? url.substring(1, url.length) : url;
+  app.get('/docs', basicAuthMiddleware, (_, res) => res.redirect(redirectUrl));
 }
 
 function _sanitizeSwaggerPath(path) {
