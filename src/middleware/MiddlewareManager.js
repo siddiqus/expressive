@@ -125,13 +125,24 @@ module.exports = class MiddlewareManager {
       this.options.swaggerDefinitions
     );
 
-    this.SwaggerUtils.registerExpress(
-      this.express,
+    const authUser = {
+      user: process.env.EXPRESS_SWAGGER_USER || 'admin',
+      password: process.env.EXPRESS_SWAGGER_PASSWORD || 'admin'
+    };
+
+    this.SwaggerUtils.registerExpress({
+      app: this.express,
       swaggerJson,
-      '/docs/swagger'
-    );
+      url: '/docs/swagger',
+      authUser
+    });
     console.log('Swagger doc up and running on /docs');
 
-    this.registerRedoc(this.express, swaggerJson, '/docs/redoc');
+    this.registerRedoc({
+      app: this.express,
+      swaggerJson,
+      url: '/docs/redoc',
+      authUser
+    });
   }
 };

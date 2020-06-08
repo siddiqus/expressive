@@ -29,6 +29,7 @@
     "celebrate": "12.0.1",
     "cors": "2.8.4",
     "express": "4.17.1",
+    "express-basic-auth": "1.2.0",
     "express-request-id": "1.4.1",
     "helmet": "3.21.2",
     "swagger-ui-express": "4.0.1"

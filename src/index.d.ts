@@ -225,6 +225,10 @@ export interface ExpressiveOptions {
   showSwaggerOnlyInDev?: boolean;
   swaggerInfo?: SwaggerInfo;
   swaggerDefinitions?: any;
+  swaggerBasicAuth?: {
+    user: string;
+    password: string;
+  }
   allowCors?: boolean;
   corsConfig?: CorsOptions;
   middleware?: Handler[];

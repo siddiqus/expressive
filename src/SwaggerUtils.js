@@ -1,20 +1,30 @@
 const fs = require('fs');
+const basicAuth = require('express-basic-auth');
 const SwaggerUi = require('swagger-ui-express');
 const RouteUtil = require('./RouteUtil.js');
 const Utils = require('./Utils');
 
 const { joiSchemaToSwaggerRequestParameters } = require('./CelebrateUtils');
 
-function registerExpress(app, swaggerJson, url) {
+function registerExpress({ app, swaggerJson, url, authUser }) {
+  const { user, password } = authUser;
+  const basicAuthMiddleware = basicAuth({
+    challenge: true,
+    users: { [user]: password }
+  });
+
   app.use(
     url,
+    basicAuthMiddleware,
     SwaggerUi.serve,
     SwaggerUi.setup(swaggerJson, {
       explorer: true
     })
   );
 
-  app.get('/docs', (_, res) => res.redirect(url));
+  const redirectUrl =
+    url.charAt(0) === '/' ? url.substring(1, url.length) : url;
+  app.get('/docs', basicAuthMiddleware, (_, res) => res.redirect(redirectUrl));
 }
 
 function _sanitizeSwaggerPath(path) {
