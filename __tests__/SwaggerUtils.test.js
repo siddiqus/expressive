@@ -88,6 +88,35 @@ describe('SwaggerUtils', () => {
 
       expect(mockRes.redirect).toHaveBeenCalledWith('someurl');
     });
+
+    it('Should sanitize redirect url', () => {
+      const mockApp = {
+        use: jest.fn(),
+        get: jest.fn()
+      };
+
+      SwaggerUtils.registerExpress({
+        app: mockApp,
+        swaggerJson: {},
+        url: 'someurl',
+        authUser: {
+          user: 'admin',
+          password: 'admin'
+        }
+      });
+
+      expect(mockApp.use).toHaveBeenCalled();
+      expect(mockApp.get).toHaveBeenCalled();
+
+      const [, , mockRedirectHandler] = mockApp.get.mock.calls[0];
+      const mockRes = {
+        redirect: jest.fn()
+      };
+
+      mockRedirectHandler(null, mockRes);
+
+      expect(mockRes.redirect).toHaveBeenCalledWith('someurl');
+    });
   });
 
   describe('_sanitizeSwaggerPath', () => {
