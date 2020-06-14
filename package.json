@@ -1,6 +1,6 @@
 {
   "name": "@siddiqus/expressive",
-  "version": "3.2.7",
+  "version": "3.2.8",
   "description": "Fast, opinionated, minimalist, and conventional REST API framework for NodeJS, built on ExpressJs.",
   "main": "src/index.js",
   "files": [
@@ -44,7 +44,9 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}"
     ],
-    "modulePathIgnorePatterns": [".stryker-tmp"]
+    "modulePathIgnorePatterns": [
+      ".stryker-tmp"
+    ]
   },
   "devDependencies": {
     "@types/jest": "25.1.4",
