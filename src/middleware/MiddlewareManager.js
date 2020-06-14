@@ -115,10 +115,13 @@ module.exports = class MiddlewareManager {
 
     if (!shouldRegister) return;
 
-    const swaggerHeader = this.SwaggerUtils.getSwaggerHeader(
-      this.options.basePath,
-      this.options.swaggerInfo
-    );
+    const { basePath, swaggerInfo, swaggerSecurityDefinitions } = this.options;
+    const swaggerHeader = this.SwaggerUtils.getSwaggerHeader({
+      basePath,
+      swaggerInfo,
+      swaggerSecurityDefinitions
+    });
+
     const swaggerJson = this.SwaggerUtils.convertDocsToSwaggerDoc(
       expressiveRouter,
       swaggerHeader,

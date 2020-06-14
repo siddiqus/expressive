@@ -520,6 +520,10 @@ To set your own username and password, set the environment variables `EXPRESS_SW
 
 #### Swagger options
 
+There are a few things you can configure for Swagger through the ExpressApp options parameter.
+
+---
+
 You can initialize your app with the basic swagger 'info' property as shown below:
 
 ```javascript
@@ -535,11 +539,36 @@ const swaggerInfo = {
 };
 
 const app = new ExpressApp(router, {
-  allowCors: true,
-  swaggerInfo: swaggerInfo,
-  showSwaggerOnlyInDev: true // default value is true, set to false to enable swagger for non-development environments
+  swaggerInfo: swaggerInfo
 });
 ```
+
+---
+
+You can configure whether to only show Swagger UI in development mode, or otherwise
+
+```javascript
+const app = new ExpressApp(router, {
+  showSwaggerOnlyInDev: false // default value is true, set to false to enable swagger for non-development environments
+});
+```
+
+---
+
+You can add API authentication using [OpenAPI 2.0 specification](https://swagger.io/docs/specification/2-0/authentication/). For example:
+
+```javascript
+const app = new ExpressApp(router, {
+  swaggerSecurityDefinitions: {
+    authHeader: {
+      type: 'apiKey',
+      name: 'Authorization',
+      in: 'header'
+    }
+  }
+});
+```
+This will add Authorize option in Swagger UI to add an `Authorization` header value.
 
 #### Declaring docs manually
 
@@ -587,15 +616,14 @@ To create a swagger.json file, the function `writeSwaggerJson` can be used from 
 
 ```javascript
 const { SwaggerUtils } = require('expressive');
-const appConfig = {
-  basePath: '/',
-  swaggerInfo: {} // swagger info property as shown above
-};
-SwaggerUtils.writeSwaggerJson(
-  router, // express router configuration
-  appConfig, // json for basic Swagger info
-  outputPath // absolute path of output file
-);
+...
+SwaggerUtils.writeSwaggerJson({
+  router, // expressive router configuration
+  output, // absolute path of output file
+  basePath, // api base path
+  swaggerInfo, // basic Swagger info
+  swaggerSecurityDefinitions // security definitions as per OpenAPI 2 specification
+});
 ```
 
 # File upload

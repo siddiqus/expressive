@@ -316,12 +316,12 @@ describe('SwaggerUtils', () => {
       };
 
       const outputPath = path.resolve(__dirname, 'output.json');
-      SwaggerUtils.writeSwaggerJson(
-        mockRouterWithTopRoutes,
-        outputPath,
-        '/api',
-        sampleSwaggerInfo
-      );
+      SwaggerUtils.writeSwaggerJson({
+        router: mockRouterWithTopRoutes,
+        output: outputPath,
+        basePath: '/api',
+        swaggerInfo: sampleSwaggerInfo
+      });
 
       const file = fs.readFileSync(outputPath);
       expect(file).toBeDefined();
@@ -330,7 +330,10 @@ describe('SwaggerUtils', () => {
 
     it('should write json for swagger using defaults', () => {
       const outputPath = path.resolve(__dirname, 'output.json');
-      SwaggerUtils.writeSwaggerJson(mockRouterWithTopRoutes, outputPath);
+      SwaggerUtils.writeSwaggerJson({
+        router: mockRouterWithTopRoutes,
+        output: outputPath
+      });
 
       const file = fs.readFileSync(outputPath);
       expect(file).toBeDefined();
@@ -340,13 +343,40 @@ describe('SwaggerUtils', () => {
 
   describe('getSwaggerHeader', () => {
     it('works with defaults', () => {
-      const header = SwaggerUtils.getSwaggerHeader();
+      const header = SwaggerUtils.getSwaggerHeader({});
       expect(header).toBeDefined();
     });
 
     it('works with non defaults', () => {
-      const header = SwaggerUtils.getSwaggerHeader('/api');
+      const header = SwaggerUtils.getSwaggerHeader({ basePath: '/api' });
       expect(header).toBeDefined();
+    });
+
+    it('should set auth properly for header', () => {
+      const header = SwaggerUtils.getSwaggerHeader({
+        basePath: '/api',
+        swaggerSecurityDefinitions: {
+          someAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-API-KEY'
+          }
+        }
+      });
+
+      expect(header).toBeDefined();
+      expect(header.securityDefinitions).toEqual({
+        someAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-KEY'
+        }
+      });
+      expect(header.security).toEqual([
+        {
+          someAuth: []
+        }
+      ]);
     });
   });
 });

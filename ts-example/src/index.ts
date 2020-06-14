@@ -9,6 +9,13 @@ const app = new ExpressApp(router, {
       message: err.message
     });
   },
+  swaggerSecurityDefinitions: {
+    headerAuth: {
+      type: 'apiKey',
+      name: 'Authorization',
+      in: 'header'
+    }
+  }
 });
 
 app.listen(3001, () => console.log('Running on port 3001'));

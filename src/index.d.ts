@@ -220,6 +220,24 @@ export declare interface ExpressiveRouter {
   subroutes?: ISubroute[];
 }
 
+export type SwaggerSecurityDefinitions = {
+  [key in string]: {
+    type: 'basic'
+  } | {
+    type: 'apiKey'
+    in: 'header' | 'query'
+    name: string
+  } | {
+    type: 'oauth2'
+    flow: string
+    authorizationUrl: string
+    tokenUrl: string
+    scopes: {
+      [key in string]: string
+    }
+  }
+}
+
 export interface ExpressiveOptions {
   basePath?: string;
   showSwaggerOnlyInDev?: boolean;
@@ -229,6 +247,7 @@ export interface ExpressiveOptions {
     user: string;
     password: string;
   }
+  swaggerSecurityDefinitions?: SwaggerSecurityDefinitions;
   allowCors?: boolean;
   corsConfig?: CorsOptions;
   middleware?: Handler[];
