@@ -43,7 +43,8 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}"
-    ]
+    ],
+    "modulePathIgnorePatterns": [".stryker-tmp"]
   },
   "devDependencies": {
     "@types/jest": "25.1.4",

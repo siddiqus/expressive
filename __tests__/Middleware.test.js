@@ -238,10 +238,11 @@ describe('Middleware Manager', () => {
           password: 'admin'
         }
       });
-      expect(manager.SwaggerUtils.getSwaggerHeader).toHaveBeenCalledWith(
-        '/',
-        swaggerInfo
-      );
+      expect(manager.SwaggerUtils.getSwaggerHeader).toHaveBeenCalledWith({
+        basePath: '/',
+        swaggerInfo,
+        swaggerSecurityDefinitions: undefined
+      });
       expect(manager.SwaggerUtils.convertDocsToSwaggerDoc).toHaveBeenCalledWith(
         mockRouter,
         mockSwaggerHeader,

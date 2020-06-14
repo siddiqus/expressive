@@ -142,17 +142,28 @@ const sampleSwaggerInfo = {
   }
 };
 
-function writeSwaggerJson(router, output, basePath = '/', swaggerInfo = null) {
-  const swaggerHeader = getSwaggerHeader(
+function writeSwaggerJson({
+  router,
+  output,
+  basePath = '/',
+  swaggerInfo = null,
+  swaggerSecurityDefinitions = null
+}) {
+  const swaggerHeader = getSwaggerHeader({
     basePath,
-    swaggerInfo || sampleSwaggerInfo
-  );
+    swaggerInfo: swaggerInfo || sampleSwaggerInfo,
+    swaggerSecurityDefinitions
+  });
   const swaggerJson = convertDocsToSwaggerDoc(router, swaggerHeader);
   fs.writeFileSync(output, JSON.stringify(swaggerJson, null, 4));
 }
 
-function getSwaggerHeader(basePath = '/', swaggerInfo = null) {
-  return {
+function getSwaggerHeader({
+  basePath = '/',
+  swaggerInfo = null,
+  swaggerSecurityDefinitions = null
+}) {
+  const swaggerHeader = {
     swagger: '2.0',
     info: swaggerInfo || sampleSwaggerInfo,
     basePath: basePath,
@@ -160,6 +171,17 @@ function getSwaggerHeader(basePath = '/', swaggerInfo = null) {
     consumes: ['application/json'],
     produces: ['application/json']
   };
+
+  if (swaggerSecurityDefinitions) {
+    swaggerHeader.securityDefinitions = swaggerSecurityDefinitions;
+    swaggerHeader.security = Object.keys(swaggerSecurityDefinitions).map(
+      (s) => ({
+        [s]: []
+      })
+    );
+  }
+
+  return swaggerHeader;
 }
 
 module.exports = {
