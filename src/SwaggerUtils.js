@@ -82,12 +82,18 @@ function _getUniqueArray(arr) {
   return Array.from(new Set(arr));
 }
 
+function _capitalize(string) {
+  if (string.length <= 1) return string.toUpperCase();
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function _setTagFromPath(path, doc) {
   if (!path) return;
   const tags = path
     .split('/')
     .filter(Boolean)
-    .filter((s) => !s.includes(':'));
+    .filter((s) => !s.includes(':'))
+    .map((s) => s.replace(/-|_/g, ' ').split(' ').map(_capitalize).join(' '));
   if (!tags.length) return;
 
   if (!doc.tags) doc.tags = [];

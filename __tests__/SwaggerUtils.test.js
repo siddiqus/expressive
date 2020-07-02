@@ -144,7 +144,68 @@ describe('SwaggerUtils', () => {
   });
 
   describe('convertDocsToSwaggerDoc', () => {
-    it('Should handle case for no parent tags', () => {
+    it('Should handle case for parent tags to capitalize', () => {
+      const routes = {
+        subroutes: [
+          {
+            path: '/',
+            router: {
+              routes: [
+                {
+                  path: '/hey',
+                  controller: () => {},
+                  method: 'get'
+                }
+              ]
+            }
+          },
+          {
+            path: '/v',
+            router: {
+              routes: [
+                {
+                  path: '/hey',
+                  controller: () => {},
+                  method: 'get'
+                }
+              ]
+            }
+          },
+          {
+            path: '/hey-there',
+            router: {
+              routes: [
+                {
+                  path: '/hey',
+                  controller: () => {},
+                  method: 'get'
+                }
+              ]
+            }
+          },
+          {
+            path: '/hi_there',
+            router: {
+              routes: [
+                {
+                  path: '/hey',
+                  controller: () => {},
+                  method: 'get'
+                }
+              ]
+            }
+          }
+        ]
+      };
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(routes);
+      expect(swaggerDoc.tags.map((t) => t.name)).toContain('V');
+      expect(swaggerDoc.tags.map((t) => t.name)).toContain('Hey There');
+      expect(swaggerDoc.tags.map((t) => t.name)).toContain('Hi There');
+      expect(swaggerDoc).toBeDefined();
+    });
+
+    it('Should handle case for no parent tags, and tags with multi word', () => {
       const routes = {
         subroutes: [
           {
@@ -163,7 +224,6 @@ describe('SwaggerUtils', () => {
       };
 
       const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(routes);
-
       expect(swaggerDoc).toBeDefined();
     });
 
