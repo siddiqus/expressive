@@ -5,6 +5,7 @@ module.exports = {
       normalizedPath = `${path}/`;
     }
     normalizedPath = normalizedPath.replace(/\/\//g, '/');
+
     return normalizedPath;
   },
   clearNullValuesInObject(obj) {

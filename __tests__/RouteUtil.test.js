@@ -48,12 +48,25 @@ describe('RouteUtil', () => {
   describe('getRoutesInfo', () => {
     it('Should register all routes and subroutes with redirects', () => {
       const expectedRoutes = [
-        { path: '/', method: 'get', doc: 'hello' },
-        { path: '/users/', method: 'get' },
-        { path: '/users/', method: 'post' },
-        { path: '/users/hey/', method: 'get', redirectUrl: '/users/' },
-        { path: '/users/:userId/posts/', method: 'get' },
-        { path: '/users/:userId/posts/', method: 'post' }
+        { path: '/', parentPath: '', method: 'get', doc: 'hello' },
+        { path: '/users/', parentPath: '/users', method: 'get' },
+        { path: '/users/', parentPath: '/users', method: 'post' },
+        {
+          path: '/users/hey/',
+          parentPath: '/users',
+          method: 'get',
+          redirectUrl: '/users/'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'get'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'post'
+        }
       ];
 
       const mockRouter = {
@@ -74,12 +87,20 @@ describe('RouteUtil', () => {
 
     it('Should register all routes and subroutes without redirects', () => {
       const expectedRoutes = [
-        { path: '/', method: 'get', doc: 'hello' },
-        { path: '/hey/', method: 'get', redirectUrl: '/' },
-        { path: '/users/', method: 'get' },
-        { path: '/users/', method: 'post' },
-        { path: '/users/:userId/posts/', method: 'get' },
-        { path: '/users/:userId/posts/', method: 'post' }
+        { path: '/', parentPath: '', method: 'get', doc: 'hello' },
+        { path: '/hey/', parentPath: '', method: 'get', redirectUrl: '/' },
+        { path: '/users/', parentPath: '/users', method: 'get' },
+        { path: '/users/', parentPath: '/users', method: 'post' },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'get'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'post'
+        }
       ];
 
       const mockSubroutesWithoutRedirect = [...mockSubroutes];
@@ -110,10 +131,18 @@ describe('RouteUtil', () => {
 
     it('Should register all subroutes from top', () => {
       const expectedRoutes = [
-        { path: '/users/', method: 'get' },
-        { path: '/users/', method: 'post' },
-        { path: '/users/:userId/posts/', method: 'get' },
-        { path: '/users/:userId/posts/', method: 'post' }
+        { path: '/users/', parentPath: '/users', method: 'get' },
+        { path: '/users/', parentPath: '/users', method: 'post' },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'get'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'post'
+        }
       ];
 
       const mockRouter = {
