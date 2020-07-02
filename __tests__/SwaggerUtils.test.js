@@ -144,6 +144,29 @@ describe('SwaggerUtils', () => {
   });
 
   describe('convertDocsToSwaggerDoc', () => {
+    it('Should handle case for no parent tags', () => {
+      const routes = {
+        subroutes: [
+          {
+            path: '/',
+            router: {
+              routes: [
+                {
+                  path: '/hey',
+                  controller: () => {},
+                  method: 'get'
+                }
+              ]
+            }
+          }
+        ]
+      };
+
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(routes);
+
+      expect(swaggerDoc).toBeDefined();
+    });
+
     it('Should write json for swagger with redirects', () => {
       const mockRoutes1 = { ...mockRouterWithTopRoutes };
       mockRoutes1.routes.push(

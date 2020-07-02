@@ -60,7 +60,7 @@ function _setDocResponses(doc, validationSchema) {
 }
 
 function _setAuthorizerDocInDescription(doc, authorizer) {
-  if (!authorizer || !(typeof authorizer === 'object')) return;
+  if (!authorizer) return;
   const authStr = `Authorized: ${JSON.stringify(authorizer)}`;
   if (doc.description) {
     doc.description = `${authStr}\n\n${doc.description}`;
@@ -78,8 +78,26 @@ function _setDocParameters(doc, validationSchema) {
   }
 }
 
+function _getUniqueArray(arr) {
+  return Array.from(new Set(arr));
+}
+
+function _setTagFromPath(path, doc) {
+  if (!path) return;
+  const tags = path
+    .split('/')
+    .filter(Boolean)
+    .filter((s) => !s.includes(':'));
+  if (!tags.length) return;
+
+  if (!doc.tags) doc.tags = [];
+  doc.tags = _getUniqueArray([...tags, ...doc.tags]);
+}
+
 function _addPathDoc(paths, route, tags) {
-  let { doc = {}, path, validationSchema, authorizer } = route;
+  let { doc = {}, path, validationSchema, authorizer, parentPath } = route;
+
+  _setTagFromPath(parentPath, doc);
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
   doc.summary = doc.summary || path;

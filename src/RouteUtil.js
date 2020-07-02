@@ -5,20 +5,17 @@ const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
 
 function _addRouteToPaths(paths, parentPath, route) {
   const routeData = {
-    method: route.method,
+    ...route,
     path: Utils.normalizePathSlashes(`${parentPath}${route.path}`),
-    validationSchema: route.validationSchema,
-    authorizer: route.authorizer
+    parentPath
   };
+
+  delete routeData.controller;
 
   if (RouteUtil.isUrlPath(route.controller)) {
     routeData.redirectUrl = Utils.normalizePathSlashes(
       `${parentPath}${route.controller}`
     );
-  }
-
-  if (route.doc) {
-    routeData.doc = route.doc;
   }
 
   Utils.clearNullValuesInObject(routeData);
@@ -27,7 +24,11 @@ function _addRouteToPaths(paths, parentPath, route) {
 }
 
 function _getSubroutes(paths, parentPath, subroute) {
-  RouteUtil.getRoutesInfo(subroute.router, paths, parentPath + subroute.path);
+  return RouteUtil.getRoutesInfo(
+    subroute.router,
+    paths,
+    parentPath + subroute.path
+  );
 }
 
 class RouteUtil {
