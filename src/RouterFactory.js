@@ -89,9 +89,8 @@ module.exports = class RouterFactory {
     routerArgs,
     { validationSchema, authorizer, middleware }
   ) {
-    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
-
     this._setAuthorizerMiddleware(authorizer, routerArgs);
+    this._registerCelebrateErrorMiddleware(validationSchema, routerArgs);
 
     const nextAdjustedMiddleware = !middleware
       ? []
