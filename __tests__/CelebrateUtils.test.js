@@ -300,6 +300,42 @@ describe('CelebrateUtils', () => {
         }
       });
     });
+
+    it('Should allow body joi object check', () => {
+      const validationSchema = {
+        body: Joi.object().required()
+      };
+
+      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+        validationSchema
+      );
+
+      expect(json).toContainEqual({
+        in: 'body',
+        name: 'body',
+        schema: {
+          type: 'object'
+        }
+      });
+    });
+
+    it('Should allow body joi any check', () => {
+      const validationSchema = {
+        body: Joi.any().required()
+      };
+
+      const json = CelebrateUtils.joiSchemaToSwaggerRequestParameters(
+        validationSchema
+      );
+
+      expect(json).toContainEqual({
+        in: 'body',
+        name: 'body',
+        schema: {
+          type: 'object'
+        }
+      });
+    });
   });
 
   describe('lowercaseHeaderSchemaProperties', () => {
