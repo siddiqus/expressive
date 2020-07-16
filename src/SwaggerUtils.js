@@ -191,7 +191,7 @@ function getSwaggerHeader({
     swagger: '2.0',
     info: swaggerInfo || sampleSwaggerInfo,
     basePath: basePath,
-    schemes: ['http', 'https'],
+    schemes: ['https', 'http'],
     consumes: ['application/json'],
     produces: ['application/json']
   };

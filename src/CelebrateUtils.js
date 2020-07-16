@@ -3,7 +3,7 @@ const { Joi, CelebrateError, Segments } = require('celebrate');
 const Utils = require('./Utils');
 
 function _isJoiObject(obj) {
-  return Boolean(obj.type === 'object' && obj.$_terms && obj.$_terms.keys);
+  return Boolean(obj.type === 'object' && obj.$_terms);
 }
 
 function _getJoiObjectKeys(obj) {
@@ -58,7 +58,14 @@ function _setMinMaxInSwaggerSchema(type, joiSchema, swaggerSchema) {
 }
 
 function _setSwaggerPropsForObject(type, joiSchema, swaggerSchema) {
-  if (!(type === 'object' && _getJoiObjectKeys(joiSchema).length > 0)) return;
+  if (
+    !(
+      type === 'object' &&
+      _getJoiObjectKeys(joiSchema) &&
+      _getJoiObjectKeys(joiSchema).length > 0
+    )
+  )
+    return;
   const requiredProperties = [];
   const objectjoiSchemaMap = {};
 
@@ -154,10 +161,15 @@ function _getAllSwaggerParamsFromValidationSchema(schema, paramIn) {
   });
 }
 
+function _isJoiAny(schema) {
+  return Boolean(schema.type === 'any' && schema.$_terms);
+}
+
 function _getSwaggerParamsForBody(bodySchema) {
-  const joiSchema = _isJoiObject(bodySchema)
-    ? bodySchema
-    : Joi.object(bodySchema);
+  const joiSchema =
+    _isJoiObject(bodySchema) || _isJoiAny(bodySchema)
+      ? bodySchema
+      : Joi.object(bodySchema);
 
   const swaggerSchema = {
     type: 'object'
