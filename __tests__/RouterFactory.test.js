@@ -225,6 +225,58 @@ describe('RouterFactory', () => {
     });
   });
 
+  describe('_registerPreHandlers', () => {
+    it('Should not change routerArgs if no pre handlers defined', () => {
+      const factory = new RouterFactory({});
+
+      const routerArgs = [];
+
+      factory._registerPreHandlers(routerArgs, null);
+
+      expect(routerArgs).toEqual([]);
+    });
+
+    it('Should register handler if single handler defined', () => {
+      const factory = new RouterFactory({});
+      factory.routeUtil = {
+        getHandlerWithManagedNextCall: jest.fn().mockReturnValue(123)
+      };
+      const routerArgs = [];
+      const handler = (req, res) => {};
+      factory._registerPreHandlers(routerArgs, handler);
+
+      expect(routerArgs).toEqual([123]);
+      expect(
+        factory.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledWith(handler);
+    });
+
+    it('Should register handler if array of handlers defined', () => {
+      const factory = new RouterFactory({});
+      factory.routeUtil = {
+        getHandlerWithManagedNextCall: jest.fn().mockReturnValue(123)
+      };
+      const routerArgs = [];
+      const handlers = [
+        (req, res) => {
+          return 1;
+        },
+        (req, res) => {
+          return 2;
+        }
+      ];
+      factory._registerPreHandlers(routerArgs, handlers);
+
+      expect(routerArgs).toEqual([123, 123]);
+      expect(
+        factory.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledWith(handlers[0]);
+      expect(
+        factory.routeUtil.getHandlerWithManagedNextCall
+      ).toHaveBeenCalledWith(handlers[1]);
+    });
+  });
+
   describe('_registerSubroute', () => {
     it('Should register subroute with middleware properly', () => {
       const factory = new RouterFactory({});

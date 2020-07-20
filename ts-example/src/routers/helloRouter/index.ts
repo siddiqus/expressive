@@ -26,7 +26,10 @@ const postHello = Route.post('/hello', {
     } else {
       next();
     }
-  }
+  },
+  pre: [(req, res) => {
+    console.log('pre', req.url); // do work here before any middleware or routes are registered
+  }]
 });
 
 export const helloRouter: ExpressiveRouter = {
