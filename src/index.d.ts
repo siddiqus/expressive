@@ -113,25 +113,26 @@ export declare interface ValidationSchema {
   }
 }
 
-interface ResponseMap {
+interface SwaggerResponseMap {
   [key: number]: object;
 }
 
 export declare interface SwaggerEndpointDoc {
   description?: string;
   summary?: string;
-  responses?: ResponseMap;
+  responses?: SwaggerResponseMap;
   tags?: string[];
 }
 
 type AuthorizerType = Handler | Handler[] | string | string[] | object | object[];
 
-export declare interface IRouteParams {
+export declare interface RouteParams {
   controller: string | Handler | typeof BaseController;
   validationSchema?: ValidationSchema;
   authorizer?: AuthorizerType;
   doc?: SwaggerEndpointDoc;
   middleware?: Handler[];
+  pre?: Handler | Handler[];
 }
 
 export declare type RouteMethod =
@@ -143,81 +144,82 @@ export declare type RouteMethod =
   | 'patch'
   | 'options';
 
-export declare interface IEndpoint extends IRouteParams {
+export declare interface Endpoint extends RouteParams {
   method: RouteMethod;
   path: string;
 }
 
-export declare type IRouteProps = Omit<IRouteParams, 'controller'>;
+export declare type RouteProps = Omit<RouteParams, 'controller'>;
 
 export declare class Route {
   static get(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static get(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static get(path: string, params?: RouteParams): Endpoint;
 
   static post(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static post(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static post(path: string, params?: RouteParams): Endpoint;
 
   static delete(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static delete(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static delete(path: string, params?: RouteParams): Endpoint;
 
   static put(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static put(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static put(path: string, params?: RouteParams): Endpoint;
 
   static head(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static head(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static head(path: string, params?: RouteParams): Endpoint;
 
   static options(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static options(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static options(path: string, params?: RouteParams): Endpoint;
 
   static patch(
     path: string,
     controller: string | Handler | typeof BaseController,
-    params?: IRouteProps
-  ): IEndpoint;
-  static patch(path: string, params?: IRouteParams): IEndpoint;
+    params?: RouteProps
+  ): Endpoint;
+  static patch(path: string, params?: RouteParams): Endpoint;
 }
 
-export declare interface ISubroute {
+export declare interface Subroute {
   path: string;
   router: ExpressiveRouter;
   authorizer?: AuthorizerType;
   middleware?: Handler[];
   validationSchema?: ValidationSchema;
+  pre?: Handler | Handler[];
 }
 
 export declare function subroute(
   path: string,
   router: ExpressiveRouter,
-  options: Pick<ISubroute, 'authorizer' | 'middleware' | 'validationSchema'>
-): ISubroute
+  options: Pick<Subroute, 'authorizer' | 'middleware' | 'validationSchema'>
+): Subroute
 
 export declare interface ExpressiveRouter {
-  routes?: IEndpoint[];
-  subroutes?: ISubroute[];
+  routes?: Endpoint[];
+  subroutes?: Subroute[];
 }
 
 export type SwaggerSecurityDefinitions = {

@@ -101,6 +101,19 @@ module.exports = class RouterFactory {
     this._setFileUploadValidationMiddleware(validationSchema, routerArgs);
   }
 
+  _registerPreHandlers(routerArgs, handler) {
+    if (!handler) return;
+
+    if (Array.isArray(handler)) {
+      const nextAdjustedMiddleware = handler.map((m) =>
+        this.routeUtil.getHandlerWithManagedNextCall(m)
+      );
+      routerArgs.push(...nextAdjustedMiddleware);
+    } else {
+      routerArgs.push(this.routeUtil.getHandlerWithManagedNextCall(handler));
+    }
+  }
+
   _registerRoute(
     router,
     {
@@ -109,10 +122,13 @@ module.exports = class RouterFactory {
       controller,
       validationSchema = null,
       authorizer = null,
-      middleware = null
+      middleware = null,
+      pre = null
     }
   ) {
     const routerArgs = [path];
+
+    this._registerPreHandlers(routerArgs, pre);
 
     this._registerMiddleware(routerArgs, {
       validationSchema,
@@ -132,10 +148,13 @@ module.exports = class RouterFactory {
       router: subrouter,
       authorizer,
       validationSchema = null,
-      middleware = []
+      middleware = [],
+      pre = null
     }
   ) {
     const routerArgs = [path];
+
+    this._registerPreHandlers(routerArgs, pre);
 
     this._registerMiddleware(routerArgs, {
       validationSchema,
