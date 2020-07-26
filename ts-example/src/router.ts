@@ -1,8 +1,8 @@
+import { Joi } from 'celebrate';
 import multer from 'multer';
 import { Route } from '../../src';
 import type { ExpressiveRouter } from '../../src';
 import { helloRouter } from './routers/helloRouter';
-import { Joi } from 'celebrate';
 
 const uploadFile = multer();
 

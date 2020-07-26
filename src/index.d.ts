@@ -3,49 +3,26 @@ import type {
   ErrorRequestHandler as ExpressErrorRequestHandler,
   Express as ExpressType,
   NextFunction as ExpressNextFunction,
-  Response as ExpressResponse
+  Response as ExpressResponse,
+  Request as ExpressRequest,
+  RequestHandler as ExpressHandler
 } from 'express';
-
-import type {
-  ParamsDictionary as CoreParamsDictionary,
-  Params as CoreParams,
-  Query as CoreQuery,
-  Request as CoreRequest
-} from 'express-serve-static-core';
 
 import { IHelmetConfiguration as HelmetConfig } from 'helmet';
 
 export declare type express = typeof import('express');
 
-interface Request<
-  P extends CoreParams = CoreParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = CoreQuery
-  > extends CoreRequest<P, ResBody, ReqBody, ReqQuery> {
-  file: any;
-  files: any[];
+interface Request extends ExpressRequest {
   authorizer?: AuthorizerType;
   user?: any;
   permissions?: any;
-  id: string
+  id?: string
 }
 
 export type Response = ExpressResponse;
 export type NextFunction = ExpressNextFunction;
 
-export interface Handler<
-  T extends CoreParams = CoreParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = CoreQuery
-  > {
-  (
-    req: Request<T, ResBody, ReqBody, ReqQuery>,
-    res: ExpressResponse<ResBody>,
-    next: NextFunction
-  ): any;
-}
+export type Handler = ExpressHandler;
 
 export type Express = ExpressType;
 export type ErrorRequestHandler = ExpressErrorRequestHandler;
