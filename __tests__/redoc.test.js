@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 const registerRedoc = require('../src/redoc/registerRedoc');
 const redocHtmlTemplate = require('../src/redoc/redocHtmlTemplate');
 

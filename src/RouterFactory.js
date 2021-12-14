@@ -4,10 +4,11 @@ const { celebrate: celebrateMiddleware } = require('celebrate');
 const RouteUtil = require('./RouteUtil');
 const AuthUtil = require('./AuthUtil');
 const CelebrateUtils = require('./CelebrateUtils');
+const BaseController = require('./BaseController');
 
 async function _handleRequestBase(req, res, next) {
   this.req = req;
-  this.res = res;
+  this.setRes(res);
   this.next = next;
 
   return this.handleRequest();
@@ -22,23 +23,16 @@ module.exports = class RouterFactory {
     this.CelebrateUtils = CelebrateUtils;
   }
 
-  async _executeController(controller, { req, res, next }) {
-    if (this.routeUtil.isUrlPath(controller)) {
-      return res.redirect(controller);
-    }
-
-    if (this.routeUtil.isFunction(controller)) {
-      return controller(req, res, next);
-    }
-
-    const Controller = controller;
-    return _handleRequestBase.call(new Controller(), req, res, next);
-  }
-
-  _getWrappedController(controller) {
+  _getWrappedController(controllerInstance) {
     return async (req, res, next) => {
       try {
-        await this._executeController(controller, { req, res, next });
+        const mappedReq = BaseController.requestMapper(req);
+        await _handleRequestBase.call(controllerInstance, mappedReq, res, next);
+        if (!controllerInstance.resolvedBy) {
+          controllerInstance.internalServerError(
+            'Server did not send any response'
+          );
+        }
       } catch (e) {
         return next(e);
       }
@@ -114,26 +108,15 @@ module.exports = class RouterFactory {
     }
   }
 
-  _registerRoute(
-    router,
-    {
-      method,
-      path,
-      controller,
-      validationSchema = null,
-      authorizer = null,
-      middleware = null,
-      pre = null
-    }
-  ) {
+  _registerRoute(router, { method, path, controller }) {
     const routerArgs = [path];
 
-    this._registerPreHandlers(routerArgs, pre);
+    this._registerPreHandlers(routerArgs, controller.pre);
 
     this._registerMiddleware(routerArgs, {
-      validationSchema,
-      authorizer,
-      middleware
+      validationSchema: controller.validationSchema,
+      authorizer: controller.authorizer,
+      middleware: controller.middleware
     });
 
     routerArgs.push(this._getWrappedController(controller));

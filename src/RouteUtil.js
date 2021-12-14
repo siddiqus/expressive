@@ -7,16 +7,13 @@ function _addRouteToPaths(paths, parentPath, route) {
   const routeData = {
     ...route,
     path: Utils.normalizePathSlashes(`${parentPath}${route.path}`),
-    parentPath
+    parentPath,
+    validationSchema: route.controller.validationSchema,
+    doc: route.controller.doc,
+    authorizer: route.controller.authorizer
   };
 
   delete routeData.controller;
-
-  if (RouteUtil.isUrlPath(route.controller)) {
-    routeData.redirectUrl = Utils.normalizePathSlashes(
-      `${parentPath}${route.controller}`
-    );
-  }
 
   Utils.clearNullValuesInObject(routeData);
 
@@ -33,9 +30,16 @@ function _getSubroutes(paths, parentPath, subroute) {
 
 class RouteUtil {
   static getRoutesInfo(router, paths = [], parentPath = '') {
+    if (!router) {
+      return paths;
+    }
     if (router.routes) {
-      router.routes.forEach((route) =>
-        _addRouteToPaths(paths, parentPath, route)
+      router.routes.forEach(({ path, method, controller }) =>
+        _addRouteToPaths(paths, parentPath, {
+          path,
+          method,
+          controller
+        })
       );
     }
 

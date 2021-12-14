@@ -136,7 +136,7 @@ Here you'll notice that the request object is available with `this.req` and you 
 ##### Wrapping response data
 
 Sometimes you will want to always wrap your response data in an object e.g. `{ data: someData }`
-The BaseController class has a static method `bodyWrapper` which has the response data as a parameter. This is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it.
+The BaseController class has a static method `responseMapper` which has the response data as a parameter. This is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it.
 
 - Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }`
 

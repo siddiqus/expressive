@@ -118,22 +118,23 @@ function _addPathDoc(paths, route, tags) {
   if (doc.tags) tags.push(...doc.tags);
 }
 
-function _handleRedirects(paths, route) {
-  const { method, path } = route;
-  if (!route.redirectUrl) return;
+// // _handleRedirects is deprecated in v2
+// function _handleRedirects(paths, route) {
+//   const { method, path } = route;
+//   if (!route.redirectUrl) return;
 
-  const redirectUrl = Utils.normalizePathSlashes(route.redirectUrl);
+//   const redirectUrl = Utils.normalizePathSlashes(route.redirectUrl);
 
-  const doc =
-    paths[redirectUrl] && paths[redirectUrl][method]
-      ? { ...paths[redirectUrl][method] }
-      : {};
+//   const doc =
+//     paths[redirectUrl] && paths[redirectUrl][method]
+//       ? { ...paths[redirectUrl][method] }
+//       : {};
 
-  doc.description = `[Redirected to ${redirectUrl}] ${doc.description || ''}`;
-  doc.summary = `[Redirected to ${redirectUrl}] ${doc.summary || ''}`;
+//   doc.description = `[Redirected to ${redirectUrl}] ${doc.description || ''}`;
+//   doc.summary = `[Redirected to ${redirectUrl}] ${doc.summary || ''}`;
 
-  paths[path][method] = doc;
-}
+//   paths[path][method] = doc;
+// }
 
 function convertDocsToSwaggerDoc(
   router,
@@ -145,7 +146,6 @@ function convertDocsToSwaggerDoc(
   let tags = [];
 
   infoList.forEach((route) => _addPathDoc(paths, route, tags));
-  infoList.forEach((route) => _handleRedirects(paths, route));
 
   tags = Array.from(new Set(tags)).map((t) => ({ name: t }));
 
