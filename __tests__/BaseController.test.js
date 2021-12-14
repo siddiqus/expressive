@@ -310,31 +310,28 @@ describe('BaseController', () => {
     expect(controller.resolvedBy).toEqual('setRes');
     controller.resolvedBy = null;
   });
-});
 
-/**
- * send: (args) => {
-        res.send(args);
-        this.resolvedBy = 'setRes';
-      },
-      json: (data) => {
-        res.json(data);
-        this.resolvedBy = 'setRes';
-      },
-      jsonp: (data) => {
-        res.jsonp(data);
-        this.resolvedBy = 'setRes';
-      },
-      sendFile: (...args) => {
-        res.sendFile(...args);
-        this.resolvedBy = 'setRes';
-      },
-      sendStatus: (code) => {
-        res.sendStatus(code);
-        this.resolvedBy = 'setRes';
-      },
-      end: (cb) => {
-        res.end(cb);
-        this.resolvedBy = 'setRes';
+  it('should call internal handler if this.ok is called', () => {
+    class SomeController extends BaseController {
+      handleRequest() {
+        this.ok({ some: 'data' });
       }
- */
+    }
+    const someRes = {
+      status: jest.fn(),
+      json: jest.fn()
+    };
+    const mockHandleInternalError = jest.fn();
+
+    const controller = new SomeController();
+
+    controller.setRes(someRes);
+    controller.internalServerError = mockHandleInternalError;
+
+    controller.handleRequest();
+
+    expect(someRes.json).toHaveBeenCalled();
+    expect(someRes.status).toHaveBeenCalled();
+    expect(mockHandleInternalError).not.toHaveBeenCalled();
+  });
+});

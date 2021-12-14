@@ -285,7 +285,12 @@ describe('RouterFactory', () => {
         }
       }
 
-      const fn = factory._getWrappedController(new SomeController());
+      const controller = new SomeController();
+
+      const mockHandleInternalError = jest.fn();
+      controller.internalServerError = mockHandleInternalError;
+
+      const fn = factory._getWrappedController(controller);
 
       const someReq = 1;
       const someRes = {
@@ -297,6 +302,9 @@ describe('RouterFactory', () => {
       await fn(someReq, someRes, someNext);
 
       expect(mockFn).toHaveBeenCalled();
+      expect(mockHandleInternalError).toHaveBeenCalledWith(
+        'Server did not send any response'
+      );
     });
 
     it('should pass error to next', async () => {
@@ -318,6 +326,32 @@ describe('RouterFactory', () => {
 
       // expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
       expect(someNext).toHaveBeenCalledWith(new Error('Some error'));
+    });
+
+    it('should not call internal if resolvedBy was populated', async () => {
+      const factory = new RouterFactory();
+      class SomeController extends BaseController {
+        handleRequest() {
+          this.ok({ some: 'data' });
+        }
+      }
+
+      const controller = new SomeController();
+      controller.resolvedBy = 'test';
+      controller.internalServerError = jest.fn();
+      const fn = factory._getWrappedController(controller);
+
+      const someReq = 1;
+      const someRes = {
+        status: jest.fn(),
+        json: jest.fn()
+      };
+      const someNext = jest.fn();
+
+      await fn(someReq, someRes, someNext);
+
+      expect(someNext).not.toHaveBeenCalled();
+      expect(controller.internalServerError).not.toHaveBeenCalled();
     });
   });
 

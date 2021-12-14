@@ -58,7 +58,7 @@ export declare abstract class BaseController {
   static responseMapper(data: any): any;
   static requestMapper(data: any): any;
 
-  handleRequest(): Promise<void>;
+  abstract handleRequest(): Promise<void>;
 
   req: Request;
   res: Response;
@@ -176,12 +176,16 @@ export declare class Route {
 export declare interface Subroute {
   path: string;
   controller: BaseController;
+  authorizer?: AuthorizerType;
+  middleware?: Handler[];
+  validationSchema?: ValidationSchema;
+  pre?: Handler | Handler[];
 }
 
 export declare function subroute(
   path: string,
   router: ExpressiveRouter,
-  options: Pick<Subroute, 'authorizer' | 'middleware' | 'validationSchema'>
+  options?: Pick<Subroute, 'authorizer' | 'middleware' | 'validationSchema'>
 ): Subroute
 
 export declare interface ExpressiveRouter {
@@ -208,6 +212,7 @@ export type SwaggerSecurityDefinitions = {
 }
 
 export interface ExpressiveOptions {
+  basePath?: string;
   showSwaggerOnlyInDev?: boolean;
   swaggerInfo?: SwaggerInfo;
   swaggerDefinitions?: any;
@@ -218,6 +223,8 @@ export interface ExpressiveOptions {
   swaggerSecurityDefinitions?: SwaggerSecurityDefinitions;
   allowCors?: boolean;
   corsConfig?: CorsOptions;
+  middleware?: Handler[];
+  authorizer?: AuthorizerType;
   errorHandler?: ErrorRequestHandler | ErrorRequestHandler[];
   bodyLimit?: string;
   helmetOptions?: HelmetConfiguration;
@@ -227,7 +234,7 @@ export interface ExpressiveOptions {
 }
 
 export declare class ExpressApp {
-  constructor(rootController: BaseController, options?: ExpressiveOptions);
+  constructor(router: ExpressiveRouter, options?: ExpressiveOptions);
   express: Express;
   listen(port: number, cb: Function): void;
 }

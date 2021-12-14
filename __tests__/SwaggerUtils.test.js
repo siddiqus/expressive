@@ -253,7 +253,7 @@ describe('SwaggerUtils', () => {
       expect(swaggerDoc).toBeDefined();
     });
 
-    it.skip('Should write json for swagger with authorizer object', () => {
+    it('Should write json for swagger with authorizer object', () => {
       const mockRoutes1 = { ...mockRouterWithTopRoutes };
       class Controller extends BaseController {
         constructor() {
@@ -279,7 +279,7 @@ describe('SwaggerUtils', () => {
 
       const swaggerstr = JSON.stringify(swaggerDoc);
       expect(
-        swaggerstr.includes(`Authorized: ["hello from hey route"]`)
+        swaggerstr.includes(`Authorized: [\\"hello from hey route\\"]`)
       ).toBeTruthy();
     });
 
