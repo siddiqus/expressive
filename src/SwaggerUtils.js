@@ -101,12 +101,19 @@ function _setTagFromPath(path, doc) {
 }
 
 function _addPathDoc(paths, route, tags) {
-  let { doc = {}, path, validationSchema, authorizer, parentPath } = route;
+  let {
+    path,
+    validationSchema,
+    authorizer,
+    parentPath,
+    controllerName,
+    doc = {}
+  } = route;
 
   _setTagFromPath(parentPath, doc);
   const { method } = route;
   path = _sanitizeSwaggerPath(path);
-  doc.summary = doc.summary || path;
+  doc.summary = `${doc.summary || ''} [${controllerName}]`.trim();
 
   _setAuthorizerDocInDescription(doc, authorizer);
   _setDocParameters(doc, validationSchema);

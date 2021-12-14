@@ -10,7 +10,8 @@ function _addRouteToPaths(paths, parentPath, route) {
     parentPath,
     validationSchema: route.controller.validationSchema,
     doc: route.controller.doc,
-    authorizer: route.controller.authorizer
+    authorizer: route.controller.authorizer,
+    controllerName: route.controller.constructor.name
   };
 
   delete routeData.controller;

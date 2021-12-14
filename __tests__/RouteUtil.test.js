@@ -44,18 +44,36 @@ describe('RouteUtil', () => {
   describe('getRoutesInfo', () => {
     it('Should register all routes and subroutes with redirects', () => {
       const expectedRoutes = [
-        { path: '/', parentPath: '', method: 'get', doc: 'hello' },
-        { path: '/users/', parentPath: '/users', method: 'get' },
-        { path: '/users/', parentPath: '/users', method: 'post' },
         {
-          path: '/users/:userId/posts/',
-          parentPath: '/users/:userId/posts',
-          method: 'get'
+          path: '/',
+          parentPath: '',
+          method: 'get',
+          doc: 'hello',
+          controllerName: 'BaseController'
+        },
+        {
+          path: '/users/',
+          parentPath: '/users',
+          method: 'get',
+          controllerName: 'BaseController'
+        },
+        {
+          path: '/users/',
+          parentPath: '/users',
+          method: 'post',
+          controllerName: 'BaseController'
         },
         {
           path: '/users/:userId/posts/',
           parentPath: '/users/:userId/posts',
-          method: 'post'
+          method: 'get',
+          controllerName: 'BaseController'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'post',
+          controllerName: 'BaseController'
         }
       ];
 
@@ -78,17 +96,29 @@ describe('RouteUtil', () => {
 
     it('Should register all subroutes from top', () => {
       const expectedRoutes = [
-        { path: '/users/', parentPath: '/users', method: 'get' },
-        { path: '/users/', parentPath: '/users', method: 'post' },
         {
-          path: '/users/:userId/posts/',
-          parentPath: '/users/:userId/posts',
-          method: 'get'
+          path: '/users/',
+          parentPath: '/users',
+          method: 'get',
+          controllerName: 'BaseController'
+        },
+        {
+          path: '/users/',
+          parentPath: '/users',
+          method: 'post',
+          controllerName: 'BaseController'
         },
         {
           path: '/users/:userId/posts/',
           parentPath: '/users/:userId/posts',
-          method: 'post'
+          method: 'get',
+          controllerName: 'BaseController'
+        },
+        {
+          path: '/users/:userId/posts/',
+          parentPath: '/users/:userId/posts',
+          method: 'post',
+          controllerName: 'BaseController'
         }
       ];
 
