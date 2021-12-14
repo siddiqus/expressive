@@ -1,5 +1,4 @@
-import Joi from "@hapi/joi";
-import { BaseController, ExpressApp, ValidationSchema } from "../../src";
+import { ExpressApp } from "../../src";
 import { errorHandler } from "./middlewares/error";
 import { router } from "./router";
 

@@ -1,6 +1,5 @@
 import { ExpressiveRouter, Route, subroute } from "../../src";
 import { HealthController } from "./controllers/health";
-import { UserController } from "./controllers/users";
 import { CreateUserController } from "./controllers/users/createUser";
 import { GetUserController, GetUsersController } from "./controllers/users/getUser";
 
