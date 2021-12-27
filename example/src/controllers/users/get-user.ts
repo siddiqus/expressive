@@ -1,5 +1,4 @@
-import Joi from "@hapi/joi";
-import { BaseController, ValidationSchema } from "../../../../src";
+import { BaseController, ValidationSchema, Joi } from "../../../../src";
 
 export class GetUserController extends BaseController {
   validationSchema?: ValidationSchema = {
