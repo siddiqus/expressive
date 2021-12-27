@@ -56,6 +56,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 - API validation using [celebrate](https://www.npmjs.com/package/celebrate) with [Joi](https://www.npmjs.com/package/@hapi/joi) schemas (Using Joi schemas also yields generated Swagger documentation!)
 - Centralized error handling
   - All errors thrown in controller functions will go into one user-defined error middleware function (can be defined with app constructor)
+- REST standard responses e.g. 200, 201, 404 built-in with the BaseController class methods
 - Centralized authorization
   - By defining authorizer function at any level - app, subroute, or route
   - Objective Authorization: By defining an authorizer object for each level, and centrally managing request authorization with one handler
@@ -71,8 +72,8 @@ Install the package: `npm i -S @siddiqus/expressive`
 Here is a basic example:
 **\*It is required for controllers to extend BaseController. This also allows for dependencies to be instantiated inside the constructor, which can be useful for testing.**
 
-```javascript
-const { Route, ExpressApp, BaseController } = require('@siddiqus/expressive');
+```typescript
+import { Route, ExpressApp, BaseController, ExpressiveRouter } from '@siddiqus/expressive';
 
 class HelloGetController extends BaseController {
   handleRequest(req, res) {
@@ -82,12 +83,12 @@ class HelloGetController extends BaseController {
   }
 }
 
-const router = {
-  routes: [Route.get('/hello', HelloGetController)]
+const router: ExpressiveRouter = {
+  routes: [Route.get('/hello', new HelloGetController())]
 };
 
 const app = new ExpressApp(router);
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT || 8080);
 app.listen(port, () => console.log('Listening on port ' + port));
 ```
 
@@ -101,21 +102,26 @@ Run this node script will start an Express app on port 8080. A GET request on [h
 
 The ExpressJS app can be used from the _express_ property of the _app_ object e.g. `app.express`
 
+*It is not recommended to write your whole application in one file like the one above. Please see the `example` folder for a sample folder structure for your application.
+
 # Routing
 
 It is easy to create routes and nested routes using Expressive, with the focus being on each individual endpoint.
 
 # The BaseController
 
-Each separate endpoint e.g. 'GET /users' is handled using a _controller_ class, that extends the `BaseController` class provided by Expressive. There is an 'abstract' method called `handleRequest` that requires an implementation for your own controller. The Express `request`, `response` and `next` objects are available in this method using `this`. This `handleRequest` method can be used as an `async` function also. For example:
+Each separate endpoint e.g. 'GET /users/:userId' is handled using a _controller_ class, that extends the `BaseController` class provided by Expressive. There is an 'abstract' method called `handleRequest` that requires an implementation for your own controller. The Express `request`, `response` and `next` objects are available in this method using `this`. This `handleRequest` method can be used as an `async` function also. For example:
 
 ```javascript
 const { BaseController } = require('@siddiqus/expressive');
 
 class GetUsersController extends BaseController {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
   async handleRequest() {
-    const id = this.req.params.id; // get an id from the path parameter
-    const userData = await someDbModel.getUser(id);
+    const userId = this.req.params.userId; // get an id from the path parameter
+    const userData = await this.usersRepository.getUserById(userId);
     this.ok(userData); // base methods available for HTTP responses
   }
 }
@@ -133,12 +139,29 @@ Here you'll notice that the request object is available with `this.req` and you 
 - tooMany (429)
 - internalServerError (500)
 
-##### Wrapping response data
+##### Wrapping request and response data
 
-Sometimes you will want to always wrap your response data in an object e.g. `{ data: someData }`
-The BaseController class has a static method `responseMapper` which has the response data as a parameter. This is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it.
+Sometimes you will want to always wrap your request/response data e.g. `response: { data: someData }`
+The BaseController class has static methods `responseMapper` and `requestMapper` which have the response data and `request` object as a parameter respectively. The `responseMapper` is used in the class methods e.g. `this.ok(data)` etc. to always wrap your response the way you define it. The `requestMapper` can be used to do any high level request mapping for your application. You can overwrite this in your startup files like `app.ts` like so: 
+```javascript
+import { BaseController, ExpressiveRouter, Route } from '@siddiqus/expressive'
 
-- Also, you don't always have to extend a BaseController class. You can simply pass a controller function as your request handler. e.g. `function (req, res, next) { }`
+BaseController.responseMapper = (data) => {
+  return {
+    body: data,
+  }
+}
+BaseController.requestMapper = (req) => {
+  // here normalizePhone is a utility function
+  req.body.phoneNumber = normalizePhone(req.body.phoneNumber) || undefined;
+  return req;
+}
+
+const router = {
+    routes: [] // route list
+}
+const app = new ExpressApp(router);
+```
 
 ## Routes and subroutes
 
@@ -156,18 +179,11 @@ The BaseController class has a static method `responseMapper` which has the resp
 
   const helloGetRoute = Route.get(
     '/some/path', // required - relative end path of endpoint
-    SomeController, // required - a controller function or class
-    {
-      doc: someDocJs, // optional - Swagger json format for a given endpoint
-      validationSchema: {
-        query: someJoiSchemaForQueryParams
-      }, // validationSchema optional - object with Joi schemas for body, query, params, etc.
-      errorHandler: function (err, req, res, next) {} // optional - middleware to handle errors for this specific endpoint
-    }
+    new SomeController(), // required - a controller function or class
   );
   ```
 
-  Similarly, the class methods `post`, `put`, `delete`, `patch`, `head`, and `options` are available for the Route class e.g. `Route.post`.
+  Similarly, the class methods `post`, `put`, `delete`, `patch`, `head`, and `options` are available for the _Route_ class e.g. `Route.post`.
 
 - Each object in the _subroutes_ array can be constructed using the `subroute` function, like so:
 
@@ -180,6 +196,8 @@ The BaseController class has a static method `responseMapper` which has the resp
     ]
   };
   ```
+
+Yes, the `router` object is recursive ;)
 
 ## Routing Example
 
@@ -197,19 +215,16 @@ const { Route, subroute } = require('@siddiqus/expressive');
 
 const helloRouter = {
   routes: [
-    [
-      // with some predefined controller functions
-      Route.get('/', GetHelloController),
-      Route.get('/users', GetUsersController),
-      Route.post('/users', PostUsersController)
-      // get /users and post /users can also be refactored into a separate subroute for "/users"
-    ]
+    // with some predefined controller functions
+    Route.get('/', new GetHelloController()),
+    Route.get('/users', new GetUsersController()),
+    Route.post('/users', new CreateUsersController())
   ]
 };
 
 const apiRouter = {
   routes: [
-    Route.get('/', ApiRootController) // some predefined controller
+    Route.get('/', new ApiRootController()) // some predefined controller
   ],
   subroutes: [subroute('/hello', helloRouter)]
 };
@@ -250,10 +265,10 @@ So _please_ be aware of using the `next()` function accordingly inside your midd
 
 The Expressive app comes with the following built-in middleware:
 
-- [body-parser](https://www.npmjs.com/package/body-parser) - manage request body in middleware
 - [cors](https://www.npmjs.com/package/cors) - Allow CORS requests
 - [express-request-id](https://www.npmjs.com/package/express-request-id) - Assign a unique ID for each request
 - [helmet](https://www.npmjs.com/package/helmet) - Add various HTTP headers for basic security
+- `json` and `urlencoded` from the `express` module (previously deprecated from `body-parser`)
 
 ### CORS
 
@@ -292,13 +307,27 @@ const app = new ExpressApp(router, {
 ## Configuring your own middleware
 
 These are examples on how to declare middleware accross the Expressive application.
-
-#### At the application level
+#### At the route level
 
 ```javascript
-const expressApp = new ExpressApp(router, {
-  middleware: [] // some array of middleware
-});
+const { BaseController, ExpressApp } = require('@siddiqus/expressive');
+
+class GetHelloController extends BaseController {
+    middleware = [someMiddlewareForHello] // some array of middleware to execute for this particular endpoint
+    handleRequest() {
+        this.ok({
+            hello: 'world'
+        })
+    }
+}
+
+const router = {
+  routes: [
+    Route.get('/hello', new GetHelloController())
+  ]
+};
+
+const app = new ExpressApp(router);
 ```
 
 #### At the sub route level
@@ -315,19 +344,15 @@ const router = {
 };
 ```
 
-#### At the route level
+#### At the application level
 
 ```javascript
-const { subroute } = require('@siddiqus/expressive');
-
-const router = {
-  routes: [
-    Route.get('/hello', someHelloController, {
-      middleware: [] // some array of middleware to execute for this particular endpoint
-    })
-  ]
-};
+const expressApp = new ExpressApp(router, {
+  middleware: [] // some array of middleware
+});
 ```
+
+**Point to note, these middleware functions run right before the main request handler for the given route**
 
 # Centralized error handling
 
@@ -338,7 +363,7 @@ const { ExpressApp } = require("@siddiqus/expressive");
 
 function centralizedErrorHandling (err, req, res, next) {
     res.status(500);
-    res.send({
+    res.json({
         message: "There was an internal error."
     });
 }
@@ -382,21 +407,21 @@ class SomeController extends BaseController {
 This example shows both async and non-async middleware being passed to multiple levels e.g. routes and subroutes.
 
 ```javascript
-Route.get(
-  '/hello',
-  (req, res) => {
-    res.json({
-      hello: 'world'
-    });
-  },
-  {
-    middleware: [
-      async (req, res, next) => console.log('from mid 1') || next(), // this works
-      (req, res, next) => console.log('from mid 2') || next(), // this works too
-      (req, res) => console.log('from mid 2') // this works too
-    ]
-  }
-);
+const someMiddlewareForGetHello = [
+  async (req, res, next) => console.log('from mid 1') || next(), // this works
+  (req, res, next) => console.log('from mid 2') || next(), // this works too
+  (req, res) => console.log('from mid 2') // this works too
+]
+
+class GetHelloController extends BaseController {
+    middleware = someMiddlewareForGetHello
+    handleRequest() {
+        this.ok({
+            hello: 'world'
+        })
+    }
+}
+const route = Route.get('/hello', new GetHelloController());
 ```
 
 Notice how the three middleware functions are different:
@@ -406,16 +431,13 @@ Notice how the three middleware functions are different:
 
 # Request validation using Celebrate
 
-Expressive uses [celebrate](https://www.npmjs.com/package/celebrate) for API endpoint validations. A schema can be added to any endpoint using the 'validationSchema' property of a route.
+Expressive uses [celebrate](https://www.npmjs.com/package/celebrate) for API endpoint validations. A schema can be added to any endpoint using the 'validationSchema' class property of a controller.
 
 ```javascript
-const { Route, Joi } = require('@siddiqus/expressive');
+const { Route, Joi, BaseController } = require('@siddiqus/expressive');
 
-const getUserById = Route.get(
-  '/users/:userId',
-  GetSpecificUser, // some predefined controller
-  {
-    validationSchema: {
+class GetUserByIdController extends BaseController {
+    validationSchema = {
       params: {
         userId: Joi.number().required()
       },
@@ -423,8 +445,15 @@ const getUserById = Route.get(
       query: {},
       headers: {} // and others based on celebrate's documentation
     }
-  }
-);
+
+    handleRequest() {
+        this.ok({
+            some: 'user'
+        })
+    }
+}
+
+const getUserById = Route.get('/users/:userId', new GetUserByIdController());
 ```
 
 # Centralized authorization
@@ -432,12 +461,14 @@ const getUserById = Route.get(
 You can define an `authorizer` property at the app, subroute or route level (in case of multiple definitions, they will be executed in that order respectively). Here are the examples:
 
 ```javascript
+class SomeController extends BaseController {
+    authorizer = (req, res) => {} // authorizer function for this particular route
+    // handleRequest is implemented, assume
+}
+
 const expressiveRouter = {
   routes: [
-    Route.get("/users", {
-      controller: someControllerFn, // required controller for the endpoint
-      authorizer: (req, res) => {} // authorizer function for this particular route
-    })
+    Route.get("/users", new SomeController()),
   ],
   subroutes: [
     {
@@ -465,14 +496,14 @@ You can use this authorization mechanism by defining an `authObjectHandler` func
 1. Let's say we define an endpoint with an authorizer
 
 ```javascript
+class SomeController extends BaseController {
+    authorizer = {
+        permissions: 'some-permission-criteria'
+    }
+}
 const expressiveRouter = {
   routes: [
-    Route.get('/hello', {
-      controller: (req, res) => {}, // some controller
-      authorizer: {
-        permissions: 'some-permission-criteria'
-      }
-    })
+    Route.get('/hello', new SomeController())
   ]
 };
 ```
@@ -480,8 +511,7 @@ const expressiveRouter = {
 2. And we have declared our `authObjectHandler` in `ExpressApp` params
 
 ```javascript
-const app = new ExpressApp(expressiveRouter, {
-  authObjectHandler: async (req, res) => {
+function authObjectHandler(req, res) {
     const user = req.user; // this object is allowed for any user data
     const authorizer = req.authorizer; // req.authorizer is a flattened array of all authorizer objects
     // in our case, req.authorizer = [{ some: 'permission-criteria' }]
@@ -495,7 +525,10 @@ const app = new ExpressApp(expressiveRouter, {
         message: 'Unauthorized'
       });
     }
-  }
+}
+
+const app = new ExpressApp(expressiveRouter, {
+  authObjectHandler,
 });
 ```
 
@@ -572,20 +605,21 @@ This will add Authorize option in Swagger UI to add an `Authorization` header va
 
 #### Declaring docs manually
 
-Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' property to the route object.
+Each API endpoint can be documented using Swagger syntax, simply by adding a 'doc' class property to the controller class.
 Example:
 
-```javascript
-const getUserById = Route.get(
-  '/hello',
-  GetHelloController, // some predefined controller
-  {
-    doc: GetHelloDocJs // Swagger doc format for an endpoint
-  }
-);
+```typescript
+import getHelloDoc from './getHelloDoc'; // Swagger doc format for an endpoint, js or json
+
+class GetHelloController extends BaseController {
+    doc = getHelloDoc // Swagger doc format for an endpoint
+    // assume handleRequest is implemented here
+}
+
+const getUserById = Route.get('/hello', new GetHelloController());
 ```
 
-The 'GetUserByIdDocJs' JS or JSON could be an Open API 2.x specification JSON, for example:
+The 'getHelloDoc' JS or JSON could be an Open API 2.x specification JSON, for example:
 
 ```javascript
 {
@@ -638,23 +672,27 @@ import multer from 'multer';
 
 const uploadFile = multer();
 
-const fileUploadRoute = Route.put('/file-upload', {
-  validationSchema: {
+class FileUploadController extends BaseController {
+  validationSchema = {
     fileUpload: {
       file: Joi.any().required() // use Joi.any() for any validations
     }
-  },
-  middleware: [uploadFile.single('file')], // adding multer middleware
-  controller: (req, res) => {
+  }
+  
+  middleware = [uploadFile.single('file')], // adding multer middleware
+  
+  handleRequest (req, res) {
     const file = req.file;
     const filename = file.originalname;
     const content = file.buffer.toString();
-    res.json({
+    this.ok({
       filename,
-      content
-    });
+      content  
+    })
   }
-});
+};
+
+const fileUploadRoute = Route.put('/file-upload', new FileUploadController());
 ```
 
 This provides two benefits:
@@ -665,6 +703,4 @@ This provides two benefits:
 \*\*\* Current limitation is the `fileUpload` in `validationSchema` is limited to `file` and `files`, which means the `formData` property has to be either `file` or `files` for this to work. You can use `multer`'s other methods like `fields`, but in that case, you won't be able to name the field anything other than `file` or `files`.
 
 # Examples
-
-- For regular JavaScript, see the 'example' folder in this repo.
-- For TypeScript, see the 'ts-example' folder
+- See the 'example' folder in this repo for the Typescript sample project structure with example controllers and configs.

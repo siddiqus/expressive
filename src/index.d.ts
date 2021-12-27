@@ -51,7 +51,6 @@ interface BaseController {
   doc?: SwaggerEndpointDoc;
   middleware?: Handler[];
   pre?: Handler | Handler[];
-  basePath?: string;
 }
 
 export declare abstract class BaseController {

@@ -22,8 +22,6 @@ class BaseController {
   }
 
   constructor() {
-    this.basePath = '/';
-
     this.req = null;
     this.res = null;
     this.next = null;
