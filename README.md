@@ -14,9 +14,10 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 
 - [Introduction](#introduction)
 - [Quickstart](#quickstart)
+- [Migrating from V3 to V4](#migrating-from-v3-to-v4)
 - [Routing](#routing)
 - [The BaseController](#the-basecontroller)
-  - [Routes and subroutes](#routes-and-subroutes)
+- [Routes and subroutes](#routes-and-subroutes)
   - [Routing Example](#routing-example)
 - [Express App Configuration](#express-app-configuration)
 - [Middleware configuration](#middleware-configuration)
@@ -34,7 +35,7 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 - [Request validation using Celebrate](#request-validation-using-celebrate)
 - [Centralized authorization](#centralized-authorization)
 - [Auto-generated documentation with Swagger](#documentation-with-swagger)
-- [File upload example with [multer](https://npmjs.org/package/multer)](#file-upload)
+- [File upload example with `multer`](#file-upload)
 - [Example applications (Both TypeScript and ES5)](#example)
 
 \*Table of contents generated with [markdown-toc](http://ecotrust-canada.github.io/markdown-toc/)
@@ -104,6 +105,53 @@ The ExpressJS app can be used from the _express_ property of the _app_ object e.
 
 *It is not recommended to write your whole application in one file like the one above. Please see the `example` folder for a sample folder structure for your application.
 
+# Migrating from V3 to V4
+V4 has two main differences from V3:
+1. Controller classes need to be initialized when creating a Route object, which allows for dependency injection.
+2. Route properties e.g. validationSchema, middleware, authorizer, doc etc. need to be set as class properties of the controller.
+
+### V3 example
+```typescript
+import { ExpressiveRouter, BaseController, Route } from '@siddiqus/expressive';
+
+class HelloController extends BaseController {
+    // some implementation of handleRequest
+}
+const router: ExpressiveRouter = {
+    routes: [
+        Route.get(
+            '/hello',
+            HelloController, // controller is not initialized here
+            {
+                validationSchema: { }, // some validation schema object
+                authorizer: { }, // some authorizer object
+                middleware: [(req, res) => {}], // some middleware functions
+                doc: someDocJs // some swagger definition
+            }
+        )
+    ]
+}
+```
+
+### V4 example
+```typescript
+import { ExpressiveRouter, BaseController, Route } from '@siddiqus/expressive';
+
+// declare validationSchema, middleware, etc. as class properties
+class HelloController extends BaseController {
+    validationSchema = { }, // some validation schema object
+    authorizer = { }, // some authorizer object
+    middleware = [(req, res) => {}], // some middleware functions
+    doc = someDocJs // some swagger definition
+    
+    // some implementation of handleRequest
+}
+const router: ExpressiveRouter = {
+    routes: [
+        Route.get('/hello', new HelloController(dependencies)) // HelloController class needs to be initialized with dependencies if any
+    ]
+}
+```
 # Routing
 
 It is easy to create routes and nested routes using Expressive, with the focus being on each individual endpoint.
