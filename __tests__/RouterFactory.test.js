@@ -13,32 +13,16 @@ const mockSubroutes = [
     path: '/users',
     router: {
       routes: [
-        {
-          path: '/',
-          method: 'get',
-          controller: BaseController
-        },
-        {
-          path: '/',
-          method: 'post',
-          controller: BaseController
-        }
+        Route.get('/', new BaseController()),
+        Route.post('/', new BaseController())
       ],
       subroutes: [
         {
           path: '/:userId/posts',
           router: {
             routes: [
-              {
-                path: '/',
-                method: 'get',
-                controller: BaseController
-              },
-              {
-                path: '/',
-                method: 'post',
-                controller: BaseController
-              }
+              Route.get('/', new BaseController()),
+              Route.post('/', new BaseController())
             ]
           }
         }
@@ -63,7 +47,7 @@ describe('RouterFactory', () => {
           {
             path: '/',
             method: 'get',
-            controller: BaseController
+            controller: new BaseController()
           }
         ],
         subroutes: mockSubroutes
@@ -96,7 +80,6 @@ describe('RouterFactory', () => {
       const mockRouter = {
         subroutes: mockSubroutes
       };
-
       const routerFactory = new RouterFactory({});
       const mockExpressRouter = {
         get: jest.fn(),
@@ -131,15 +114,22 @@ describe('RouterFactory', () => {
       };
 
       factory.routeUtil = {
+        getDuplicateUrls: jest.fn().mockReturnValue([]),
         getHandlerWithManagedNextCall: jest.fn()
       };
+
+      class SomeController extends BaseController {}
+      const controller = new SomeController();
+      controller.router = {
+        routes: [Route.get('/hello', new BaseController())]
+      };
+      controller.middleware = [(req, res) => 1, (req, res) => 2];
+      controller.authorizer = (req, res) => {};
 
       factory._registerRoute(mockExpressRouter, {
         method: 'get',
         path: '/',
-        controller: BaseController,
-        middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => {}
+        controller
       });
 
       expect(
@@ -169,13 +159,16 @@ describe('RouterFactory', () => {
         }
       };
 
+      class SomeController extends BaseController {}
+      const controller = new SomeController();
+      controller.middleware = [(req, res) => 1, (req, res) => 2];
+      controller.authorizer = (req, res) => {};
+      controller.validationSchema = schema;
+
       factory._registerRoute(mockExpressRouter, {
         method: 'get',
         path: '/',
-        controller: BaseController,
-        middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => {},
-        validationSchema: schema
+        controller
       });
 
       expect(factory.celebrateMiddleware).toHaveBeenCalledWith(schema, {
@@ -208,13 +201,16 @@ describe('RouterFactory', () => {
         }
       };
 
+      class SomeCtr extends BaseController {}
+      const controller = new SomeCtr();
+      controller.middleware = [(req, res) => 1, (req, res) => 2];
+      controller.authorizer = (req, res) => {};
+      controller.validationSchema = schema;
+
       factory._registerRoute(mockExpressRouter, {
         method: 'get',
         path: '/',
-        controller: BaseController,
-        middleware: [(req, res) => 1, (req, res) => 2],
-        authorizer: (req, res) => {},
-        validationSchema: schema
+        controller
       });
 
       expect(factory.celebrateMiddleware).not.toHaveBeenCalledWith(schema);
@@ -277,66 +273,7 @@ describe('RouterFactory', () => {
     });
   });
 
-  describe('_registerSubroute', () => {
-    it('Should register subroute with middleware properly', () => {
-      const factory = new RouterFactory({});
-
-      const mockExpressRouter = {
-        use: jest.fn()
-      };
-      factory.getExpressRouter = jest.fn();
-      factory.routeUtil = {
-        getHandlerWithManagedNextCall: jest.fn()
-      };
-
-      factory._registerSubroute(mockExpressRouter, {
-        path: '/',
-        router: 'somerouter',
-        middleware: [(req, res) => 1, (req, res) => 2, (req, res) => 3],
-        authorizer: (req, res) => {}
-      });
-
-      expect(factory.getExpressRouter).toHaveBeenCalled();
-      expect(
-        factory.routeUtil.getHandlerWithManagedNextCall
-      ).toHaveBeenCalledTimes(3);
-      expect(mockExpressRouter.use).toHaveBeenCalled();
-    });
-  });
-
   describe('_getWrappedController', () => {
-    it('should execute controller if given a function', async () => {
-      const factory = new RouterFactory();
-
-      const mockFn = jest.fn();
-      const fn = factory._getWrappedController(mockFn);
-
-      const someReq = 1;
-      const someRes = 2;
-      const someNext = 3;
-
-      await fn(someReq, someRes, someNext);
-
-      expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
-    });
-
-    it('should execute controller if given an anonymous function', async () => {
-      const factory = new RouterFactory();
-
-      const mockFn = jest.fn();
-      const fn = factory._getWrappedController((req, res, next) => {
-        mockFn(req, res, next);
-      });
-
-      const someReq = 1;
-      const someRes = 2;
-      const someNext = 3;
-
-      await fn(someReq, someRes, someNext);
-
-      expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
-    });
-
     it('should execute given base controller child', async () => {
       const factory = new RouterFactory();
 
@@ -344,19 +281,30 @@ describe('RouterFactory', () => {
 
       class SomeController extends BaseController {
         handleRequest() {
-          mockFn(this.req, this.res, this.next);
+          mockFn();
         }
       }
 
-      const fn = factory._getWrappedController(SomeController);
+      const controller = new SomeController();
+
+      const mockHandleInternalError = jest.fn();
+      controller.internalServerError = mockHandleInternalError;
+
+      const fn = factory._getWrappedController(controller);
 
       const someReq = 1;
-      const someRes = 2;
+      const someRes = {
+        status: jest.fn(),
+        json: jest.fn
+      };
       const someNext = 3;
 
       await fn(someReq, someRes, someNext);
 
-      expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
+      expect(mockFn).toHaveBeenCalled();
+      expect(mockHandleInternalError).toHaveBeenCalledWith(
+        'Server did not send any response'
+      );
     });
 
     it('should pass error to next', async () => {
@@ -368,7 +316,7 @@ describe('RouterFactory', () => {
         }
       }
 
-      const fn = factory._getWrappedController(SomeController);
+      const fn = factory._getWrappedController(new SomeController());
 
       const someReq = 1;
       const someRes = 2;
@@ -379,22 +327,31 @@ describe('RouterFactory', () => {
       // expect(mockFn).toHaveBeenCalledWith(someReq, someRes, someNext);
       expect(someNext).toHaveBeenCalledWith(new Error('Some error'));
     });
-  });
 
-  describe('_executeController', () => {
-    it('Should redirect if route url', () => {
+    it('should not call internal if resolvedBy was populated', async () => {
       const factory = new RouterFactory();
-      const mockRes = {
-        redirect: jest.fn()
+      class SomeController extends BaseController {
+        handleRequest() {
+          this.ok({ some: 'data' });
+        }
+      }
+
+      const controller = new SomeController();
+      controller.resolvedBy = 'test';
+      controller.internalServerError = jest.fn();
+      const fn = factory._getWrappedController(controller);
+
+      const someReq = 1;
+      const someRes = {
+        status: jest.fn(),
+        json: jest.fn()
       };
+      const someNext = jest.fn();
 
-      factory._executeController('/somepath', {
-        req: null,
-        res: mockRes,
-        next: null
-      });
+      await fn(someReq, someRes, someNext);
 
-      expect(mockRes.redirect).toHaveBeenCalledWith('/somepath');
+      expect(someNext).not.toHaveBeenCalled();
+      expect(controller.internalServerError).not.toHaveBeenCalled();
     });
   });
 

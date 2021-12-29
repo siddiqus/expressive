@@ -45,14 +45,34 @@ export declare interface SwaggerInfo {
   contact?: SwaggerInfoContact;
 }
 
-export declare class BaseController {
-  static bodyWrapper(): any;
+interface BaseController {
+  validationSchema?: ValidationSchema;
+  authorizer?: AuthorizerType;
+  doc?: SwaggerEndpointDoc;
+  middleware?: Handler[];
+  pre?: Handler | Handler[];
+}
 
-  handleRequest(): Promise<void> | void;
+export declare abstract class BaseController {
+  static responseMapper(data: any): any;
+  static requestMapper(data: any): any;
+
+  abstract handleRequest(): Promise<void>;
 
   req: Request;
   res: Response;
   next: NextFunction;
+
+  getData(): {
+    body: Record<string, any>
+    query: Record<string, any>
+    params: Record<string, any>
+    fileUpload: {
+      file: any
+      files: any
+    }
+    user: Record<string, any>
+  };
 
   ok(data?: any): void;
 
@@ -74,9 +94,6 @@ export declare class BaseController {
 
   internalServerError(message?: string, body?: any): void;
 }
-
-type controller = string | Handler | typeof BaseController;
-
 export declare interface ValidationSchema {
   body?: object;
   params?: object;
@@ -103,15 +120,6 @@ export declare interface SwaggerEndpointDoc {
 
 type AuthorizerType = Handler | Handler[] | string | string[] | object | object[];
 
-export declare interface RouteParams {
-  controller: string | Handler | typeof BaseController;
-  validationSchema?: ValidationSchema;
-  authorizer?: AuthorizerType;
-  doc?: SwaggerEndpointDoc;
-  middleware?: Handler[];
-  pre?: Handler | Handler[];
-}
-
 export declare type RouteMethod =
   | 'get'
   | 'post'
@@ -121,67 +129,52 @@ export declare type RouteMethod =
   | 'patch'
   | 'options';
 
-export declare interface Endpoint extends RouteParams {
+export declare interface Endpoint {
+  controller: BaseController;
   method: RouteMethod;
   path: string;
 }
 
-export declare type RouteProps = Omit<RouteParams, 'controller'>;
-
 export declare class Route {
   static get(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static get(path: string, params?: RouteParams): Endpoint;
 
   static post(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static post(path: string, params?: RouteParams): Endpoint;
 
   static delete(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static delete(path: string, params?: RouteParams): Endpoint;
 
   static put(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static put(path: string, params?: RouteParams): Endpoint;
 
   static head(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static head(path: string, params?: RouteParams): Endpoint;
 
   static options(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static options(path: string, params?: RouteParams): Endpoint;
 
   static patch(
     path: string,
-    controller: string | Handler | typeof BaseController,
-    params?: RouteProps
+    controller: BaseController
   ): Endpoint;
-  static patch(path: string, params?: RouteParams): Endpoint;
 }
 
 export declare interface Subroute {
   path: string;
-  router: ExpressiveRouter;
+  controller: BaseController;
   authorizer?: AuthorizerType;
   middleware?: Handler[];
   validationSchema?: ValidationSchema;
@@ -191,7 +184,7 @@ export declare interface Subroute {
 export declare function subroute(
   path: string,
   router: ExpressiveRouter,
-  options: Pick<Subroute, 'authorizer' | 'middleware' | 'validationSchema'>
+  options?: Pick<Subroute, 'authorizer' | 'middleware' | 'validationSchema'>
 ): Subroute
 
 export declare interface ExpressiveRouter {

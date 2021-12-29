@@ -2,56 +2,36 @@ const path = require('path');
 const fs = require('fs');
 const SwaggerUtils = require('../src/SwaggerUtils');
 const { Joi } = require('celebrate');
+const Route = require('../src/Route');
+const BaseController = require('../src/BaseController');
+const { subroute } = require('../src');
 
+class SomeTestController extends BaseController {
+  constructor() {
+    super();
+
+    this.doc = {
+      tags: ['SomeTag']
+    };
+  }
+}
 const mockRouterWithTopRoutes = {
-  routes: [
-    {
-      path: '/',
-      method: 'get',
-      controller: () => {},
-      doc: {
-        tags: ['SomeTag']
-      }
-    }
-  ],
+  routes: [Route.get('/', new SomeTestController())],
   subroutes: [
     {
       path: '/users',
       router: {
         routes: [
-          {
-            path: '/',
-            method: 'get',
-            controller: () => {},
-            doc: {
-              tags: ['SomeTag']
-            }
-          },
-          {
-            path: '/',
-            method: 'post',
-            controller: () => {},
-            doc: {}
-          }
+          Route.get('/', new SomeTestController()),
+          Route.post('/', new SomeTestController())
         ],
         subroutes: [
-          {
-            path: '/:userId/posts',
-            router: {
-              routes: [
-                {
-                  path: '/',
-                  method: 'get',
-                  controller: () => {}
-                },
-                {
-                  path: '/',
-                  method: 'post',
-                  controller: () => {}
-                }
-              ]
-            }
-          }
+          subroute('/:userId/posts', {
+            routes: [
+              Route.get('/', new BaseController()),
+              Route.post('/', new BaseController())
+            ]
+          })
         ]
       }
     }
@@ -79,6 +59,7 @@ describe('SwaggerUtils', () => {
       expect(mockApp.use).toHaveBeenCalled();
       expect(mockApp.get).toHaveBeenCalled();
 
+      // eslint-disable-next-line prefer-destructuring
       const [, , mockRedirectHandler] = mockApp.get.mock.calls[0];
       const mockRes = {
         redirect: jest.fn()
@@ -108,6 +89,7 @@ describe('SwaggerUtils', () => {
       expect(mockApp.use).toHaveBeenCalled();
       expect(mockApp.get).toHaveBeenCalled();
 
+      // eslint-disable-next-line prefer-destructuring
       const [, , mockRedirectHandler] = mockApp.get.mock.calls[0];
       const mockRes = {
         redirect: jest.fn()
@@ -153,7 +135,7 @@ describe('SwaggerUtils', () => {
               routes: [
                 {
                   path: '/hey',
-                  controller: () => {},
+                  controller: new BaseController(),
                   method: 'get'
                 }
               ]
@@ -165,7 +147,7 @@ describe('SwaggerUtils', () => {
               routes: [
                 {
                   path: '/hey',
-                  controller: () => {},
+                  controller: new BaseController(),
                   method: 'get'
                 }
               ]
@@ -177,7 +159,7 @@ describe('SwaggerUtils', () => {
               routes: [
                 {
                   path: '/hey',
-                  controller: () => {},
+                  controller: new BaseController(),
                   method: 'get'
                 }
               ]
@@ -189,7 +171,7 @@ describe('SwaggerUtils', () => {
               routes: [
                 {
                   path: '/hey',
-                  controller: () => {},
+                  controller: new BaseController(),
                   method: 'get'
                 }
               ]
@@ -210,11 +192,11 @@ describe('SwaggerUtils', () => {
         subroutes: [
           {
             path: '/',
-            router: {
+            controller: {
               routes: [
                 {
                   path: '/hey',
-                  controller: () => {},
+                  controller: new BaseController(),
                   method: 'get'
                 }
               ]
@@ -232,7 +214,7 @@ describe('SwaggerUtils', () => {
       mockRoutes1.routes.push(
         {
           path: '/hey',
-          controller: '/users',
+          controller: new BaseController(),
           method: 'get',
           doc: {
             summary: 'hey route',
@@ -244,7 +226,7 @@ describe('SwaggerUtils', () => {
         },
         {
           path: '/hello',
-          controller: '/products',
+          controller: new BaseController(),
           method: 'get',
           doc: {
             responses: {
@@ -273,53 +255,57 @@ describe('SwaggerUtils', () => {
 
     it('Should write json for swagger with authorizer object', () => {
       const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      class Controller extends BaseController {
+        constructor() {
+          super();
+          this.doc = {
+            summary: 'hey route',
+            responses: {
+              200: {}
+            }
+          };
+          this.authorizer = ['hello from hey route'];
+        }
+      }
       mockRoutes1.routes.push({
         path: '/hey',
-        controller: () => {},
-        method: 'get',
-        doc: {
-          summary: 'hey route',
-          responses: {
-            200: {}
-          }
-        },
-        authorizer: ['hello']
+        controller: new Controller(),
+        method: 'get'
       });
 
-      let swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
-
-      mockRoutes1.routes.push({
-        path: '/hello',
-        controller: '/hey/',
-        method: 'get',
-        doc: {
-          responses: {}
-        }
-      });
-      swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
+      const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
 
       expect(swaggerDoc).toBeDefined();
 
       const swaggerstr = JSON.stringify(swaggerDoc);
-      expect(swaggerstr.substring(`Authorized: ["hello"]`)).toBeDefined();
+      expect(
+        swaggerstr.includes(`Authorized: [\\"hello from hey route\\"]`)
+      ).toBeTruthy();
     });
 
     it('Should write json for swagger with responses defined', () => {
       const mockRoutes1 = { routes: [] };
+
+      class Controller extends BaseController {
+        constructor() {
+          super();
+          this.doc = {
+            summary: 'hey route',
+            responses: {
+              200: {}
+            }
+          };
+          this.authorizer = ['hello'];
+          this.validationSchema = {
+            some: 'schema'
+          };
+        }
+      }
+
       mockRoutes1.routes.push({
         path: '/hey',
-        controller: () => {},
-        method: 'get',
-        doc: {
-          summary: 'hey route',
-          responses: {
-            200: {}
-          }
-        },
-        authorizer: ['hello'],
-        validationSchema: {
-          some: 'schema'
-        }
+        controller: new Controller(),
+        method: 'get'
       });
 
       const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
@@ -333,22 +319,29 @@ describe('SwaggerUtils', () => {
 
     it('Should write json for swagger with file upload defined', () => {
       const mockRoutes1 = { routes: [] };
+      class FileUploadController extends BaseController {
+        constructor() {
+          super();
+
+          this.doc = {
+            summary: 'hey route',
+            responses: {
+              200: {}
+            }
+          };
+          this.authorizer = ['hello'];
+          this.validationSchema = {
+            fileUpload: {
+              file: Joi.any().required()
+            }
+          };
+        }
+      }
+
       mockRoutes1.routes.push({
         path: '/hey',
-        controller: () => {},
-        method: 'get',
-        doc: {
-          summary: 'hey route',
-          responses: {
-            200: {}
-          }
-        },
-        authorizer: ['hello'],
-        validationSchema: {
-          fileUpload: {
-            file: Joi.any().required()
-          }
-        }
+        controller: new FileUploadController(),
+        method: 'get'
       });
 
       const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
@@ -359,21 +352,29 @@ describe('SwaggerUtils', () => {
     });
 
     it('Should write json for swagger with responses defined for validation', () => {
-      const mockRoutes1 = { ...mockRouterWithTopRoutes };
+      const mockRoutes1 = { routes: [] };
+      class Controller extends BaseController {
+        constructor() {
+          super();
+          this.doc = {
+            summary: 'hey route',
+            description: 'hey route',
+            responses: {
+              200: {},
+              400: {
+                response: 'this is a response schema'
+              }
+            },
+            tags: ['hello']
+          };
+          this.authorizer = ['hello'];
+        }
+      }
+
       mockRoutes1.routes.push({
         path: '/hey',
-        controller: () => {},
-        method: 'get',
-        doc: {
-          summary: 'hey route',
-          responses: {
-            200: {},
-            400: {
-              response: 'hehe'
-            }
-          }
-        },
-        authorizer: ['hello']
+        controller: new Controller(),
+        method: 'get'
       });
 
       const swaggerDoc = SwaggerUtils.convertDocsToSwaggerDoc(mockRoutes1);
@@ -383,6 +384,8 @@ describe('SwaggerUtils', () => {
       expect(
         swaggerstr.includes(`Schema validation error response`)
       ).toBeFalsy();
+
+      expect(swaggerstr.includes(`this is a response schema`)).toBeTruthy();
     });
   });
 
