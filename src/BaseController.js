@@ -41,36 +41,6 @@ class BaseController {
     );
   }
 
-  setRes(res) {
-    this.res = {
-      ...res,
-      send: (args) => {
-        res.send(args);
-        this.resolvedBy = 'setRes';
-      },
-      json: (data) => {
-        res.json(data);
-        this.resolvedBy = this.resolvedBy || 'setRes';
-      },
-      jsonp: (data) => {
-        res.jsonp(data);
-        this.resolvedBy = 'setRes';
-      },
-      sendFile: (...args) => {
-        res.sendFile(...args);
-        this.resolvedBy = 'setRes';
-      },
-      sendStatus: (code) => {
-        res.sendStatus(code);
-        this.resolvedBy = 'setRes';
-      },
-      end: (cb) => {
-        res.end(cb);
-        this.resolvedBy = 'setRes';
-      }
-    };
-  }
-
   getData() {
     const { body, query, params, fileUpload, user } = this.req;
     return {

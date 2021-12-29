@@ -296,7 +296,9 @@ function getCelebrateValidationMiddlewareForFileUpload(fileUploadValidation) {
       return next();
     } catch (error) {
       error.isJoi = true;
-      return next(CelebrateError(error, Segments.BODY, { celebrated: true }));
+      return next(
+        new CelebrateError(error, Segments.BODY, { celebrated: true })
+      );
     }
   };
 }

@@ -40,7 +40,7 @@ describe('BaseController', () => {
       end: jest.fn()
     };
 
-    controller.setRes(mockRes);
+    controller.res = mockRes;
 
     beforeEach(() => {
       Object.keys(mockRes).forEach((fn) => {
@@ -264,53 +264,6 @@ describe('BaseController', () => {
     expect(controller.getCookies()).toEqual(req);
   });
 
-  it('should set res and set isResolved accordingly', () => {
-    const controller = new BaseController();
-
-    const mockRes = {
-      status: jest.fn(),
-      send: jest.fn(),
-      json: jest.fn(),
-      jsonp: jest.fn(),
-      sendFile: jest.fn(),
-      sendStatus: jest.fn(),
-      end: jest.fn()
-    };
-
-    controller.setRes(mockRes);
-
-    expect(controller.resolvedBy).toBeNull();
-
-    controller.ok('hehe');
-    expect(mockRes.status).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('ok');
-
-    controller.res.send({});
-    expect(mockRes.send).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('setRes');
-    controller.resolvedBy = null;
-
-    controller.res.sendFile({});
-    expect(mockRes.sendFile).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('setRes');
-    controller.resolvedBy = null;
-
-    controller.res.json({});
-    expect(mockRes.json).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('setRes');
-    controller.resolvedBy = null;
-
-    controller.res.jsonp({});
-    expect(mockRes.jsonp).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('setRes');
-    controller.resolvedBy = null;
-
-    controller.res.end({});
-    expect(mockRes.end).toHaveBeenCalled();
-    expect(controller.resolvedBy).toEqual('setRes');
-    controller.resolvedBy = null;
-  });
-
   it('should call internal handler if this.ok is called', () => {
     class SomeController extends BaseController {
       handleRequest() {
@@ -324,8 +277,8 @@ describe('BaseController', () => {
     const mockHandleInternalError = jest.fn();
 
     const controller = new SomeController();
+    controller.res = someRes;
 
-    controller.setRes(someRes);
     controller.internalServerError = mockHandleInternalError;
 
     controller.handleRequest();

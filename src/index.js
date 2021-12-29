@@ -1,5 +1,5 @@
 const express = require('express');
-const { Joi, isCelebrate: isValidationError } = require('celebrate');
+const { Joi, isCelebrateError: isValidationError } = require('celebrate');
 const celebrate = require('celebrate');
 const ExpressApp = require('./ExpressApp');
 const RouteUtil = require('./RouteUtil');

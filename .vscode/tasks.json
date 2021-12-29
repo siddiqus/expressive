@@ -6,7 +6,7 @@
     {
       "label": "build-ts-example",
       "type": "typescript",
-      "tsconfig": "ts-example/tsconfig.json",
+      "tsconfig": "example/tsconfig.json",
       "problemMatcher": [
         "$tsc"
       ],

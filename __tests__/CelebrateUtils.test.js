@@ -449,7 +449,9 @@ describe('CelebrateUtils', () => {
       const mockReq = {};
       await handler(mockReq, null, mockNext);
 
-      expect(mockNext.mock.calls[0][0].message).toEqual(`"file" is required`);
+      expect(mockNext.mock.calls[0][0].message).toEqual(
+        `ValidationError: "file" is required`
+      );
     });
 
     it('should return proper handler with joi object - with error', async () => {
@@ -465,7 +467,9 @@ describe('CelebrateUtils', () => {
       const mockReq = {};
       await handler(mockReq, null, mockNext);
 
-      expect(mockNext.mock.calls[0][0].message).toEqual(`"file" is required`);
+      expect(mockNext.mock.calls[0][0].message).toEqual(
+        `ValidationError: "file" is required`
+      );
     });
   });
 });

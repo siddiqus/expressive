@@ -8,7 +8,7 @@ const BaseController = require('./BaseController');
 
 async function _handleRequestBase(req, res, next) {
   this.req = req;
-  this.setRes(res);
+  this.res = res;
   this.next = next;
 
   return this.handleRequest();
@@ -28,7 +28,7 @@ module.exports = class RouterFactory {
       try {
         const mappedReq = BaseController.requestMapper(req);
         await _handleRequestBase.call(controllerInstance, mappedReq, res, next);
-        if (!controllerInstance.resolvedBy) {
+        if (!controllerInstance.res.headersSent) {
           controllerInstance.internalServerError(
             'Server did not send any response'
           );

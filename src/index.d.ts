@@ -8,8 +8,6 @@ import type {
   RequestHandler as ExpressHandler
 } from 'express';
 
-import { IHelmetConfiguration as HelmetConfig } from 'helmet';
-
 export declare type express = typeof import('express');
 
 interface Request extends ExpressRequest {
@@ -24,14 +22,14 @@ export type NextFunction = ExpressNextFunction;
 
 export type Handler = ExpressHandler;
 
+export type HelmetConfiguration = Parameters<typeof import('helmet')>[0];
+
 export type Express = ExpressType;
 export type ErrorRequestHandler = ExpressErrorRequestHandler;
-
-export type HelmetConfiguration = HelmetConfig;
 export type CorsOptions = CorsLibOptions;
 
 export declare const Joi: typeof import('celebrate').Joi;
-export declare const isValidationError: typeof import('celebrate').isCelebrate;
+export declare const isValidationError: typeof import('celebrate').isCelebrateError;
 export declare const celebrate: typeof import('celebrate');
 
 export declare interface SwaggerInfoContact {

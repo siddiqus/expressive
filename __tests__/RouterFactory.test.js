@@ -295,7 +295,8 @@ describe('RouterFactory', () => {
       const someReq = 1;
       const someRes = {
         status: jest.fn(),
-        json: jest.fn
+        json: jest.fn,
+        headersSent: false
       };
       const someNext = 3;
 
@@ -344,7 +345,8 @@ describe('RouterFactory', () => {
       const someReq = 1;
       const someRes = {
         status: jest.fn(),
-        json: jest.fn()
+        json: jest.fn(),
+        headersSent: true
       };
       const someNext = jest.fn();
 

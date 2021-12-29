@@ -20,22 +20,13 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Run Example",
-            "program": "${workspaceRoot}/example/index.js",
-            "env": {
-                "NODE_ENV": "development"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "ts-example",
-            "program": "${workspaceFolder}/ts-example/src/index.ts",
+            "program": "${workspaceFolder}/example/src/index.ts",
             "preLaunchTask": "build-ts-example",
             "outFiles": [
-                "${workspaceFolder}/ts-example/dist/**/*.js"
+                "${workspaceFolder}/example/dist/**/*.js"
             ],
-            "cwd": "${workspaceFolder}/ts-example/",
+            "cwd": "${workspaceFolder}/example/",
             "env": {
                 "NODE_ENV": "development"
             }
