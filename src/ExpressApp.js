@@ -4,6 +4,8 @@ const RouteUtil = require('./RouteUtil');
 const AuthUtil = require('./AuthUtil');
 const MiddlewareManager = require('./middleware/MiddlewareManager');
 
+const expressStatusMonitor = require('express-status-monitor');
+
 module.exports = class ExpressApp {
   constructor(
     expressiveRouter,
@@ -22,7 +24,8 @@ module.exports = class ExpressApp {
       helmetOptions = null,
       celebrateErrorHandler = null,
       notFoundHandler = null,
-      authObjectHandler = null
+      authObjectHandler = null,
+      expressStatusMonitorConfig = {}
     } = {}
   ) {
     this.config = {
@@ -40,7 +43,8 @@ module.exports = class ExpressApp {
       authorizer,
       celebrateErrorHandler,
       notFoundHandler,
-      authObjectHandler
+      authObjectHandler,
+      expressStatusMonitorConfig
     };
     this.expressiveRouter = expressiveRouter;
 
@@ -83,6 +87,10 @@ module.exports = class ExpressApp {
   }
 
   registerHandlers() {
+    this.express.use(
+      expressStatusMonitor(this.config.expressStatusMonitorConfig)
+    );
+
     this.middlewareManager.registerDocs(this.expressiveRouter);
 
     this.middlewareManager.configureCors();

@@ -13,6 +13,6 @@ Fast, opinionated, minimalist, and conventional REST API framework for [node](ht
 
 # Introduction
 
-**Expressive** is a NodeJS REST API framework built on ExpressJs and best practices for smooth development. Features include:
+**Expressive** is a NodeJS REST API framework built on ExpressJs and best practices for smooth development.
 
 Please visit the [wiki page](https://github.com/siddiqus/expressive/wiki) for the full documentation.

@@ -8,6 +8,9 @@ import type {
   RequestHandler as ExpressHandler
 } from 'express';
 
+import ExpressStatusMonitor from 'express-status-monitor';
+type ExpressStatusMonitorConfig = Parameters<typeof ExpressStatusMonitor>[0];
+
 export declare type express = typeof import('express');
 
 interface Request extends ExpressRequest {
@@ -228,6 +231,7 @@ export interface ExpressiveOptions {
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
   authObjectHandler?: Handler;
+  expressStatusMonitorConfig?: ExpressStatusMonitorConfig;
 }
 
 export declare class ExpressApp {
