@@ -1,7 +1,7 @@
 const Utils = require('./Utils');
-const FUNCTION_STRING = 'function';
-const CLASS_STRING = 'class';
-const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
+// const FUNCTION_STRING = 'function';
+// const CLASS_STRING = 'class';
+// const FUNCTION_STRING_LENGTH = FUNCTION_STRING.length;
 
 function _addRouteToPaths(paths, parentPath, route) {
   const routeData = {
@@ -80,15 +80,15 @@ class RouteUtil {
     };
   }
 
-  static isFunction(functionToCheck) {
-    const stringPrefix = functionToCheck
-      .toString()
-      .substring(0, FUNCTION_STRING_LENGTH);
-    if (stringPrefix.includes(CLASS_STRING)) return false;
-    return (
-      functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING
-    );
-  }
+  // static isFunction(functionToCheck) {
+  //   const stringPrefix = functionToCheck
+  //     .toString()
+  //     .substring(0, FUNCTION_STRING_LENGTH);
+  //   if (stringPrefix.includes(CLASS_STRING)) return false;
+  //   return (
+  //     functionToCheck instanceof Function || stringPrefix === FUNCTION_STRING
+  //   );
+  // }
 
   static isUrlPath(string) {
     if (typeof string !== 'string') return false;

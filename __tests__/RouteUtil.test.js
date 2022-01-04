@@ -227,29 +227,29 @@ describe('RouteUtil', () => {
     });
   });
 
-  describe('isFunction', () => {
-    it('Should return false if it is a class', () => {
-      class SomeClass {}
+  // describe('isFunction', () => {
+  //   it('Should return false if it is a class', () => {
+  //     class SomeClass {}
 
-      const result = RouteUtil.isFunction(SomeClass);
+  //     const result = RouteUtil.isFunction(SomeClass);
 
-      expect(result).toBeFalsy();
-    });
+  //     expect(result).toBeFalsy();
+  //   });
 
-    it('Should return true if a named function', () => {
-      function someFunc() {}
+  //   it('Should return true if a named function', () => {
+  //     function someFunc() {}
 
-      const result = RouteUtil.isFunction(someFunc);
+  //     const result = RouteUtil.isFunction(someFunc);
 
-      expect(result).toBeTruthy();
-    });
+  //     expect(result).toBeTruthy();
+  //   });
 
-    it('Should return true if an unnamed function', () => {
-      const result = RouteUtil.isFunction(() => {});
+  //   it('Should return true if an unnamed function', () => {
+  //     const result = RouteUtil.isFunction(() => {});
 
-      expect(result).toBeTruthy();
-    });
-  });
+  //     expect(result).toBeTruthy();
+  //   });
+  // });
 
   describe('isUrlPath', () => {
     it('Should return true for valid urls', () => {
