@@ -42,8 +42,10 @@ module.exports = class RouterFactory {
   _registerCelebrateErrorMiddleware(validationSchema, routerArgs) {
     if (!validationSchema) return;
 
+    const { options, ...validationSchemaObj } = validationSchema;
+
     const sanitizedValidationSchema = this.CelebrateUtils.getSanitizedValidationSchema(
-      validationSchema
+      validationSchemaObj
     );
 
     if (sanitizedValidationSchema) {
@@ -52,7 +54,8 @@ module.exports = class RouterFactory {
       );
       routerArgs.push(
         this.celebrateMiddleware(sanitizedValidationSchema, {
-          abortEarly: false
+          abortEarly: false,
+          ...(options || {})
         })
       );
     }

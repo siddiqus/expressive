@@ -35,6 +35,9 @@ export declare const Joi: typeof import('celebrate').Joi;
 export declare const isValidationError: typeof import('celebrate').isCelebrateError;
 export declare const celebrate: typeof import('celebrate');
 
+import { celebrate as CelebrateFn  } from 'celebrate';
+export type ValidationOptions = Parameters<typeof CelebrateFn>[1]
+
 export declare interface SwaggerInfoContact {
   name?: string;
   email?: string;
@@ -106,6 +109,7 @@ export declare interface ValidationSchema {
     file?: object,
     files?: object
   }
+  options?: ValidationOptions
 }
 
 interface SwaggerResponseMap {

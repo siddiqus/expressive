@@ -4,6 +4,9 @@ export class GetUserController extends BaseController {
   validationSchema?: ValidationSchema = {
     params: {
       userId: Joi.number().positive().required()
+    },
+    options: {
+      allowUnknown: true
     }
   }
   async handleRequest() {
