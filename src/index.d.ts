@@ -8,8 +8,8 @@ import type {
   RequestHandler as ExpressHandler
 } from 'express';
 
-import ExpressStatusMonitor from 'express-status-monitor';
-type ExpressStatusMonitorConfig = Parameters<typeof ExpressStatusMonitor>[0];
+// import ExpressStatusMonitor from 'express-status-monitor';
+// type ExpressStatusMonitorConfig = Parameters<typeof ExpressStatusMonitor>[0];
 
 export declare type express = typeof import('express');
 
