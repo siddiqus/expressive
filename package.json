@@ -30,7 +30,8 @@
     "express-basic-auth": "1.2.1",
     "express-request-id": "1.4.1",
     "helmet": "4.6.0",
-    "swagger-ui-express": "4.3.0"
+    "swagger-ui-express": "4.3.0",
+    "uuid": "^8.3.2"
   },
   "jest-stare": {
     "resultDir": "reports/jest-stare",
