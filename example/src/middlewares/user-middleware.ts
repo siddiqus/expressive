@@ -1,5 +1,5 @@
 import { Handler } from "../../../src";
 
-export const someMiddleware: Handler = async (req, res) => {
-  console.log(`some user middleware`)
+export const someMiddleware: Handler = async (req) => {
+  console.log(`some user middleware`, req.user)
 }

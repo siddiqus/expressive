@@ -8,22 +8,20 @@ import type {
   RequestHandler as ExpressHandler
 } from 'express';
 
-// import ExpressStatusMonitor from 'express-status-monitor';
-// type ExpressStatusMonitorConfig = Parameters<typeof ExpressStatusMonitor>[0];
-
 export declare type express = typeof import('express');
 
 interface Request extends ExpressRequest {
-  authorizer?: AuthorizerType;
-  user?: any;
-  permissions?: any;
   id?: string
+  authorizer?: AuthorizerType;
+  user?: Record<string, any>;
 }
 
 export type Response = ExpressResponse;
 export type NextFunction = ExpressNextFunction;
 
-export type Handler = ExpressHandler;
+export interface Handler {
+  (req: Request, res: Response, next: NextFunction): void
+}
 
 export type HelmetConfiguration = Parameters<typeof import('helmet')>[0];
 
@@ -35,7 +33,7 @@ export declare const Joi: typeof import('celebrate').Joi;
 export declare const isValidationError: typeof import('celebrate').isCelebrateError;
 export declare const celebrate: typeof import('celebrate');
 
-import { celebrate as CelebrateFn  } from 'celebrate';
+import { celebrate as CelebrateFn } from 'celebrate';
 export type ValidationOptions = Parameters<typeof CelebrateFn>[1]
 
 export declare interface SwaggerInfoContact {
@@ -235,7 +233,6 @@ export interface ExpressiveOptions {
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
   authObjectHandler?: Handler;
-  expressStatusMonitorConfig?: ExpressStatusMonitorConfig;
 }
 
 export declare class ExpressApp {
