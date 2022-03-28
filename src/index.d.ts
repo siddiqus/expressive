@@ -233,6 +233,9 @@ export interface ExpressiveOptions {
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
   authObjectHandler?: Handler;
+  requestLoggerOptions?: import('morgan-body').IMorganBodyOptions & {
+    disabled: boolean
+  }
 }
 
 export declare class ExpressApp {
