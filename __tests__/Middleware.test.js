@@ -21,6 +21,84 @@ describe('response middleware', () => {
 
 describe('Middleware Manager', () => {
   describe('registerMiddleware', () => {
+    it('should skip for morgan body properl with defaults', () => {
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const mockUserMiddleware = ['abc'];
+      const manager = new MiddlewareManager(
+        {
+          middleware: mockUserMiddleware
+        },
+        mockExpress
+      );
+
+      let morganConfigs = {};
+      manager.morganBody = (app, configs) => {
+        morganConfigs = configs;
+      };
+
+      manager._registerMorganBody();
+
+      expect(morganConfigs.skip).toBeDefined();
+
+      const mockReq = {
+        originalUrl: '/'
+      };
+      expect(morganConfigs.skip(mockReq)).toBeTruthy();
+      mockReq.originalUrl = '/favicon';
+      expect(morganConfigs.skip(mockReq)).toBeTruthy();
+      mockReq.originalUrl = '/some/url';
+      expect(morganConfigs.skip(mockReq)).toBeFalsy();
+    });
+    it('should ignore morgan if disabled', () => {
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const mockUserMiddleware = ['abc'];
+      const manager = new MiddlewareManager(
+        {
+          middleware: mockUserMiddleware,
+          requestLoggerOptions: {
+            disabled: true
+          }
+        },
+        mockExpress
+      );
+      manager.morganBody = jest.fn();
+      manager._registerMorganBody();
+
+      expect(manager.morganBody).not.toBeCalled();
+    });
+    it('should skip for morgan body properl with given requestLoggerOptions', () => {
+      const mockExpress = {
+        use: jest.fn()
+      };
+      const mockUserMiddleware = ['abc'];
+      const manager = new MiddlewareManager(
+        {
+          middleware: mockUserMiddleware,
+          requestLoggerOptions: {
+            skip: (req) => req.originalUrl === '/skip-this'
+          }
+        },
+        mockExpress
+      );
+
+      let morganConfigs = {};
+      manager.morganBody = (app, configs) => {
+        morganConfigs = configs;
+      };
+
+      manager._registerMorganBody();
+
+      expect(morganConfigs.skip).toBeDefined();
+
+      const mockReq = {
+        originalUrl: '/skip-this'
+      };
+      expect(morganConfigs.skip(mockReq)).toBeTruthy();
+    });
     it('Should register defaults and user middleware', () => {
       const mockExpress = {
         use: jest.fn()
@@ -41,7 +119,7 @@ describe('Middleware Manager', () => {
       manager.routeUtil = {
         getHandlerWithManagedNextCall: jest.fn().mockImplementation((d) => d)
       };
-
+      manager.morganBody = (app) => app;
       manager.registerBasicMiddleware();
 
       expect(mockExpress.use).toHaveBeenCalledTimes(6);
@@ -63,6 +141,7 @@ describe('Middleware Manager', () => {
         use: jest.fn()
       };
       const manager = new MiddlewareManager({}, mockExpress);
+      manager.morganBody = (app) => app;
       manager.expressModule = {
         json: jest.fn().mockReturnValue(1),
         urlencoded: jest.fn().mockReturnValue(2)

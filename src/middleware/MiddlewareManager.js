@@ -2,6 +2,7 @@ const expressModule = require('express');
 const addRequestId = require('express-request-id');
 const helmet = require('helmet');
 const cors = require('cors');
+const morganBody = require('morgan-body');
 const { errors: celebrateErrors } = require('celebrate');
 const responseMiddleware = require('./response');
 const RouteUtil = require('../RouteUtil');
@@ -27,6 +28,7 @@ module.exports = class MiddlewareManager {
     this.SwaggerUtils = SwaggerUtils;
     this.registerRedoc = registerRedoc;
     this.celebrateErrors = celebrateErrors;
+    this.morganBody = morganBody;
   }
 
   defaultNotFoundHandler(req, res) {
@@ -52,12 +54,39 @@ module.exports = class MiddlewareManager {
     this.express.use(this.expressModule.urlencoded({ extended: true }));
   }
 
+  _registerMorganBody() {
+    if (
+      this.options.requestLoggerOptions &&
+      this.options.requestLoggerOptions.disabled
+    ) {
+      return;
+    }
+
+    this.morganBody(this.express, {
+      logRequestId: true,
+      prettify: false,
+      skip: (req) => {
+        return (
+          req.originalUrl === '/' ||
+          req.originalUrl.match(/^\/favicon\/*/) ||
+          (this.options.requestLoggerOptions &&
+            this.options.requestLoggerOptions.skip &&
+            this.options.requestLoggerOptions.skip(req))
+        );
+      },
+      includeNewLine: true,
+      immediateReqLog: true,
+      ...(this.options.requestLoggerOptions || {})
+    });
+  }
+
   registerBasicMiddleware() {
     this._registerBodyParser();
     this.express.use(responseMiddleware);
     this.express.use(this.addRequestId());
 
     this._registerHelmet();
+    this._registerMorganBody();
 
     const { middleware: userMiddleware } = this.options;
     if (userMiddleware && userMiddleware.length > 0) {

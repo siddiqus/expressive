@@ -26,5 +26,8 @@ export default new ExpressApp(router, {
   authorizer: (req, res) => {
     console.log(`${req.url}: auth from top`);
     res.setHeader('testingAuth', 1234);
+  },
+  requestLoggerOptions: {
+    disabled: false
   }
 }).express;

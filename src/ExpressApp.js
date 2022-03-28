@@ -24,7 +24,8 @@ module.exports = class ExpressApp {
       helmetOptions = null,
       celebrateErrorHandler = null,
       notFoundHandler = null,
-      authObjectHandler = null
+      authObjectHandler = null,
+      requestLoggerOptions = undefined
       // expressStatusMonitorConfig = {}
     } = {}
   ) {
@@ -43,7 +44,8 @@ module.exports = class ExpressApp {
       authorizer,
       celebrateErrorHandler,
       notFoundHandler,
-      authObjectHandler
+      authObjectHandler,
+      requestLoggerOptions
       // expressStatusMonitorConfig
     };
     this.expressiveRouter = expressiveRouter;
