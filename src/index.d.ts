@@ -23,7 +23,7 @@ export interface Handler {
   (req: Request, res: Response, next: NextFunction): void
 }
 
-export type HelmetConfiguration = Parameters<typeof import('helmet')>[0];
+export type HelmetOptions = typeof import('helmet').HelmetOptions
 
 export type Express = ExpressType;
 export type ErrorRequestHandler = ExpressErrorRequestHandler;
@@ -229,7 +229,7 @@ export interface ExpressiveOptions {
   authorizer?: AuthorizerType;
   errorHandler?: ErrorRequestHandler | ErrorRequestHandler[];
   bodyLimit?: string;
-  helmetOptions?: HelmetConfiguration;
+  helmetOptions?: HelmetOptions;
   celebrateErrorHandler?: ErrorRequestHandler;
   notFoundHandler?: Handler;
   authObjectHandler?: Handler;
