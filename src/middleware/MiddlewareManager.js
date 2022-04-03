@@ -1,5 +1,4 @@
 const expressModule = require('express');
-const addRequestId = require('express-request-id');
 const helmet = require('helmet');
 const cors = require('cors');
 const morganBody = require('morgan-body');
@@ -9,6 +8,7 @@ const RouteUtil = require('../RouteUtil');
 const AuthUtil = require('../AuthUtil');
 const SwaggerUtils = require('../SwaggerUtils');
 const registerRedoc = require('../redoc/registerRedoc');
+const addRequestId = require('./requestId');
 
 module.exports = class MiddlewareManager {
   constructor(expressiveConfig, expressApp) {

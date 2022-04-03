@@ -1867,13 +1867,6 @@ express-basic-auth@1.2.1:
   dependencies:
     basic-auth "^2.0.1"
 
-express-request-id@1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/express-request-id/-/express-request-id-1.4.1.tgz#66feaf1f0be3deca13f3abfe1c098e49b12f2c28"
-  integrity sha512-qpxK6XhDYtdx9FvxwCHkUeZVWtkGbWR87hBAzGECfwYF/QQCPXEwwB2/9NGkOR1tT7/aLs9mma3CT0vjSzuZVw==
-  dependencies:
-    uuid "^3.3.2"
-
 express@4.17.3:
   version "4.17.3"
   resolved "https://registry.yarnpkg.com/express/-/express-4.17.3.tgz#f6c7302194a4fb54271b73a1fe7a06478c8f85a1"
